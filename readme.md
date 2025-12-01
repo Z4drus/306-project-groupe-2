@@ -31,8 +31,91 @@ Ce dossier regroupe tous les documents produits dans le cadre du projet, notamme
 Présentation du contexte, du besoin initial, des objectifs et de la justification du projet.
 
 #### **2.2 Cahier des charges**
+### Contexte
 
-Définition claire et structurée des exigences fonctionnelles et non fonctionnelles, ainsi que des contraintes du projet.
+Dans de nombreux espaces éducatifs, entreprises et lieux publics, il existe un besoin croissant d’activités ludiques, conviviales et simples d’accès. L’idée de **ArcadiaLabs**, la société commanditaire, est de proposer une **borne d’arcade moderne**, basée sur un **Raspberry Pi**, accessible depuis n’importe quel navigateur et compatible avec des **manettes Xbox**.
+
+L’expérience doit être simple, intuitive, amusante et pensée pour des utilisateurs non techniques : élèves, collaborateurs, visiteurs, participants d’un événement.
+
+- Matériel utilisé : Raspberry Pi + manette(s) Xbox + écran HDMI
+- Public visé : écoles, entreprises, médiathèques, centres de loisirs, salons
+- Usage typique : lancer rapidement un mini-jeu, organiser un petit tournoi interne, proposer une animation libre en salle de pause ou en couloir
+
+### Objectif global
+
+Mettre à disposition une **application web arcade** accessible depuis un navigateur, permettant de choisir un jeu, jouer immédiatement avec une manette ou le clavier, et consulter un tableau des scores clair et attractif.
+
+L’expérience doit rester simple, rapide, ludique et facilement déployable sur un Raspberry Pi.
+
+### Fonctionnalités attendues
+
+- Accès depuis un navigateur moderne, sans installation ni configuration
+- Menu Arcade présentant clairement les jeux disponibles (3 minimum)
+- Jeux jouables simplement avec une manette Xbox (Gamepad API) ou le clavier
+- Tableau des scores par jeu, consultable et remis à zéro via l'administration
+- Mode plein écran pour une expérience type borne d’arcade
+- Page de présentation de chaque jeu (but, règles, nombre de joueurs)
+- Page « aide » courte expliquant comment connecter une manette et démarrer une partie
+- Mode attract (animation automatique) lorsque la borne reste inactive
+- Interface compatible écran standard ou projecteur
+
+### KPI (indicateurs de succès)
+
+- 90% des utilisateurs trouvent l’interface « simple » ou « très simple »
+- 95% des parties peuvent être lancées en ≤ 10 secondes
+- Temps de prise en main ≤ 2 minutes pour un joueur découvrant l’ArcadiaBox
+- Fluidité des jeux ≥ 50 FPS sur Raspberry Pi 4
+- Taux de plantage ou freeze ≤ 1% des sessions de jeu
+- Temps médian pour trouver et lancer un jeu ≤ 20 secondes depuis le menu
+
+### Objectifs business
+
+- Proposer un produit “clé en main” divertissant et personnalisable pour écoles et entreprises
+- Réduire les coûts de matériel en utilisant un Raspberry Pi (<150 CHF matériel total)
+- Créer une première offre ArcadiaLabs pouvant évoluer vers un catalogue de jeux
+- Favoriser la réutilisation du système dans plusieurs établissements (≥ 3 installations dans les 3 mois suivant le déploiement pilote)
+- Permettre la location ou la vente d’ArcadiaBox pour des événements (tournois, journées portes ouvertes, stands)
+
+---
+
+### Documentation obligatoire
+
+A la fin du projet, le groupe doit fournir les documents suivants :
+
+**Une planification**
+
+Cette planification doit être réalisée au début du projet avant toute autre action (selon modèle fourni). Elle décrit les étapes importantes du projet ainsi que la durée estimée correspondante. Elle doit être validée par le supérieur professionnel.
+
+**Un journal de travail**
+
+Ce document décrit les diverses étapes et activités liées au projet (selon modèle fourni).
+
+**Une documentation d’analyse**
+
+Ce document détermine les exigences et contraintes du projet et permet la justification des choix pour la réalisation du travail demandé. Ce document est composé de :
+
+1. Synthèse de la définition du projet et des choix définitifs.
+2. Explications de tous les diagrammes d’analyse réalisés.
+
+### **Une documentation de réalisation**
+
+La documentation de réalisation a pour objectif de faciliter la maintenance et doit contenir les informations suivantes :
+
+1. Conception :
+    1. Les diagrammes de classes des applications.
+    2. Les diagrammes d’interactions des tâches principales des applications
+    3. Le modèle ER de la base de données de l’application Backend
+2. Implémentation :
+    1. Les codes sources des applications, commentés.
+    2. Le script de création et sauvegarde de la base de données, commenté.
+    3. Tests fonctionnels des applications et leur communication.
+3. Remarques et la conclusion :
+    1. Problèmes rencontrés, limites des versions et améliorations possibles.
+    2. Commentaires personnels et une auto-évaluation.
+
+**Un Web Summary**
+
+Ce document a pour objectif de présenter le projet de manière succincte.
 
 #### **2.3 Documentation**
 
