@@ -1,0 +1,28 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "description": "Ce dossier contient **l'intégralité du code source** développé dans le cadre du **module 306 – Réaliser un petit projet informatique**. Il représente la partie technique du projet et regroupe tous les éléments nécessaires pour exécuter, tester et comprendre l'application.",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "start": "npm run build && npm run server"
+  },
+  "keywords": ["arcade", "phaser", "games"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "alpinejs": "^3.15.2",
+    "better-sqlite3": "^12.5.0",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "vite": "^7.2.7"
+  }
+}
