@@ -57,18 +57,53 @@ Alpine.store('arcade', {
     // Charge dynamiquement le jeu
     try {
       let gameModule;
+      const gameContainer = document.getElementById('game-container');
+
+      // Callback appelé à la fin du jeu
+      const onGameOver = async (score) => {
+        console.log(`Game Over! Score: ${score}`);
+
+        // Sauvegarder le score via l'API
+        if (score > 0) {
+          try {
+            const response = await fetch('/api/scores', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                gameId: gameName,
+                score: score,
+                playerName: 'Joueur'
+              })
+            });
+
+            if (response.ok) {
+              console.log('Score sauvegardé avec succès');
+            } else {
+              console.error('Erreur lors de la sauvegarde du score');
+            }
+          } catch (error) {
+            console.error('Erreur lors de la sauvegarde du score:', error);
+          }
+        }
+
+        // Retour au menu
+        this.backToMenu();
+      };
+
       switch (gameName) {
         case 'pacman':
           gameModule = await import('./games/pacman/index.js');
-          gameModule.startPacman();
+          gameModule.startPacman(gameContainer, onGameOver);
           break;
         case 'wallbreaker':
           gameModule = await import('./games/wallbreaker/index.js');
-          gameModule.startWallbreaker();
+          gameModule.startWallbreaker(gameContainer, onGameOver);
           break;
         case 'santa-cruz-runner':
           gameModule = await import('./games/santa-cruz-runner/index.js');
-          gameModule.startSantaCruzRunner();
+          gameModule.startSantaCruzRunner(gameContainer, onGameOver);
           break;
         default:
           console.error(`Jeu inconnu: ${gameName}`);
