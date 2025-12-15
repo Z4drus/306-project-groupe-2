@@ -249,6 +249,9 @@ export default class GameController {
       return;
     }
 
+    // Mettre à jour l'InputController (boutons manette)
+    this.inputController.update();
+
     // Récupérer l'entrée utilisateur
     const requestedDirection = this.inputController.getRequestedDirection();
 
@@ -317,6 +320,9 @@ export default class GameController {
 
     // Sortie du mode frightened
     if (this.gameState.isPaused && this.gameState.changeModeTimer < time) {
+      // D'abord sortir les fantômes du mode frightened visuellement
+      this.exitFrightenedMode();
+
       this.gameState.exitFrightenedMode(time);
 
       if (this.gameState.getCurrentMode() === GameMode.CHASE) {
@@ -325,6 +331,13 @@ export default class GameController {
         this.sendScatterOrder();
       }
     }
+  }
+
+  /**
+   * Sort tous les fantômes du mode frightened
+   */
+  exitFrightenedMode() {
+    Object.values(this.ghostControllers).forEach(gc => gc.exitFrightenedMode());
   }
 
   /**
@@ -413,8 +426,15 @@ export default class GameController {
     this.collisionController.pacmanController = this.pacmanController;
     this.collisionController.reconfigureCollisions();
 
+    // Réinitialiser les flags de sortie des fantômes
+    this.gameState.isInkyOut = false;
+    this.gameState.isClydeOut = false;
+
     // Réinitialiser les fantômes
     Object.values(this.ghostControllers).forEach(gc => gc.reset());
+
+    // Blinky est déjà dehors (startsOutside: true), lui envoyer l'ordre d'attaque
+    this.ghostControllers.blinky.attack();
 
     // Pinky sort immédiatement
     this.ghostControllers.pinky.exitHome();

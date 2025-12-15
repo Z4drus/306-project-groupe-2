@@ -5,6 +5,8 @@
  */
 
 import { loadGame, getGameDisplayName } from './GameLoader.js';
+import gamepadManager from './GamepadManager.js';
+import cursorManager from './CursorManager.js';
 
 /**
  * Durée d'inactivité avant le mode attract (ms)
@@ -32,12 +34,56 @@ export function createArcadeStore() {
     attractMode: false,
     attractTimeout: null,
 
+    // État des manettes
+    connectedGamepads: [],
+    gamepadPollInterval: null,
+
     /**
      * Initialise le store
      */
     init() {
       this.resetAttractTimer();
       this.setupActivityListeners();
+      this.initGamepadManager();
+    },
+
+    /**
+     * Initialise le gestionnaire de manettes
+     */
+    initGamepadManager() {
+      gamepadManager.init();
+
+      // Callbacks de connexion/déconnexion
+      gamepadManager.onConnect((gamepad) => {
+        this.updateGamepadStatus();
+        this.resetAttractTimer();
+      });
+
+      gamepadManager.onDisconnect((gamepad) => {
+        this.updateGamepadStatus();
+      });
+
+      // Polling régulier pour mettre à jour l'état
+      this.gamepadPollInterval = setInterval(() => {
+        this.updateGamepadStatus();
+      }, 1000);
+
+      // État initial
+      this.updateGamepadStatus();
+    },
+
+    /**
+     * Met à jour le statut des manettes
+     */
+    updateGamepadStatus() {
+      this.connectedGamepads = gamepadManager.getConnectedGamepads();
+    },
+
+    /**
+     * Retourne le nombre de manettes connectées
+     */
+    getGamepadCount() {
+      return this.connectedGamepads.length;
     },
 
     /**
@@ -77,6 +123,9 @@ export function createArcadeStore() {
       this.gameLevel = 1;
       this.currentGameName = getGameDisplayName(gameName);
       this.resetAttractTimer();
+
+      // Masquer le curseur custom pendant le jeu Phaser
+      cursorManager.hide();
 
       console.log(`Lancement du jeu: ${gameName}`);
 
@@ -158,6 +207,14 @@ export function createArcadeStore() {
       this.currentGame = null;
       this.currentView = 'menu';
       this.resetAttractTimer();
+
+      // Réinitialiser l'affichage du score/niveau
+      this.gameScore = 0;
+      this.gameLives = 3;
+      this.gameLevel = 1;
+
+      // Réafficher le curseur custom
+      cursorManager.show();
 
       const gameContainer = document.getElementById('game-container');
       if (gameContainer) {

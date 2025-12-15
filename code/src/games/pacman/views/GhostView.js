@@ -182,6 +182,14 @@ export default class GhostView {
   }
 
   /**
+   * Joue l'animation normale selon la direction actuelle
+   */
+  playNormalAnimation() {
+    const direction = this.model.currentDirection || Phaser.LEFT;
+    this.sprite.play(`${this.model.name}_${direction}`, true);
+  }
+
+  /**
    * Aligne le sprite sur un point
    * @param {number} x - Position X
    * @param {number} y - Position Y

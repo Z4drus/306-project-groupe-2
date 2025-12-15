@@ -233,10 +233,12 @@ export default class GhostModel {
     this.x = this.gridX * GRID_SIZE + GRID_SIZE / 2;
     this.y = this.gridY * GRID_SIZE + GRID_SIZE / 2;
     this.currentDirection = this.startDirection;
-    this.mode = GhostMode.AT_HOME;
+    this.mode = this.config.startsOutside ? GhostMode.SCATTER : GhostMode.AT_HOME;
     this.isAttacking = false;
     this.destination = null;
     this.turnTimer = 0;
+    // Réinitialiser les safe tiles selon si le fantôme commence dehors ou dans la maison
+    this.safeTiles = this.config.startsOutside ? [TILES.SAFE] : [...TILES.GHOST_HOUSE];
   }
 
   /**

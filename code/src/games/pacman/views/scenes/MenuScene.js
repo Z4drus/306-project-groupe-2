@@ -2,14 +2,17 @@
  * MenuScene - Scene du menu de démarrage
  *
  * Affiche un écran de démarrage avec le titre et les instructions
+ * Supporte clavier, souris et manette
  */
 
 import Phaser from 'phaser';
 import { ASSETS_PATH } from '../../config/GameConfig.js';
+import gamepadManager, { GamepadButton } from '../../../../core/GamepadManager.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MenuScene' });
+    this.canStart = true;
   }
 
   /**
@@ -40,6 +43,8 @@ export default class MenuScene extends Phaser.Scene {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
 
+    this.canStart = true;
+
     // Fond noir
     this.cameras.main.setBackgroundColor('#000000');
 
@@ -55,8 +60,26 @@ export default class MenuScene extends Phaser.Scene {
     // High Score
     this.createHighScore(centerX, centerY);
 
-    // Event listeners
+    // Event listeners clavier/souris
     this.setupInputListeners();
+  }
+
+  /**
+   * Boucle de mise à jour - vérifie les entrées manette
+   */
+  update() {
+    if (!this.canStart) return;
+
+    // Bouton A ou START = Démarrer
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.START, 0)) {
+      this.startGame();
+    }
+
+    // Bouton B = Retour menu arcade
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      this.returnToMenu();
+    }
   }
 
   /**
@@ -134,7 +157,7 @@ export default class MenuScene extends Phaser.Scene {
     const instructionsText = this.add.text(
       centerX,
       centerY + 80,
-      'APPUYEZ SUR ESPACE\nOU CLIQUEZ POUR JOUER',
+      'APPUYEZ SUR ESPACE / A\nOU CLIQUEZ POUR JOUER',
       {
         fontSize: '18px',
         fontFamily: 'Arial',
@@ -157,7 +180,7 @@ export default class MenuScene extends Phaser.Scene {
     const controlsText = this.add.text(
       centerX,
       centerY + 150,
-      'Fleches directionnelles pour se deplacer\nESC pour quitter',
+      'Fleches / Joystick pour se deplacer\nESC / B pour quitter',
       {
         fontSize: '14px',
         fontFamily: 'Arial',
@@ -181,7 +204,7 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   /**
-   * Configure les listeners d'entrée
+   * Configure les listeners d'entrée clavier/souris
    */
   setupInputListeners() {
     this.input.keyboard.once('keydown-SPACE', () => {
@@ -202,6 +225,8 @@ export default class MenuScene extends Phaser.Scene {
    * Lance le jeu
    */
   startGame() {
+    if (!this.canStart) return;
+    this.canStart = false;
     this.scene.start('GameScene');
   }
 
@@ -209,6 +234,9 @@ export default class MenuScene extends Phaser.Scene {
    * Retourne au menu principal de l'arcade
    */
   returnToMenu() {
+    if (!this.canStart) return;
+    this.canStart = false;
+
     const onGameOver = this.game.registry.get('onGameOver');
     if (onGameOver && typeof onGameOver === 'function') {
       onGameOver(0);
