@@ -49,9 +49,16 @@ export default class PacmanController {
     this.view.handleWrapping(this.map.widthInPixels);
 
     // Vérifier les entrées
-    if (requestedDirection !== Phaser.NONE && requestedDirection !== this.model.currentDirection) {
-      this.model.setWantedDirection(requestedDirection);
-      this.checkDirection(requestedDirection);
+    if (requestedDirection !== Phaser.NONE) {
+      // Si c'est un demi-tour, l'exécuter immédiatement
+      if (this.model.isOppositeDirection(requestedDirection)) {
+        this.model.turningDirection = Phaser.NONE; // Annuler tout virage en cours
+        this.move(requestedDirection);
+      } else if (requestedDirection !== this.model.currentDirection) {
+        // Nouvelle direction demandée - toujours mettre à jour
+        this.model.setWantedDirection(requestedDirection);
+        this.checkDirection(requestedDirection);
+      }
     }
 
     // Tourner si nécessaire
@@ -84,21 +91,13 @@ export default class PacmanController {
     // Récupérer les tiles adjacentes
     this.updateAdjacentTiles();
 
-    // Vérifier si la direction est valide
-    if (
-      this.model.turningDirection === turnTo ||
-      !this.directions[turnTo] ||
-      this.directions[turnTo].index !== TILES.SAFE
-    ) {
+    // Vérifier si la direction est valide (tile traversable)
+    if (!this.directions[turnTo] || this.directions[turnTo].index !== TILES.SAFE) {
       return;
     }
 
-    // Demi-tour instantané
-    if (this.model.isOppositeDirection(turnTo)) {
-      this.move(turnTo);
-    } else {
-      this.model.setTurningDirection(turnTo);
-    }
+    // Programmer le virage (remplace tout virage précédent)
+    this.model.setTurningDirection(turnTo);
   }
 
   /**

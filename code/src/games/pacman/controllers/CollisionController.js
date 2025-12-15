@@ -162,16 +162,21 @@ export default class CollisionController {
 
     const ghostMode = ghostController.getMode();
 
-    if (this.gameState.isPaused && ghostMode === GhostMode.FRIGHTENED) {
-      // Pacman mange le fantôme
+    // Ignorer les collisions avec les fantômes dans la maison ou en train de sortir/retourner
+    if (ghostMode === GhostMode.AT_HOME || ghostMode === GhostMode.EXIT_HOME || ghostMode === GhostMode.RETURNING) {
+      return;
+    }
+
+    if (ghostMode === GhostMode.FRIGHTENED) {
+      // Pacman mange le fantôme (en mode frightened)
       ghostController.eaten();
       this.gameState.eatGhost();
 
       if (this.onGhostEaten) {
         this.onGhostEaten(ghostController);
       }
-    } else if (ghostMode !== GhostMode.RETURNING) {
-      // Le fantôme tue Pacman
+    } else {
+      // Le fantôme tue Pacman (modes CHASE ou SCATTER)
       if (this.onPacmanKilled) {
         this.onPacmanKilled();
       }
