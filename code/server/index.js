@@ -5,12 +5,13 @@
  * et gérer les scores via une API REST
  */
 
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { initDatabase } from "./db.js";
 import scoresRouter from "./routes/scores.js";
+import authRouter from "./routes/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 });
 
 // Routes API
+app.use("/api/auth", authRouter);
 app.use("/api/scores", scoresRouter);
 
 // Health check
@@ -58,9 +60,6 @@ app.use((err, req, res, next) => {
     error: "Erreur interne du serveur",
   });
 });
-
-// Initialise la base de données et démarre le serveur
-initDatabase();
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`

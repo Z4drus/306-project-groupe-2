@@ -22,6 +22,9 @@ export default class GameOverScene extends Phaser.Scene {
    */
   init(data) {
     this.finalScore = data.score || 0;
+    this.bestScore = this.game.registry.get('bestScore') || 0;
+    this.username = this.game.registry.get('username') || null;
+    this.isNewBestScore = this.finalScore > this.bestScore && this.username;
   }
 
   /**
@@ -169,15 +172,16 @@ export default class GameOverScene extends Phaser.Scene {
    * Crée l'affichage du score
    */
   createScoreDisplay(centerX, centerY) {
-    const scoreLabel = this.add.text(centerX, centerY - 60, 'SCORE FINAL', {
-      fontSize: '18px',
+    // Score actuel
+    const scoreLabel = this.add.text(centerX, centerY - 70, 'SCORE FINAL', {
+      fontSize: '16px',
       fontFamily: 'Arial',
       fill: '#888888'
     });
     scoreLabel.setOrigin(0.5);
 
-    const scoreText = this.add.text(centerX, centerY - 20, `${this.finalScore}`, {
-      fontSize: '48px',
+    const scoreText = this.add.text(centerX, centerY - 35, `${this.finalScore}`, {
+      fontSize: '42px',
       fontFamily: 'Arial Black, Arial',
       fill: '#ffff00',
       stroke: '#ff8800',
@@ -194,6 +198,44 @@ export default class GameOverScene extends Phaser.Scene {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
+
+    // Afficher le meilleur score si l'utilisateur est connecté
+    if (this.username) {
+      // Nouveau record ?
+      if (this.isNewBestScore) {
+        const newRecordText = this.add.text(centerX, centerY + 5, 'NOUVEAU RECORD !', {
+          fontSize: '18px',
+          fontFamily: 'Arial Black, Arial',
+          fill: '#00ff00',
+          stroke: '#006600',
+          strokeThickness: 2
+        });
+        newRecordText.setOrigin(0.5);
+
+        this.tweens.add({
+          targets: newRecordText,
+          alpha: 0.5,
+          duration: 400,
+          yoyo: true,
+          repeat: -1
+        });
+      } else {
+        const bestScoreLabel = this.add.text(centerX, centerY + 5, `MEILLEUR: ${this.bestScore}`, {
+          fontSize: '16px',
+          fontFamily: 'Arial',
+          fill: '#00ccff'
+        });
+        bestScoreLabel.setOrigin(0.5);
+      }
+    } else {
+      // Message pour inciter à se connecter
+      const loginHint = this.add.text(centerX, centerY + 5, 'Connectez-vous pour sauvegarder', {
+        fontSize: '12px',
+        fontFamily: 'Arial',
+        fill: '#666666'
+      });
+      loginHint.setOrigin(0.5);
+    }
   }
 
   /**
@@ -201,7 +243,7 @@ export default class GameOverScene extends Phaser.Scene {
    */
   createButtons(centerX, centerY) {
     // Bouton Rejouer
-    this.replayButton = this.add.text(centerX, centerY + 60, '► REJOUER', {
+    this.replayButton = this.add.text(centerX, centerY + 50, '► REJOUER', {
       fontSize: '24px',
       fontFamily: 'Arial Black, Arial',
       fill: '#00ff00',
@@ -215,7 +257,7 @@ export default class GameOverScene extends Phaser.Scene {
     this.replayButton.on('pointerout', () => this.replayButton.setScale(1));
 
     // Bouton Menu
-    this.menuButton = this.add.text(centerX, centerY + 110, '◄ MENU', {
+    this.menuButton = this.add.text(centerX, centerY + 95, '◄ MENU', {
       fontSize: '20px',
       fontFamily: 'Arial Black, Arial',
       fill: '#00ffff',
@@ -235,7 +277,7 @@ export default class GameOverScene extends Phaser.Scene {
   createInstructions(centerX, centerY) {
     const instructionsText = this.add.text(
       centerX,
-      centerY + 160,
+      centerY + 140,
       'R / ESPACE = Rejouer    ESC / B = Menu    A = Cliquer',
       {
         fontSize: '12px',

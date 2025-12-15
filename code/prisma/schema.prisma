@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Enum des jeux disponibles
+enum Jeu {
+  PACMAN
+  SANTA_CRUZ_RUNNER
+  WALLBREAKER
+}
+
+/// Table Joueur
+model Joueur {
+  id_joueur    Int      @id @default(autoincrement())
+  pseudo       String   @unique @db.VarChar(50)
+  mot_de_passe String   @db.VarChar(100)
+
+  scores       Score[]
+}
+
+/// Table Score
+model Score {
+  id_score   Int      @id @default(autoincrement())
+  id_joueur  Int
+  jeu        Jeu
+  valeur     Int
+  date_score DateTime @default(now())
+
+  joueur     Joueur   @relation(fields: [id_joueur], references: [id_joueur], onDelete: Cascade)
+
+  @@index([jeu, valeur(sort: Desc)])
+  @@index([id_joueur])
+}

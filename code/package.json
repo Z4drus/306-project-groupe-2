@@ -6,10 +6,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "bash scripts/start-dev.sh",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node server/index.js",
-    "start": "npm run build && npm run server"
+    "server": "node --experimental-strip-types server/index.js",
+    "start": "npm run build && npm run server",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev"
   },
   "keywords": [
     "arcade",
@@ -19,11 +23,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^7.1.0",
+    "@prisma/client": "^7.1.0",
     "alpinejs": "^3.15.2",
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "phaser": "^3.90.0",
+    "prisma": "^7.1.0",
     "terser": "^5.44.1"
   },
   "devDependencies": {
