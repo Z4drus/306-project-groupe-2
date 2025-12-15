@@ -56,7 +56,7 @@ ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par 
 
 ## Problèmes rencontrés
 
--   Pas de problèmes renconrés pour l'istant
+-   Aucun problème majeur à ce jour.
 
 # Instructions
 

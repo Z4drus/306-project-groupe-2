@@ -1,26 +1,15 @@
 
-# **SCRUM : Sprint Backlog - Semaine 1 (1,5 jour)**  | Scrum Master: Axelle
-
-| Tâche                             | N° story | Sous-tâche                                                                        | Développeur      | Story Points |
-| --------------------------------- | -------- | --------------------------------------------------------------------------------- | ---------------- | ------------ |
-| **Conception Backend**            | 1        | Créer les classes pour la gestion des utilisateurs (authentification)             | Elouan & Léonard | 2            |
-|                                   | 1        | Implémenter les services d'authentification avec cartes magnétiques               | Elouan & Léonard | 3            |
-| **Développement IHM**             | 2        | Créer l’interface graphique de base avec JavaFX/Swing pour l’affichage des scores | Romain & Cyril   | 2            |
-|                                   | 2        | Développer les éléments graphiques pour les sliders Phidget (raquettes)           | Romain & Cyril   | 3            |
-| **Tests et validation**           | 3        | Créer des tests unitaires pour la gestion de l’authentification                   | Elouan & Léonard | 2            |
-| **Coordination et documentation** | 4        | Animation des daily scrums et mise à jour du backlog SCRUM                        | Axelle           | 1            |
-|                                   | 4        | Préparer les diagrammes UML pour la structure des classes (Backend et IHM)        | Axelle           | 3            |
-
----
-
-### **Résumé**
-
-**Semaine 1** :  
-1,5 jour pour commencer l’implémentation des fonctionnalités principales : gestion des utilisateurs, authentification par carte magnétique, développement des éléments de l’IHM (affichage des scores et des sliders), ainsi que les tests unitaires pour le backend.
-
-**Semaine 2** :  
-1,5 jour pour continuer le développement backend, implémenter la logique de calcul des scores, connecter la base de données, et développer l’interaction avec les boutons Phidget pour les bonus/malus dans l'IHM. L’accent est également mis sur les tests fonctionnels et la mise à jour du sprint backlog.
-
-**Semaine 3** :  
-1 jour pour finaliser la communication entre le client et le serveur, assurer la gestion des bonus/malus et des fonctionnalités avancées. Une dernière série de tests intégrés est réalisée, suivie de la mise à jour finale de la documentation et la coordination de la fin du projet.
-
+# **SCRUM : Sprint Backlog 01 | Scrum Master: Axelle
+| ID   | User Story (résumé)                               | Tâches techniques                                                                                                                                                                                                                          | Priorité | Responsable | Statut  |
+| ---- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------- | ------- |
+| US1  | Accéder à l’interface arcade depuis un navigateur | - Configuration Raspberry Pi / serveur<br>- Installation serveur web / configuration réseau<br>- Déploiement prototype HTML/CSS/JS sur serveur<br>- Test accès navigateur externe | Haute    | Équipe      | À faire |
+| US2  | Voir un menu simple avec la liste des jeux        | - Création maquettes interface menu minimal<br>- Prototype menu arcade minimal                                                                                                                                                             | Haute    | Équipe      | À faire |
+| US3  | Voir la fiche de présentation d’un jeu            | - Prototype menu arcade minimal (accès infos jeu)<br>- Intégration écran de présentation avant lancement                                                                                                                                   | Haute    | Équipe      | À faire |
+| US4  | Jouer avec une manette Xbox (Gamepad API)         | - Test Gamepad API sur PC                                                                                                                                                                                                                  | Haute    | Équipe      | À faire |
+| US5  | Jouer au clavier                                  | - Implémentation contrôles clavier                                                                                                                                                                                                         | Haute    | Équipe      | À faire |
+| US6  | Jeux fluides (≥ 50 FPS)                           | - Optimisation Canvas 2D / performance Jeu 1                                                                                                                                                                                               | Moyenne  | Équipe      | À faire |
+| US7  | Lancer un mini-jeu en < 10 secondes               | - Organisation dossiers assets (images/sons)<br>- Chargement dynamique assets via JS                                                                                                                                                       | Moyenne  | Équipe      | À faire |
+| US9  | Mini-jeu en plein écran                           | - Intégration Jeu 1 dans menu arcade (lancement du jeu)                                                                                                                                                                                    | Moyenne  | Équipe      | À faire |
+| US12 | Affichage du score en temps réel                  | - Développement Jeu 1 : logiques de base et collisions                                                                                                                                                                                     | Haute    | Équipe      | À faire |
+| US21 | Alerte si manette déconnectée                     | - Test Gamepad API sur PC (gestion connexion/déconnexion)                                                                                                                                                                                  | Moyenne  | Équipe      | À faire |
+| US18 | Tester rapidement le jeu (admin)                  | - Tests d’intégration du jeu                                                                                                                                                                                                               | Basse    | Équipe      | À faire |
