@@ -24,6 +24,9 @@ export default class GameOverScene extends Phaser.Scene {
   init(data) {
     this.finalScore = data.score || 0;
     this.finalLevel = data.level || 1;
+    this.bestScore = this.game.registry.get('bestScore') || 0;
+    this.username = this.game.registry.get('username') || null;
+    this.isNewBestScore = this.finalScore > this.bestScore && this.username;
   }
 
   /**
@@ -216,15 +219,15 @@ export default class GameOverScene extends Phaser.Scene {
    */
   createScoreDisplay(centerX, centerY) {
     // Score
-    const scoreLabel = this.add.text(centerX, centerY - 70, 'SCORE FINAL', {
-      fontSize: '16px',
+    const scoreLabel = this.add.text(centerX, centerY - 80, 'SCORE FINAL', {
+      fontSize: '14px',
       fontFamily: 'Arial',
       fill: COLORS.TEXT_DARK
     });
     scoreLabel.setOrigin(0.5);
 
-    const scoreText = this.add.text(centerX, centerY - 35, this.finalScore.toString(), {
-      fontSize: '48px',
+    const scoreText = this.add.text(centerX, centerY - 50, this.finalScore.toString(), {
+      fontSize: '42px',
       fontFamily: 'Arial Black, Arial',
       fill: COLORS.ACCENT,
       stroke: '#0d9488',
@@ -256,9 +259,71 @@ export default class GameOverScene extends Phaser.Scene {
       });
     });
 
+    // Afficher le meilleur score ou nouveau record
+    if (this.username) {
+      if (this.isNewBestScore) {
+        const newRecordText = this.add.text(centerX, centerY - 10, 'NOUVEAU RECORD !', {
+          fontSize: '16px',
+          fontFamily: 'Arial Black, Arial',
+          fill: '#4ade80',
+          stroke: '#166534',
+          strokeThickness: 2
+        });
+        newRecordText.setOrigin(0.5);
+        newRecordText.setAlpha(0);
+
+        this.tweens.add({
+          targets: newRecordText,
+          alpha: 1,
+          duration: 400,
+          delay: 500,
+          onComplete: () => {
+            this.tweens.add({
+              targets: newRecordText,
+              alpha: 0.5,
+              duration: 400,
+              yoyo: true,
+              repeat: -1
+            });
+          }
+        });
+      } else {
+        const bestScoreLabel = this.add.text(centerX, centerY - 10, `MEILLEUR: ${this.bestScore}`, {
+          fontSize: '14px',
+          fontFamily: 'Arial',
+          fill: '#22d3ee'
+        });
+        bestScoreLabel.setOrigin(0.5);
+        bestScoreLabel.setAlpha(0);
+
+        this.tweens.add({
+          targets: bestScoreLabel,
+          alpha: 1,
+          duration: 400,
+          delay: 500
+        });
+      }
+    } else {
+      // Message pour inciter à se connecter
+      const loginHint = this.add.text(centerX, centerY - 10, 'Connectez-vous pour sauvegarder', {
+        fontSize: '11px',
+        fontFamily: 'Arial',
+        fill: COLORS.TEXT_DARK
+      });
+      loginHint.setOrigin(0.5);
+      loginHint.setAlpha(0);
+
+      this.tweens.add({
+        targets: loginHint,
+        alpha: 0.7,
+        duration: 400,
+        delay: 500
+      });
+    }
+
     // Niveau atteint
     const levelText = this.add.text(centerX, centerY + 15, `Niveau atteint: ${this.finalLevel}`, {
-      fontSize: '18px',
+      fontSize: '16px',
       fontFamily: 'Arial',
       fill: COLORS.SECONDARY
     });
@@ -280,7 +345,7 @@ export default class GameOverScene extends Phaser.Scene {
     // Bouton Rejouer
     const replayButton = this.createButton(
       centerX,
-      centerY + 80,
+      centerY + 60,
       'REJOUER',
       COLORS.ACCENT,
       '#0d9488',
@@ -291,7 +356,7 @@ export default class GameOverScene extends Phaser.Scene {
     // Bouton Menu
     const menuButton = this.createButton(
       centerX,
-      centerY + 130,
+      centerY + 105,
       'MENU',
       COLORS.SECONDARY,
       '#b45309',
@@ -365,10 +430,10 @@ export default class GameOverScene extends Phaser.Scene {
   createInstructions(centerX, centerY) {
     const instructionsText = this.add.text(
       centerX,
-      centerY + 190,
+      centerY + 150,
       'ESPACE / A = Valider    ESC / B = Menu    ↑↓ = Naviguer',
       {
-        fontSize: '12px',
+        fontSize: '11px',
         fontFamily: 'Arial',
         fill: COLORS.TEXT_DARK
       }

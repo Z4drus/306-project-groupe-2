@@ -46,9 +46,11 @@ export const GAMES_CONFIG = {
  * @param {HTMLElement} container - Container DOM
  * @param {Function} onGameOver - Callback de fin de partie
  * @param {Function} onScoreUpdate - Callback de mise à jour du score
+ * @param {number} bestScore - Meilleur score du joueur
+ * @param {string|null} username - Pseudo du joueur connecté
  * @returns {Promise<Object>} Instance du jeu
  */
-export async function loadGame(gameId, container, onGameOver, onScoreUpdate) {
+export async function loadGame(gameId, container, onGameOver, onScoreUpdate, bestScore = 0, username = null) {
   const gameConfig = GAMES_CONFIG[gameId];
 
   if (!gameConfig) {
@@ -63,7 +65,7 @@ export async function loadGame(gameId, container, onGameOver, onScoreUpdate) {
       throw new Error(`Fonction de démarrage non trouvée: ${gameConfig.startFunction}`);
     }
 
-    return startFunction(container, onGameOver, onScoreUpdate);
+    return startFunction(container, onGameOver, onScoreUpdate, bestScore, username);
   } catch (error) {
     console.error(`Erreur lors du chargement du jeu ${gameId}:`, error);
     throw error;

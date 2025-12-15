@@ -7,6 +7,18 @@
 import { loadGame, getGameDisplayName } from './GameLoader.js';
 import gamepadManager from './GamepadManager.js';
 import cursorManager from './CursorManager.js';
+import {
+  getStoredUser,
+  getStoredToken,
+  verifyToken,
+  login,
+  register,
+  logout,
+  submitScore,
+  getLeaderboard,
+  getGameScores,
+  getUserBestScore,
+} from './AuthManager.js';
 
 /**
  * Durée d'inactivité avant le mode attract (ms)
@@ -20,7 +32,7 @@ const ATTRACT_MODE_DELAY = 60000;
 export function createArcadeStore() {
   return {
     // État de la vue
-    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help'
+    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help' | 'auth'
     currentGame: null,
     currentGameName: '',
 
@@ -38,13 +50,119 @@ export function createArcadeStore() {
     connectedGamepads: [],
     gamepadPollInterval: null,
 
+    // État d'authentification
+    isAuthenticated: false,
+    user: null,
+    authError: null,
+    authLoading: false,
+    authMode: 'login', // 'login' | 'register'
+
+    // État du leaderboard
+    leaderboard: [],
+    gameScores: {},
+    scoresLoading: false,
+
+    // Meilleur score du joueur pour le jeu en cours
+    currentBestScore: 0,
+
     /**
      * Initialise le store
      */
-    init() {
+    async init() {
       this.resetAttractTimer();
       this.setupActivityListeners();
       this.initGamepadManager();
+
+      // Vérifier si l'utilisateur est déjà connecté
+      await this.checkAuth();
+    },
+
+    /**
+     * Vérifie l'authentification au démarrage
+     */
+    async checkAuth() {
+      const storedUser = getStoredUser();
+      const storedToken = getStoredToken();
+
+      if (storedUser && storedToken) {
+        const result = await verifyToken();
+        if (result.success) {
+          this.isAuthenticated = true;
+          this.user = result.user;
+        }
+      }
+    },
+
+    /**
+     * Connexion utilisateur
+     * @param {string} username
+     * @param {string} password
+     */
+    async handleLogin(username, password) {
+      this.authLoading = true;
+      this.authError = null;
+
+      const result = await login(username, password);
+
+      this.authLoading = false;
+
+      if (result.success) {
+        this.isAuthenticated = true;
+        this.user = result.user;
+        this.backToMenu();
+      } else {
+        this.authError = result.error;
+      }
+    },
+
+    /**
+     * Inscription utilisateur
+     * @param {string} username
+     * @param {string} password
+     */
+    async handleRegister(username, password) {
+      this.authLoading = true;
+      this.authError = null;
+
+      const result = await register(username, password);
+
+      this.authLoading = false;
+
+      if (result.success) {
+        this.isAuthenticated = true;
+        this.user = result.user;
+        this.backToMenu();
+      } else {
+        this.authError = result.error;
+      }
+    },
+
+    /**
+     * Déconnexion
+     */
+    handleLogout() {
+      logout();
+      this.isAuthenticated = false;
+      this.user = null;
+      this.currentGameToken = null;
+    },
+
+    /**
+     * Affiche la page d'authentification
+     */
+    showAuth() {
+      this.currentView = 'auth';
+      this.authError = null;
+      this.resetAttractTimer();
+    },
+
+    /**
+     * Change le mode d'authentification
+     * @param {string} mode
+     */
+    setAuthMode(mode) {
+      this.authMode = mode;
+      this.authError = null;
     },
 
     /**
@@ -122,12 +240,21 @@ export function createArcadeStore() {
       this.gameLives = 3;
       this.gameLevel = 1;
       this.currentGameName = getGameDisplayName(gameName);
+      this.currentBestScore = 0;
       this.resetAttractTimer();
 
       // Masquer le curseur custom pendant le jeu Phaser
       cursorManager.hide();
 
       console.log(`Lancement du jeu: ${gameName}`);
+
+      // Récupérer le meilleur score de l'utilisateur si connecté
+      if (this.isAuthenticated) {
+        const result = await getUserBestScore(gameName);
+        if (result.success) {
+          this.currentBestScore = result.bestScore;
+        }
+      }
 
       try {
         const gameContainer = document.getElementById('game-container');
@@ -136,7 +263,9 @@ export function createArcadeStore() {
           gameName,
           gameContainer,
           (score) => this.handleGameOver(gameName, score),
-          (score, lives, level) => this.handleScoreUpdate(score, lives, level)
+          (score, lives, level) => this.handleScoreUpdate(score, lives, level),
+          this.currentBestScore,
+          this.isAuthenticated ? this.user?.pseudo : null
         );
       } catch (error) {
         console.error(`Erreur lors du chargement du jeu ${gameName}:`, error);
@@ -160,31 +289,21 @@ export function createArcadeStore() {
     },
 
     /**
-     * Sauvegarde un score
+     * Sauvegarde un score (requiert authentification)
      * @param {string} gameId - Identifiant du jeu
      * @param {number} score - Score à sauvegarder
      */
     async saveScore(gameId, score) {
-      try {
-        const response = await fetch('/api/scores', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            gameId,
-            score,
-            playerName: 'Joueur'
-          })
-        });
+      if (this.isAuthenticated) {
+        const result = await submitScore(gameId, score);
 
-        if (response.ok) {
+        if (result.success) {
           console.log('Score sauvegardé avec succès');
         } else {
-          console.error('Erreur lors de la sauvegarde du score');
+          console.error('Erreur lors de la sauvegarde du score:', result.error);
         }
-      } catch (error) {
-        console.error('Erreur lors de la sauvegarde du score:', error);
+      } else {
+        console.log('Score non sauvegardé (utilisateur non connecté)');
       }
     },
 
@@ -223,11 +342,39 @@ export function createArcadeStore() {
     },
 
     /**
-     * Affiche les scores
+     * Affiche les scores et charge le leaderboard
      */
-    showScores() {
+    async showScores() {
       this.currentView = 'scores';
       this.resetAttractTimer();
+      await this.loadLeaderboard();
+    },
+
+    /**
+     * Charge le leaderboard global
+     */
+    async loadLeaderboard() {
+      this.scoresLoading = true;
+      this.leaderboard = [];
+      this.gameScores = {};
+
+      const result = await getLeaderboard(20);
+
+      if (result.success && result.data) {
+        this.leaderboard = result.data;
+      }
+
+      // Charger aussi les scores par jeu
+      for (const gameId of ['pacman', 'wallbreaker', 'santa-cruz-runner']) {
+        const gameResult = await getGameScores(gameId, 10);
+        if (gameResult.success && gameResult.data) {
+          this.gameScores[gameId] = gameResult.data;
+        } else {
+          this.gameScores[gameId] = [];
+        }
+      }
+
+      this.scoresLoading = false;
     },
 
     /**
