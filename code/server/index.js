@@ -47,7 +47,7 @@ app.use(express.static(distPath));
 
 // SPA fallback (sans pattern -> évite path-to-regexp)
 app.use((req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
+  res.sendFile(join(distPath, "index.html"));
 });
 
 // Gestion des erreurs
