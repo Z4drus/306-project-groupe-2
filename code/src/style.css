@@ -485,27 +485,180 @@ body::before {
 
 /* Vue Jeu */
 .game-view {
-  padding: var(--spacing-md);
+  padding: 0;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .game-header {
-  max-width: 1200px;
-  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--darker-bg);
+  border-bottom: 2px solid var(--neon-purple);
+  flex-shrink: 0;
 }
 
-#game-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 600px;
+/* Layout principal du jeu avec panneaux latéraux */
+.game-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Panneau latéral gauche - Nom du jeu */
+.game-side-panel {
+  width: 200px;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.game-side-panel.left {
+  border-right: 2px solid var(--neon-purple);
+}
+
+.game-side-panel.right {
+  border-left: 2px solid var(--neon-purple);
+}
+
+.game-title-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 3rem;
+  font-family: var(--font-title);
+  color: #ffff00;
+  text-shadow:
+    0 0 10px #ffff00,
+    0 0 20px #ff8800,
+    0 0 30px #ff8800;
+  letter-spacing: 0.2em;
+  transform: rotate(180deg);
+}
+
+/* Info panels dans les panneaux latéraux */
+.game-info-panel {
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.game-info-label {
+  font-size: 0.8rem;
+  font-family: var(--font-title);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px var(--neon-cyan);
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: 0.1em;
+}
+
+.game-info-value {
+  font-size: 2rem;
+  font-family: var(--font-title);
+  color: #fff;
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px var(--neon-purple);
+}
+
+.game-info-value.level {
+  color: #00ffff;
+  text-shadow:
+    0 0 5px #00ffff,
+    0 0 10px #0088ff;
+}
+
+.game-info-value.score {
+  color: #ffff00;
+  text-shadow:
+    0 0 5px #ffff00,
+    0 0 10px #ff8800;
+}
+
+.game-info-value.lives {
+  color: #ff4444;
+  text-shadow:
+    0 0 5px #ff4444,
+    0 0 10px #ff0000;
+}
+
+/* Container central du jeu */
+.game-center {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--card-bg);
-  border: 2px solid var(--neon-purple);
-  border-radius: var(--border-radius);
-  box-shadow:
-    0 0 20px rgba(189, 0, 255, 0.5),
-    inset 0 0 30px rgba(189, 0, 255, 0.1);
+  min-width: 0;
+  min-height: 0;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+#game-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  overflow: hidden;
+}
+
+#game-container canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Responsive pour les panneaux latéraux */
+@media (max-width: 900px) {
+  .game-side-panel {
+    width: 120px;
+    padding: var(--spacing-sm);
+  }
+
+  .game-title-vertical {
+    font-size: 2rem;
+  }
+
+  .game-info-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-layout {
+    flex-direction: column;
+  }
+
+  .game-side-panel {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: var(--spacing-sm);
+    border: none !important;
+    border-bottom: 2px solid var(--neon-purple) !important;
+  }
+
+  .game-side-panel.right {
+    border-bottom: none !important;
+    border-top: 2px solid var(--neon-purple) !important;
+  }
+
+  .game-title-vertical {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 1.5rem;
+  }
+
+  .game-info-panel {
+    margin: 0;
+  }
 }
 
 /* Vue Scores */
