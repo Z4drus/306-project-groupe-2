@@ -11,7 +11,11 @@
     "server": "node server/index.js",
     "start": "npm run build && npm run server"
   },
-  "keywords": ["arcade", "phaser", "games"],
+  "keywords": [
+    "arcade",
+    "phaser",
+    "games"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -19,7 +23,8 @@
     "better-sqlite3": "^12.5.0",
     "cors": "^2.8.5",
     "express": "^5.2.1",
-    "phaser": "^3.90.0"
+    "phaser": "^3.90.0",
+    "terser": "^5.44.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
