@@ -118,6 +118,9 @@ body::before {
     inset 0 0 40px rgba(189, 0, 255, 0.1);
   position: relative;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .arcade-header::before {
@@ -862,4 +865,181 @@ img {
 
 .arcade-title:hover {
   animation: glitch 0.3s infinite;
+}
+
+/* Indicateurs de manettes */
+.gamepad-status {
+  display: flex;
+  gap: var(--spacing-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.gamepad-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #333;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  opacity: 0.4;
+}
+
+.gamepad-indicator.connected {
+  opacity: 1;
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.5),
+    inset 0 0 10px rgba(0, 255, 255, 0.1);
+  animation: gamepad-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gamepad-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(0, 255, 255, 0.5),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.8),
+      inset 0 0 15px rgba(0, 255, 255, 0.2);
+  }
+}
+
+.gamepad-icon {
+  width: 32px;
+  height: 32px;
+  color: #444;
+  transition: var(--transition);
+}
+
+.gamepad-indicator.connected .gamepad-icon {
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.8));
+}
+
+.gamepad-label {
+  font-family: var(--font-title);
+  font-size: 0.7rem;
+  color: #444;
+  letter-spacing: 0.1em;
+  transition: var(--transition);
+}
+
+.gamepad-indicator.connected .gamepad-label {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+}
+
+/* Responsive pour les indicateurs */
+@media (max-width: 768px) {
+  .gamepad-status {
+    gap: var(--spacing-xs);
+  }
+
+  .gamepad-indicator {
+    padding: 4px 8px;
+  }
+
+  .gamepad-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .gamepad-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* ================================
+   CURSEUR CUSTOM
+   ================================ */
+
+/* Cacher le curseur natif sur tout le document */
+* {
+  cursor: none !important;
+}
+
+/* Élément du curseur custom */
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-4px, -4px);
+  transition: opacity 0.15s ease;
+}
+
+#custom-cursor img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(18, 199, 0, 0.8))
+          drop-shadow(0 0 15px rgba(118, 255, 3, 0.5));
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+/* Animation lors du clic */
+#custom-cursor.clicking img {
+  transform: scale(0.8);
+  filter: drop-shadow(0 0 15px rgba(18, 199, 0, 1))
+          drop-shadow(0 0 25px rgba(118, 255, 3, 0.8))
+          drop-shadow(0 0 35px rgba(255, 255, 255, 0.5));
+}
+
+/* Animation de pulsation subtile */
+@keyframes cursor-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(18, 199, 0, 0.8))
+            drop-shadow(0 0 15px rgba(118, 255, 3, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(18, 199, 0, 1))
+            drop-shadow(0 0 20px rgba(118, 255, 3, 0.7));
+  }
+}
+
+#custom-cursor img {
+  animation: cursor-pulse 2s ease-in-out infinite;
+}
+
+/* Mode manette - curseur plus visible */
+#custom-cursor.gamepad-mode img {
+  filter: drop-shadow(0 0 10px rgba(18, 199, 0, 1))
+          drop-shadow(0 0 20px rgba(118, 255, 3, 0.8))
+          drop-shadow(0 0 30px rgba(0, 255, 0, 0.4));
+}
+
+/* Hover sur éléments interactifs */
+#custom-cursor.hovering-interactive img {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 12px rgba(189, 0, 255, 1))
+          drop-shadow(0 0 20px rgba(189, 0, 255, 0.7));
+}
+
+/* État hover appliqué par le curseur custom */
+.cursor-hover {
+  outline: 2px solid var(--neon-purple) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 20px rgba(189, 0, 255, 0.5) !important;
+}
+
+/* Effet spécial pour les cartes de jeu */
+.game-card.cursor-hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--neon-purple) !important;
+}
+
+/* Effet spécial pour les boutons */
+button.cursor-hover,
+.action-btn.cursor-hover,
+.game-play-btn.cursor-hover,
+.back-btn.cursor-hover {
+  transform: scale(1.05);
 }

@@ -2,13 +2,16 @@
  * GameOverScene - Ecran de fin de partie
  *
  * Affiche le score final et propose de rejouer ou retourner au menu
+ * Supporte clavier, souris et manette
  */
 
 import Phaser from 'phaser';
+import gamepadManager, { GamepadButton } from '../../../../core/GamepadManager.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameOverScene' });
+    this.canAct = true;
   }
 
   /**
@@ -25,6 +28,8 @@ export default class GameOverScene extends Phaser.Scene {
   create() {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
+
+    this.canAct = true;
 
     // Fond noir
     this.cameras.main.setBackgroundColor('#000000');
@@ -43,6 +48,24 @@ export default class GameOverScene extends Phaser.Scene {
 
     // Raccourcis clavier
     this.setupKeyboardShortcuts();
+  }
+
+  /**
+   * Boucle de mise à jour - vérifie les entrées manette
+   */
+  update() {
+    if (!this.canAct) return;
+
+    // Bouton A ou START = Rejouer
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.START, 0)) {
+      this.restartGame();
+    }
+
+    // Bouton B = Retour menu arcade
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      this.returnToMenu();
+    }
   }
 
   /**
@@ -103,50 +126,45 @@ export default class GameOverScene extends Phaser.Scene {
    * Crée les boutons
    */
   createButtons(centerX, centerY) {
-    this.createButton(centerX, centerY + 60, 'REJOUER', '#00ff00', () => this.restartGame());
-    this.createButton(centerX, centerY + 120, 'MENU', '#00ffff', () => this.returnToMenu());
-  }
-
-  /**
-   * Crée un bouton interactif
-   */
-  createButton(x, y, text, color, callback) {
-    const button = this.add.text(x, y, text, {
+    // Bouton Rejouer
+    this.replayButton = this.add.text(centerX, centerY + 60, '► REJOUER', {
       fontSize: '24px',
       fontFamily: 'Arial Black, Arial',
-      fill: color,
-      stroke: '#000000',
-      strokeThickness: 2,
-      padding: { x: 20, y: 10 }
+      fill: '#00ff00',
+      stroke: '#006600',
+      strokeThickness: 2
     });
-    button.setOrigin(0.5);
-    button.setInteractive({ useHandCursor: true });
+    this.replayButton.setOrigin(0.5);
+    this.replayButton.setInteractive({ useHandCursor: true });
+    this.replayButton.on('pointerdown', () => this.restartGame());
+    this.replayButton.on('pointerover', () => this.replayButton.setScale(1.1));
+    this.replayButton.on('pointerout', () => this.replayButton.setScale(1));
 
-    button.on('pointerover', () => {
-      button.setScale(1.2);
-      button.setStyle({ fill: '#ffffff' });
+    // Bouton Menu
+    this.menuButton = this.add.text(centerX, centerY + 110, '◄ MENU', {
+      fontSize: '20px',
+      fontFamily: 'Arial Black, Arial',
+      fill: '#00ffff',
+      stroke: '#006666',
+      strokeThickness: 2
     });
-
-    button.on('pointerout', () => {
-      button.setScale(1);
-      button.setStyle({ fill: color });
-    });
-
-    button.on('pointerdown', callback);
-
-    return button;
+    this.menuButton.setOrigin(0.5);
+    this.menuButton.setInteractive({ useHandCursor: true });
+    this.menuButton.on('pointerdown', () => this.returnToMenu());
+    this.menuButton.on('pointerover', () => this.menuButton.setScale(1.1));
+    this.menuButton.on('pointerout', () => this.menuButton.setScale(1));
   }
 
   /**
-   * Crée les instructions clavier
+   * Crée les instructions clavier/manette
    */
   createInstructions(centerX, centerY) {
     const instructionsText = this.add.text(
       centerX,
-      centerY + 180,
-      'R = Rejouer    ESC = Menu',
+      centerY + 160,
+      'R / A / ESPACE = Rejouer    ESC / B = Menu',
       {
-        fontSize: '14px',
+        fontSize: '12px',
         fontFamily: 'Arial',
         fill: '#666666'
       }
@@ -175,17 +193,26 @@ export default class GameOverScene extends Phaser.Scene {
    * Relance une nouvelle partie
    */
   restartGame() {
+    if (!this.canAct) return;
+    this.canAct = false;
+
+    // Réinitialiser le score et le niveau dans l'interface externe
     const onScoreUpdate = this.game.registry.get('onScoreUpdate');
     if (onScoreUpdate) {
       onScoreUpdate(0, 3, 1);
     }
-    this.scene.start('GameScene');
+
+    // Redémarrer la scène de jeu avec les valeurs initiales
+    this.scene.start('GameScene', { level: 1, score: 0, lives: 3 });
   }
 
   /**
    * Retourne au menu principal de l'arcade
    */
   returnToMenu() {
+    if (!this.canAct) return;
+    this.canAct = false;
+
     const onGameOver = this.game.registry.get('onGameOver');
     if (onGameOver && typeof onGameOver === 'function') {
       onGameOver(this.finalScore);

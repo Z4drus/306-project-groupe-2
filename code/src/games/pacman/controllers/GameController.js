@@ -249,6 +249,9 @@ export default class GameController {
       return;
     }
 
+    // Mettre à jour l'InputController (boutons manette)
+    this.inputController.update();
+
     // Récupérer l'entrée utilisateur
     const requestedDirection = this.inputController.getRequestedDirection();
 

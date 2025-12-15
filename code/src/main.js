@@ -5,12 +5,14 @@
  * - core/ArcadeStore.js: Gestion de l'état global (Alpine.js store)
  * - core/ArcadeMenu.js: Composant menu et template HTML
  * - core/GameLoader.js: Chargement dynamique des jeux
+ * - core/CursorManager.js: Curseur custom manette/souris
  */
 
 import Alpine from 'alpinejs';
 import './style.css';
 import { createArcadeStore } from './core/ArcadeStore.js';
 import { createArcadeMenuComponent, getMainMenuTemplate } from './core/ArcadeMenu.js';
+import cursorManager from './core/CursorManager.js';
 
 /**
  * Initialise l'application
@@ -30,6 +32,9 @@ function initializeApp() {
 
   // Initialiser le store
   Alpine.store('arcade').init();
+
+  // Initialiser le curseur custom
+  cursorManager.init();
 
   // Rendre le menu principal
   renderMainMenu();
