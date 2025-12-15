@@ -1,72 +1,61 @@
-# SCRUM : Daily scrum du mercredi après-midi 02 avril 2025 | Scrum Master: Axelle
+# SCRUM : Daily scrum du mardi matin 09 decembre 2025 | Scrum Master: Axelle
 
 ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par qui. Donnez donc suffisamment de substance ici pour cela. Rien de plus.
 
-## Ce qui a été fait ce matin - Mercredi 02 avril 2025 
+## Ce qui a été fait la semaine passée
+### TOUS
 
 ### AXELLE
-- Finalisation et ajustement des Daily Scrum
-- Mise en place du Kanban et des tâches
-- Analyse et création d’un diagramme implémentant les ordres envoyés par le client et le serveur
+- maquette
 
 
-### CYRIL
-- Définition des tâches liées à l’interface utilisateur
-- Participation à l’analyse des ordres envoyés
-- Réflexion sur l’image et la visualisation de l’application
-- Réflexion et analyse sur la partie client
+### NOE
+- comencement implementtation maquette
+- premier jeu moyennement fonctionnelle
+- aide diogo rasberry
+- ER
+- achitecture db
 
 
-
-### ROMAIN
-- Mise en place d’une branche dev et production
-- Gestion des versions et des fusions de branches
-- Réflexion sur l’image et la visualisation de l’application
-- Réflexion et analyse sur la partie client
+### DIOGO
+- conf raberry
+- diagramme activity
 
 
-
-
-### ELOUAN
-- Conception et implémentation initiale de la classe utilisateur avec ses attributs et méthodes essentiels
-- Élaboration détaillée de l’architecture serveur et planification approfondie des composants backend
-- Organisation et structuration du développement des fonctionnalités côté serveur
-
-
-### LEONARD
-- Conception et implémentation initiale de la classe utilisateur avec ses attributs et méthodes essentiels
-- Élaboration détaillée de l’architecture serveur et planification approfondie des composants backend
-- Organisation et structuration du développement des fonctionnalités côté serveur
+### VALENTIN
+- user stories
+- doc
+- aide diogo
 
 
 
 ## Ce qui sera fait aujourd'hui
+
 ### AXELLE
-- Réalisation de la documentation
-- Réalisation des UserStories ainsi que ProductBacklog
-- Élaboration du diagramme de cas d'utilisation et du diagramme de séquence
-- Conception des classe phidget
-
-### CYRIL
-
-- Réalisation, conception et implémentation de l'IHM
-
-### ROMAIN
-
--  Réalisation, conception et implémentation de l'IHM
+- jeu 2
+- aide noe
+- gamepad API 
 
 
-### ELOUAN
-- Réalisation de la base de données
-- Documentation sur la base de données
-- Élaboration du diagramme de la base de données
+### Noe
+- finir jeu 1 
+- interface
 
-### LEONARD
-- Réalisation du diagramme d'activité
+
+### Diogo
+- finir config raspberry
+
+
+
+### Valentin
+- doc
+- aide diogo
+
+
 
 ## Problèmes rencontrés
-- aucun 
 
+-   Pas de problèmes renconrés pour l'istant
 
 # Instructions
 
