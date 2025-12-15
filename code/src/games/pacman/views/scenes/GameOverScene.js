@@ -7,11 +7,13 @@
 
 import Phaser from 'phaser';
 import gamepadManager, { GamepadButton } from '../../../../core/GamepadManager.js';
+import cursorManager from '../../../../core/CursorManager.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameOverScene' });
     this.canAct = true;
+    this.hoveredButton = null;
   }
 
   /**
@@ -30,6 +32,9 @@ export default class GameOverScene extends Phaser.Scene {
     const centerY = this.cameras.main.centerY;
 
     this.canAct = true;
+
+    // Afficher le curseur pour permettre l'interaction avec la souris/manette
+    cursorManager.show();
 
     // Fond noir
     this.cameras.main.setBackgroundColor('#000000');
@@ -51,20 +56,89 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   /**
-   * Boucle de mise à jour - vérifie les entrées manette
+   * Boucle de mise à jour - vérifie les entrées manette et survol des boutons
    */
   update() {
     if (!this.canAct) return;
 
-    // Bouton A ou START = Rejouer
-    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
-        gamepadManager.isButtonJustPressed(GamepadButton.START, 0)) {
-      this.restartGame();
+    // Gérer le survol des boutons avec le curseur custom (manette)
+    this.updateButtonHover();
+
+    // Bouton A = Cliquer sur le bouton survolé
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0)) {
+      if (this.hoveredButton === 'replay') {
+        this.restartGame();
+      } else if (this.hoveredButton === 'menu') {
+        this.returnToMenu();
+      }
     }
 
-    // Bouton B = Retour menu arcade
+    // Bouton B = Retour menu arcade (raccourci)
     if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
       this.returnToMenu();
+    }
+  }
+
+  /**
+   * Met à jour l'état de survol des boutons avec le curseur custom
+   */
+  updateButtonHover() {
+    const cursorPos = cursorManager.getPosition();
+    const canvas = this.game.canvas;
+    const canvasRect = canvas.getBoundingClientRect();
+
+    // Convertir les coordonnées écran en coordonnées canvas
+    const scaleX = canvas.width / canvasRect.width;
+    const scaleY = canvas.height / canvasRect.height;
+    const canvasX = (cursorPos.x - canvasRect.left) * scaleX;
+    const canvasY = (cursorPos.y - canvasRect.top) * scaleY;
+
+    // Vérifier si le curseur est dans le canvas
+    if (canvasX < 0 || canvasX > canvas.width || canvasY < 0 || canvasY > canvas.height) {
+      this.setHoveredButton(null);
+      return;
+    }
+
+    // Vérifier le survol de chaque bouton
+    const replayBounds = this.replayButton.getBounds();
+    const menuBounds = this.menuButton.getBounds();
+
+    if (this.isPointInBounds(canvasX, canvasY, replayBounds)) {
+      this.setHoveredButton('replay');
+    } else if (this.isPointInBounds(canvasX, canvasY, menuBounds)) {
+      this.setHoveredButton('menu');
+    } else {
+      this.setHoveredButton(null);
+    }
+  }
+
+  /**
+   * Vérifie si un point est dans les limites d'un rectangle
+   */
+  isPointInBounds(x, y, bounds) {
+    return x >= bounds.x && x <= bounds.x + bounds.width &&
+           y >= bounds.y && y <= bounds.y + bounds.height;
+  }
+
+  /**
+   * Définit le bouton actuellement survolé et met à jour l'affichage
+   */
+  setHoveredButton(buttonName) {
+    if (this.hoveredButton === buttonName) return;
+
+    // Réinitialiser l'ancien bouton survolé
+    if (this.hoveredButton === 'replay') {
+      this.replayButton.setScale(1);
+    } else if (this.hoveredButton === 'menu') {
+      this.menuButton.setScale(1);
+    }
+
+    // Appliquer le survol au nouveau bouton
+    this.hoveredButton = buttonName;
+    if (buttonName === 'replay') {
+      this.replayButton.setScale(1.1);
+    } else if (buttonName === 'menu') {
+      this.menuButton.setScale(1.1);
     }
   }
 
@@ -162,7 +236,7 @@ export default class GameOverScene extends Phaser.Scene {
     const instructionsText = this.add.text(
       centerX,
       centerY + 160,
-      'R / A / ESPACE = Rejouer    ESC / B = Menu',
+      'R / ESPACE = Rejouer    ESC / B = Menu    A = Cliquer',
       {
         fontSize: '12px',
         fontFamily: 'Arial',
@@ -195,6 +269,9 @@ export default class GameOverScene extends Phaser.Scene {
   restartGame() {
     if (!this.canAct) return;
     this.canAct = false;
+
+    // Masquer le curseur pendant le jeu
+    cursorManager.hide();
 
     // Réinitialiser le score et le niveau dans l'interface externe
     const onScoreUpdate = this.game.registry.get('onScoreUpdate');

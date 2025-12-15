@@ -1,99 +1,53 @@
 /**
- * Jeu Wallbreaker
+ * Wallbreaker Game - Point d'entrée
  *
- * Détruisez tous les murs avec votre balle
+ * Jeu Wallbreaker (casse-briques) classique avec architecture MVC
+ * - Models: Gestion des données (état du jeu, paddle, balle, briques)
+ * - Views: Rendu visuel (sprites, animations, HUD)
+ * - Controllers: Logique de jeu (mouvements, collisions, niveaux)
+ *
+ * Caractéristiques:
+ * - Système de niveaux infinis avec difficulté progressive
+ * - Briques de différentes résistances (normale, solide, renforcée, super)
+ * - Contrôles souris, clavier et manette
+ * - Interface avec nom du jeu à gauche, aire de jeu au centre, score/niveau à droite
  */
 
 import Phaser from 'phaser';
+import { createPhaserConfig } from './config/GameConfig.js';
+import MenuScene from './views/scenes/MenuScene.js';
+import GameScene from './views/scenes/GameScene.js';
+import GameOverScene from './views/scenes/GameOverScene.js';
 
 /**
- * Configuration du jeu Wallbreaker
+ * Démarre le jeu Wallbreaker
+ * @param {HTMLElement} container - Container DOM pour le canvas
+ * @param {Function} onGameOver - Callback appelé à la fin du jeu avec le score
+ * @param {Function} onScoreUpdate - Callback appelé à chaque mise à jour du score
+ * @returns {Phaser.Game} Instance du jeu Phaser
  */
-export const WallbreakerConfig = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  parent: 'game-container',
-  backgroundColor: '#1a1a2e',
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update,
-  },
-};
+export function startWallbreaker(container = null, onGameOver = null, onScoreUpdate = null) {
+  // Créer la configuration Phaser
+  const config = createPhaserConfig(container);
 
-let score = 0;
-let scoreText;
+  // Ajouter les scènes
+  config.scene = [MenuScene, GameScene, GameOverScene];
 
-/**
- * Préchargement des assets
- */
-function preload() {
-  // Les assets seront chargés ici
-  console.log('Wallbreaker: Préchargement des assets...');
-}
+  // Créer l'instance du jeu
+  const game = new Phaser.Game(config);
 
-/**
- * Création de la scène
- */
-function create() {
-  console.log('Wallbreaker: Création de la scène...');
+  // Passer les callbacks via le registry
+  if (onGameOver) {
+    game.registry.set('onGameOver', onGameOver);
+  }
+  if (onScoreUpdate) {
+    game.registry.set('onScoreUpdate', onScoreUpdate);
+  }
 
-  // Texte de placeholder
-  const title = this.add.text(400, 200, 'WALLBREAKER', {
-    fontSize: '64px',
-    fill: '#ff6b35',
-    fontStyle: 'bold',
-  });
-  title.setOrigin(0.5);
-
-  const instruction = this.add.text(400, 300, 'Jeu à implémenter', {
-    fontSize: '24px',
-    fill: '#f7931e',
-  });
-  instruction.setOrigin(0.5);
-
-  // Score
-  scoreText = this.add.text(16, 16, 'Score: 0', {
-    fontSize: '32px',
-    fill: '#fff',
-  });
-
-  // Instructions contrôles
-  const controls = this.add.text(400, 500, 'Flèches: Déplacement | ESC: Quitter', {
-    fontSize: '16px',
-    fill: '#888',
-  });
-  controls.setOrigin(0.5);
-
-  // Gestion de la touche ESC pour retourner au menu
-  this.input.keyboard.on('keydown-ESC', () => {
-    this.scene.stop();
-    window.Alpine.store('arcade').backToMenu();
-  });
-}
-
-/**
- * Boucle de mise à jour
- * @param {number} time - Temps écoulé
- * @param {number} delta - Delta depuis la dernière frame
- */
-function update(time, delta) {
-  // Logique du jeu sera implémentée ici
-}
-
-/**
- * Initialise et lance le jeu Wallbreaker
- */
-export function startWallbreaker() {
-  console.log('Démarrage de Wallbreaker...');
-  const game = new Phaser.Game(WallbreakerConfig);
   return game;
 }
+
+/**
+ * Exporte la configuration pour référence externe
+ */
+export { createPhaserConfig } from './config/GameConfig.js';
