@@ -40,6 +40,16 @@ export const GAMES_CONFIG = {
     thumbnail: '/assets/images/home-menu/santacruz.webp',
     module: () => import('../games/santa-cruz-runner/index.js'),
     startFunction: 'startSantaCruzRunner'
+  },
+  'pong-duel': {
+    id: 'pong-duel',
+    name: 'Pong Duel',
+    displayName: 'PONG DUEL',
+    description: 'Affrontez votre adversaire dans ce classique revisité',
+    players: '2 joueurs',
+    thumbnail: '/assets/images/home-menu/pong.webp',
+    module: () => import('../games/pong-duel/index.js'),
+    startFunction: 'startPongDuel'
   }
 };
 

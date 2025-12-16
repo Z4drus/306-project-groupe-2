@@ -223,20 +223,21 @@ body::before {
 }
 
 .attract-text {
-  font-size: 1.5rem;
+  font-size: 2.2rem;
   font-family: var(--font-title);
   text-align: center;
   color: var(--neon-cyan);
   text-shadow:
-    0 0 10px var(--neon-cyan),
-    0 0 20px var(--neon-cyan),
-    0 0 30px var(--neon-blue);
+    0 0 15px var(--neon-cyan),
+    0 0 30px var(--neon-cyan),
+    0 0 45px var(--neon-blue);
   animation: blink 1.5s infinite, colorshift 3s infinite;
-  padding: var(--spacing-md);
-  border: 2px solid var(--neon-cyan);
+  padding: var(--spacing-lg);
+  border: 3px solid var(--neon-cyan);
   box-shadow:
-    0 0 10px var(--neon-cyan),
-    inset 0 0 10px rgba(0, 255, 255, 0.1);
+    0 0 20px var(--neon-cyan),
+    0 0 40px rgba(0, 255, 255, 0.3),
+    inset 0 0 15px rgba(0, 255, 255, 0.1);
 }
 
 @keyframes blink {
@@ -336,51 +337,54 @@ body::before {
 }
 
 .game-name {
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 400;
   font-family: var(--font-title);
   margin-bottom: var(--spacing-sm);
   color: var(--neon-blue);
   text-shadow:
-    0 0 5px var(--neon-blue),
-    0 0 10px var(--neon-blue);
-  letter-spacing: 0.05em;
+    0 0 8px var(--neon-blue),
+    0 0 15px var(--neon-blue),
+    0 0 25px var(--neon-purple);
+  letter-spacing: 0.08em;
 }
 
 .game-description {
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   margin-bottom: var(--spacing-sm);
   color: var(--neon-purple);
   line-height: 1.5;
   font-family: var(--font-body);
+  text-shadow: 0 0 5px rgba(189, 0, 255, 0.3);
 }
 
 .game-players {
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
   margin-bottom: var(--spacing-md);
   font-family: var(--font-body);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 5px var(--neon-cyan);
 }
 
 .game-play-btn {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background-color: var(--darker-bg);
   color: var(--neon-purple);
-  border: 2px solid var(--neon-purple);
+  border: 3px solid var(--neon-purple);
   border-radius: var(--border-radius);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   font-family: var(--font-title);
   font-weight: 400;
   cursor: pointer;
   transition: var(--transition);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   box-shadow:
-    0 0 10px rgba(189, 0, 255, 0.3),
-    inset 0 0 10px rgba(189, 0, 255, 0.1);
+    0 0 15px rgba(189, 0, 255, 0.4),
+    inset 0 0 15px rgba(189, 0, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -425,21 +429,21 @@ body::before {
 }
 
 .action-btn {
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
   background-color: var(--darker-bg);
   color: var(--neon-blue);
   border: 2px solid var(--neon-blue);
   border-radius: var(--border-radius);
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   font-family: var(--font-title);
   font-weight: 400;
   cursor: pointer;
   transition: var(--transition);
   box-shadow:
-    0 0 10px rgba(0, 212, 255, 0.3),
+    0 0 15px rgba(0, 212, 255, 0.4),
     inset 0 0 10px rgba(0, 212, 255, 0.05);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .action-btn:hover,
@@ -456,22 +460,22 @@ body::before {
 
 /* Bouton retour */
 .back-btn {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background-color: var(--darker-bg);
   color: var(--neon-cyan);
   border: 2px solid var(--neon-cyan);
   border-radius: var(--border-radius);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-family: var(--font-title);
   font-weight: 400;
   cursor: pointer;
   transition: var(--transition);
   margin-bottom: var(--spacing-md);
   box-shadow:
-    0 0 10px rgba(0, 255, 255, 0.3),
+    0 0 12px rgba(0, 255, 255, 0.4),
     inset 0 0 10px rgba(0, 255, 255, 0.05);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .back-btn:hover,
@@ -554,42 +558,54 @@ body::before {
 }
 
 .game-info-label {
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   font-family: var(--font-title);
   color: var(--neon-cyan);
-  text-shadow: 0 0 5px var(--neon-cyan);
-  margin-bottom: var(--spacing-xs);
-  letter-spacing: 0.1em;
+  text-shadow:
+    0 0 8px var(--neon-cyan),
+    0 0 15px var(--neon-cyan);
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: 0.15em;
 }
 
 .game-info-value {
-  font-size: 2rem;
+  font-size: 3.5rem;
   font-family: var(--font-title);
   color: #fff;
   text-shadow:
-    0 0 5px #fff,
-    0 0 10px var(--neon-purple);
+    0 0 10px #fff,
+    0 0 20px var(--neon-purple),
+    0 0 30px var(--neon-purple);
 }
 
 .game-info-value.level {
   color: #00ffff;
   text-shadow:
-    0 0 5px #00ffff,
-    0 0 10px #0088ff;
+    0 0 10px #00ffff,
+    0 0 20px #0088ff,
+    0 0 30px #0088ff;
+  animation: pulse-level 2s ease-in-out infinite;
+}
+
+@keyframes pulse-level {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
 
 .game-info-value.score {
   color: #ffff00;
   text-shadow:
-    0 0 5px #ffff00,
-    0 0 10px #ff8800;
+    0 0 10px #ffff00,
+    0 0 20px #ff8800,
+    0 0 30px #ff8800;
 }
 
 .game-info-value.lives {
   color: #ff4444;
   text-shadow:
-    0 0 5px #ff4444,
-    0 0 10px #ff0000;
+    0 0 10px #ff4444,
+    0 0 20px #ff0000,
+    0 0 30px #ff0000;
 }
 
 /* Container central du jeu */
@@ -621,7 +637,7 @@ body::before {
 /* Responsive pour les panneaux latéraux */
 @media (max-width: 900px) {
   .game-side-panel {
-    width: 120px;
+    width: 140px;
     padding: var(--spacing-sm);
   }
 
@@ -629,8 +645,12 @@ body::before {
     font-size: 2rem;
   }
 
+  .game-info-label {
+    font-size: 1rem;
+  }
+
   .game-info-value {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
   }
 }
 
@@ -676,15 +696,16 @@ body::before {
 }
 
 .scores-header h2 {
-  font-size: 2rem;
+  font-size: 2.8rem;
   font-family: var(--font-title);
   color: var(--neon-purple);
   text-shadow:
-    0 0 10px var(--neon-purple),
-    0 0 20px var(--neon-purple);
+    0 0 15px var(--neon-purple),
+    0 0 30px var(--neon-purple),
+    0 0 45px rgba(189, 0, 255, 0.5);
   text-align: center;
   margin-top: var(--spacing-md);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
@@ -713,15 +734,16 @@ body::before {
 }
 
 .help-header h2 {
-  font-size: 2rem;
+  font-size: 2.8rem;
   font-family: var(--font-title);
   color: var(--neon-purple);
   text-shadow:
-    0 0 10px var(--neon-purple),
-    0 0 20px var(--neon-purple);
+    0 0 15px var(--neon-purple),
+    0 0 30px var(--neon-purple),
+    0 0 45px rgba(189, 0, 255, 0.5);
   text-align: center;
   margin-top: var(--spacing-md);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
@@ -729,22 +751,24 @@ body::before {
   background-color: var(--card-bg);
   border: 2px solid var(--neon-blue);
   border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   box-shadow:
-    0 0 15px rgba(0, 212, 255, 0.4),
-    inset 0 0 20px rgba(0, 212, 255, 0.05);
+    0 0 20px rgba(0, 212, 255, 0.4),
+    inset 0 0 25px rgba(0, 212, 255, 0.05);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .help-content h3 {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   color: var(--neon-purple);
-  text-shadow: 0 0 5px var(--neon-purple);
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-sm);
+  text-shadow:
+    0 0 8px var(--neon-purple),
+    0 0 15px var(--neon-purple);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
   font-family: var(--font-title);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .help-content h3:first-child {
@@ -754,19 +778,19 @@ body::before {
 .help-content ul,
 .help-content ol {
   margin-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   color: var(--neon-cyan);
-  font-size: 0.95rem;
+  font-size: 1.15rem;
 }
 
 .help-content li {
-  margin-bottom: var(--spacing-xs);
-  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.7;
 }
 
 .help-content strong {
   color: var(--neon-blue);
-  text-shadow: 0 0 3px var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
 }
 
 /* Responsive */
@@ -1350,12 +1374,14 @@ button.cursor-hover,
 .leaderboard-section h3,
 .game-scores-section h3 {
   font-family: var(--font-title);
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: var(--neon-purple);
-  text-shadow: 0 0 10px var(--neon-purple);
-  margin-bottom: var(--spacing-md);
+  text-shadow:
+    0 0 12px var(--neon-purple),
+    0 0 25px var(--neon-purple);
+  margin-bottom: var(--spacing-lg);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .leaderboard-table {
@@ -1463,14 +1489,16 @@ button.cursor-hover,
 
 .game-score-card h4 {
   font-family: var(--font-title);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   color: var(--neon-blue);
-  text-shadow: 0 0 10px var(--neon-blue);
+  text-shadow:
+    0 0 10px var(--neon-blue),
+    0 0 20px var(--neon-blue);
   margin-bottom: var(--spacing-md);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-align: center;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.4);
   padding-bottom: var(--spacing-sm);
 }
 
@@ -1494,21 +1522,23 @@ button.cursor-hover,
 
 .score-rank {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: var(--neon-purple);
-  width: 30px;
+  width: 35px;
 }
 
 .score-player {
   flex: 1;
   font-family: var(--font-body);
+  font-size: 1.05rem;
   color: var(--neon-cyan);
 }
 
 .score-value {
   font-family: var(--font-title);
+  font-size: 1.1rem;
   color: #ffff00;
-  text-shadow: 0 0 5px #ffff00;
+  text-shadow: 0 0 8px #ffff00;
 }
 
 .no-game-scores {
@@ -1670,22 +1700,25 @@ button.cursor-hover,
 /* Nom du joueur */
 .podium-player {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   color: var(--neon-cyan);
   text-align: center;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 5px var(--neon-cyan);
 }
 
 /* Score du podium */
 .podium-score {
   font-family: var(--font-title);
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   color: #ffff00;
-  text-shadow: 0 0 5px #ffff00;
+  text-shadow:
+    0 0 8px #ffff00,
+    0 0 15px #ff8800;
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1746,26 +1779,28 @@ button.cursor-hover,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md);
   margin-top: var(--spacing-md);
   background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
+  border: 2px solid rgba(0, 212, 255, 0.4);
   border-radius: var(--border-radius);
 }
 
 .stats-label {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .stats-value {
   font-family: var(--font-title);
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--neon-purple);
-  text-shadow: 0 0 8px var(--neon-purple);
+  text-shadow:
+    0 0 10px var(--neon-purple),
+    0 0 20px var(--neon-purple);
 }
 
 /* Responsive podium */
@@ -1820,24 +1855,26 @@ button.cursor-hover,
 .user-scores-title {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   font-family: var(--font-title);
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   color: var(--neon-purple);
-  text-shadow: 0 0 5px var(--neon-purple);
-  margin-bottom: var(--spacing-xs);
+  text-shadow:
+    0 0 8px var(--neon-purple),
+    0 0 15px var(--neon-purple);
+  margin-bottom: var(--spacing-sm);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .user-icon {
-  font-size: 1rem;
+  font-size: 1.3rem;
 }
 
 .user-scores-row {
   display: flex;
   justify-content: space-between;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   flex-wrap: wrap;
 }
 
@@ -1846,27 +1883,29 @@ button.cursor-hover,
   align-items: center;
   gap: var(--spacing-sm);
   flex: 1;
-  min-width: 150px;
+  min-width: 180px;
 }
 
 .user-score-game {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
   text-transform: uppercase;
 }
 
 .user-score-value {
   font-family: var(--font-title);
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: #ffff00;
-  text-shadow: 0 0 5px #ffff00;
+  text-shadow:
+    0 0 8px #ffff00,
+    0 0 15px #ff8800;
 }
 
 .user-score-plays {
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  color: rgba(0, 212, 255, 0.7);
+  font-size: 0.9rem;
+  color: rgba(0, 212, 255, 0.8);
 }
 
 @media (max-width: 768px) {
@@ -1892,12 +1931,14 @@ button.cursor-hover,
 
 .plays-ranking-section h3 {
   font-family: var(--font-title);
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
-  margin-bottom: var(--spacing-md);
+  text-shadow:
+    0 0 12px var(--neon-cyan),
+    0 0 25px var(--neon-cyan);
+  margin-bottom: var(--spacing-lg);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-align: center;
 }
 
@@ -1916,12 +1957,13 @@ button.cursor-hover,
 
 .plays-ranking-card h4 {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: var(--neon-cyan);
   text-align: center;
-  margin-bottom: var(--spacing-sm);
-  padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+  text-shadow: 0 0 8px var(--neon-cyan);
 }
 
 .plays-ranking-list {
@@ -1949,30 +1991,30 @@ button.cursor-hover,
 
 .plays-rank {
   font-family: var(--font-title);
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
-  width: 25px;
+  width: 30px;
 }
 
 .active-rank-1 {
   color: #00ff88 !important;
-  text-shadow: 0 0 5px #00ff88;
+  text-shadow: 0 0 8px #00ff88;
 }
 
 .active-rank-2 {
   color: #00ddff !important;
-  text-shadow: 0 0 5px #00ddff;
+  text-shadow: 0 0 8px #00ddff;
 }
 
 .active-rank-3 {
   color: #00aaff !important;
-  text-shadow: 0 0 5px #00aaff;
+  text-shadow: 0 0 8px #00aaff;
 }
 
 .plays-player {
   flex: 1;
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: var(--neon-blue);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1981,9 +2023,9 @@ button.cursor-hover,
 
 .plays-count {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   color: var(--neon-purple);
-  text-shadow: 0 0 3px var(--neon-purple);
+  text-shadow: 0 0 5px var(--neon-purple);
 }
 
 @media (max-width: 768px) {
