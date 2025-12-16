@@ -5,58 +5,120 @@ ArcadiaLabs développe une borne d’arcade moderne, accessible depuis un naviga
 L’objectif est de proposer une expérience simple, fluide, intuitive, adaptée à des utilisateurs non techniques (élèves, visiteurs, collaborateurs).
 
 ## User-stories
-1. En tant qu’utilisateur, je veux accéder à l’interface arcade depuis un navigateur web pour pouvoir lancer un jeu immédiatement sans installation.
+### **US01 – Utiliser la manette**
 
-2. En tant qu’utilisateur, je veux voir un menu simple et clair avec la liste des mini-jeux afin de choisir rapidement le jeu auquel je veux jouer.
+En tant que joueur,
 
-3. En tant qu’utilisateur, je veux afficher la fiche de présentation d’un jeu (objectifs, règles, contrôles) avant de le lancer pour comprendre comment jouer.
+Je veux utiliser une manette Xbox,
 
-Contrôles & Jouabilité
+Afin de contrôler les menus et les mini-jeux.
 
-4. En tant que joueur, je veux pouvoir jouer avec une manette Xbox connectée via la Gamepad API pour profiter d’un contrôle intuitif.
+---
 
-5. En tant que joueur, je veux pouvoir jouer avec le clavier si aucune manette n’est disponible.
+### **US02 – Utiliser le clavier**
 
-6. En tant que joueur, je veux que les jeux soient fluides (≥ 50 FPS) pour avoir une expérience agréable.
+En tant que joueur,
 
-Mini-jeux
+Je veux utiliser le clavier,
 
-7. En tant que joueur, je veux pouvoir lancer un mini-jeu en moins de 10 secondes pour commencer à jouer rapidement.
+Afin de jouer même sans manette.
 
-8. En tant que joueur, je veux avoir accès à au moins 3 jeux différents pour varier l’expérience de jeu.
+---
 
-9. En tant que joueur, je veux qu’un mini-jeu se lance en plein écran afin d’avoir une immersion type borne d’arcade.
+### **US03 – Accéder via navigateur**
 
-Scores
+En tant que joueur,
 
-10. En tant qu’utilisateur, je veux voir un tableau des scores pour chaque jeu afin de comparer mes performances.
+Je veux accéder à ArcadiaBox via un navigateur web,
 
-11. En tant qu’administrateur, je veux pouvoir remettre à zéro les scores à tout moment pour recommencer un tournoi ou un événement.
+Afin de jouer sans installer d'application.
 
-12. En tant que joueur, je veux que mon score soit affiché clairement pendant la partie pour suivre ma performance en temps réel.
+---
 
-Mode attract & Inactivité
+### **US04 – Naviguer dans un menu**
 
-13. En tant qu’utilisateur, je veux qu’un mode attract s’active automatiquement après quelques minutes d’inactivité pour attirer les gens à jouer.
+En tant que joueur,
 
-14. En tant qu’utilisateur, je veux pouvoir revenir au mode normal dès que j’appuie sur une touche ou un bouton de manette.
+Je veux un menu simple et clair,
 
-Compatibilité & Matériel
+Afin de choisir facilement un mini-jeu.
 
-15. En tant qu’installateur, je veux que l’interface soit optimisée pour un Raspberry Pi 4 afin de garantir de bonnes performances.
+---
 
-16. En tant qu’utilisateur, je veux que l’application fonctionne correctement sur un écran ou un projecteur, en s’adaptant automatiquement à la résolution.
+### **US05 – Lancer un mini-jeu**
 
-Administration & Maintenance
+En tant que joueur,
 
-17. En tant qu’administrateur, je veux accéder à une page d’aide pour savoir comment connecter une manette et lancer les jeux.
+Je veux lancer un mini-jeu depuis le menu,
 
-18. En tant qu’administrateur, je veux pouvoir tester rapidement chaque jeu pour m’assurer que le système est prêt avant un événement.
+Afin de commencer à jouer rapidement.
 
-19. En tant qu’administrateur, je veux que le système reste stable (≤ 1% de crash) pour garantir une expérience sans interruption.
+---
 
-Expérience utilisateur
+### **US06 – Jouer avec fluidité**
 
-20. En tant qu’utilisateur, je veux que les jeux soient simples à comprendre et qu’on puisse prendre en main le gameplay en ≤ 2 minutes.
+En tant que joueur,
 
-21. En tant que joueur, si une manette se déconnecte, je veux être informé pour pouvoir reconnecter ou passer automatiquement au clavier.
+Je veux que les mini-jeux soient fluides,
+
+Afin d’avoir une bonne expérience de jeu.
+
+---
+
+### **US07 – Sauvegarder mon score**
+
+En tant que joueur,
+
+Je veux que mon score soit sauvegardé automatiquement,
+
+Afin de conserver ma progression.
+
+---
+
+### **US08 – Voir les scores**
+
+En tant que joueur,
+
+Je veux voir les scores sauvegardés,
+
+Afin de me comparer aux autres joueurs.
+
+---
+
+### **US09 – Servir l’application**
+
+En tant que système,
+
+Je veux servir l’application web au navigateur,
+
+Afin que les joueurs puissent y accéder via HTTP.
+
+---
+
+### **US10 – Stocker les scores**
+
+En tant que système,
+
+Je veux stocker les scores dans un fichier JSON ou une petite base,
+
+Afin de conserver les données même après un redémarrage.
+
+---
+
+### **US11 – Charger les assets du jeu**
+
+En tant que système,
+
+Je veux fournir les images, sons et scripts,
+
+Afin que les mini-jeux fonctionnent correctement.
+
+---
+
+### **US12 – Interface responsive**
+
+En tant que joueur,
+
+Je veux une interface adaptée à l’écran (PC, tablette, RPi),
+
+Afin de jouer confortablement sur n’importe quel device.
