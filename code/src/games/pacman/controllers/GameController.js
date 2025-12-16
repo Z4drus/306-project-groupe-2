@@ -13,6 +13,7 @@ import InputController from './InputController.js';
 import CollisionController from './CollisionController.js';
 import HUDView from '../views/HUDView.js';
 import { TILES, GRID_SIZE, ASSETS_PATH, GHOST_EXIT_THRESHOLDS } from '../config/GameConfig.js';
+import ExitConfirmDialog from '../../../core/ExitConfirmDialog.js';
 
 export default class GameController {
   /**
@@ -43,6 +44,10 @@ export default class GameController {
 
     // Flags
     this.waitingForDeathAnimation = false;
+    this.levelTransitionInProgress = false;
+
+    // Dialogue de confirmation de sortie
+    this.exitDialog = null;
   }
 
   /**
@@ -161,7 +166,15 @@ export default class GameController {
   createControllers() {
     // Input
     this.inputController = new InputController(this.scene);
-    this.inputController.setEscapeCallback(() => this.returnToMenu());
+    this.inputController.setEscapeCallback(() => this.handleEscape());
+
+    // Dialogue de confirmation de sortie
+    this.exitDialog = new ExitConfirmDialog(this.scene, {
+      onConfirm: () => this.confirmExit(),
+      onCancel: () => this.cancelExit(),
+      message: 'Quitter la partie ?',
+      subMessage: 'Ta progression ne sera pas sauvegardee'
+    });
 
     // Pacman
     this.pacmanController = new PacmanController(this.scene, this.map, this.layer);
@@ -232,6 +245,17 @@ export default class GameController {
    * Boucle principale (appelée chaque frame)
    */
   update() {
+    // Mettre à jour le dialogue de confirmation si visible
+    if (this.exitDialog?.isShowing()) {
+      this.exitDialog.updateGamepad();
+      return; // Bloquer les autres inputs
+    }
+
+    // Bloquer les updates pendant la transition de niveau
+    if (this.levelTransitionInProgress) {
+      return;
+    }
+
     // Gérer la fin de l'animation de mort
     if (this.waitingForDeathAnimation && this.pacmanController.isDeathAnimationComplete()) {
       this.waitingForDeathAnimation = false;
@@ -451,9 +475,19 @@ export default class GameController {
    * Niveau terminé
    */
   levelComplete() {
+    // Activer le flag de transition pour bloquer les updates
+    this.levelTransitionInProgress = true;
+
     this.gameState.completeLevel();
+
+    // Arrêter les fantômes
     this.stopGhosts();
-    this.pacmanController.update(Phaser.NONE);
+
+    // Arrêter Pacman
+    this.pacmanController.stop();
+
+    // Désactiver les collisions pendant la transition
+    this.collisionController.disableCollisions();
 
     const nextLevel = this.gameState.level + 1;
 
@@ -475,6 +509,31 @@ export default class GameController {
    */
   gameOver() {
     this.scene.scene.start('GameOverScene', { score: this.gameState.score });
+  }
+
+  /**
+   * Gère l'appui sur Escape - affiche le dialogue de confirmation
+   */
+  handleEscape() {
+    // Ne pas afficher si déjà visible
+    if (this.exitDialog?.isShowing()) return;
+
+    // Afficher le dialogue de confirmation
+    this.exitDialog?.show();
+  }
+
+  /**
+   * Confirme la sortie du jeu
+   */
+  confirmExit() {
+    this.returnToMenu();
+  }
+
+  /**
+   * Annule la sortie du jeu
+   */
+  cancelExit() {
+    // Le dialogue se ferme automatiquement, rien d'autre à faire
   }
 
   /**
@@ -501,5 +560,6 @@ export default class GameController {
     this.pacmanController.destroy();
     Object.values(this.ghostControllers).forEach(gc => gc.destroy());
     this.hudView.destroy();
+    if (this.exitDialog) this.exitDialog.destroy();
   }
 }

@@ -290,11 +290,15 @@ export default class MenuScene extends Phaser.Scene {
     if (!this.canStart) return;
     this.canStart = false;
 
-    const onGameOver = this.game.registry.get('onGameOver');
-    if (onGameOver && typeof onGameOver === 'function') {
-      onGameOver(0);
-    }
-    this.scene.stop();
-    this.game.destroy(true);
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.stop();
+      this.game.destroy(true);
+
+      // Retourner au menu arcade
+      if (window.Alpine?.store('arcade')) {
+        window.Alpine.store('arcade').backToMenu();
+      }
+    });
   }
 }

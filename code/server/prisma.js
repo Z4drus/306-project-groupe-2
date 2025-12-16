@@ -1,9 +1,14 @@
 /**
  * Client Prisma pour la connexion à la base de données PostgreSQL (Neon)
+ *
+ * Utilise pg (node-postgres) avec l'adaptateur Prisma - compatible avec Neon
  */
 
-import { neon } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon';
+// Charger dotenv en premier pour s'assurer que DATABASE_URL est disponible
+import 'dotenv/config';
+
+import pg from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from './generated/prisma/client.ts';
 
 if (!process.env.DATABASE_URL) {
@@ -12,8 +17,15 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-const sql = neon(process.env.DATABASE_URL);
-const adapter = new PrismaNeon(sql);
+console.log('[Prisma] Connexion à la base de données...');
+
+// Créer un pool de connexion PostgreSQL standard
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+// Créer l'adaptateur Prisma pour pg
+const adapter = new PrismaPg(pool);
 
 const prisma = new PrismaClient({ adapter });
 

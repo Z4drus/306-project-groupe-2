@@ -134,48 +134,6 @@ router.get('/leaderboard', async (req, res) => {
 });
 
 /**
- * GET /api/scores/:gameId
- * Récupère les meilleurs scores pour un jeu spécifique
- */
-router.get('/:gameId', async (req, res) => {
-  try {
-    const { gameId } = req.params;
-    const limit = Math.min(parseInt(req.query.limit) || 10, 100);
-
-    if (!VALID_GAMES.includes(gameId)) {
-      return res.status(400).json({ success: false, error: 'Jeu invalide' });
-    }
-
-    const jeuEnum = GAME_ID_TO_ENUM[gameId];
-
-    const scores = await prisma.score.findMany({
-      where: { jeu: jeuEnum },
-      orderBy: { valeur: 'desc' },
-      take: limit,
-      include: {
-        joueur: {
-          select: { pseudo: true },
-        },
-      },
-    });
-
-    res.json({
-      success: true,
-      data: scores.map((s, index) => ({
-        rank: index + 1,
-        id: s.id_score,
-        playerName: s.joueur.pseudo,
-        score: s.valeur,
-        date: s.date_score,
-      })),
-    });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des scores:', error);
-    res.status(500).json({ success: false, error: 'Erreur serveur' });
-  }
-});
-
-/**
  * POST /api/scores
  * Ajoute un nouveau score (requiert authentification)
  */
@@ -232,45 +190,9 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 /**
- * GET /api/scores/:gameId/stats
- * Récupère les statistiques d'un jeu
- */
-router.get('/:gameId/stats', async (req, res) => {
-  try {
-    const { gameId } = req.params;
-
-    if (!VALID_GAMES.includes(gameId)) {
-      return res.status(400).json({ success: false, error: 'Jeu invalide' });
-    }
-
-    const jeuEnum = GAME_ID_TO_ENUM[gameId];
-
-    const stats = await prisma.score.aggregate({
-      where: { jeu: jeuEnum },
-      _count: true,
-      _max: { valeur: true },
-      _avg: { valeur: true },
-      _min: { valeur: true },
-    });
-
-    res.json({
-      success: true,
-      data: {
-        totalPlays: stats._count,
-        bestScore: stats._max.valeur || 0,
-        avgScore: Math.round(stats._avg.valeur || 0),
-        worstScore: stats._min.valeur || 0,
-      },
-    });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des stats:', error);
-    res.status(500).json({ success: false, error: 'Erreur serveur' });
-  }
-});
-
-/**
  * GET /api/scores/user/me
  * Récupère les scores du joueur connecté
+ * IMPORTANT: Cette route doit être définie AVANT /:gameId pour éviter que "user" soit interprété comme un gameId
  */
 router.get('/user/me', authMiddleware, async (req, res) => {
   try {
@@ -316,6 +238,87 @@ router.get('/user/me', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des scores utilisateur:', error);
+    res.status(500).json({ success: false, error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * GET /api/scores/:gameId/stats
+ * Récupère les statistiques d'un jeu
+ * IMPORTANT: Cette route doit être définie AVANT /:gameId car elle est plus spécifique
+ */
+router.get('/:gameId/stats', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+
+    if (!VALID_GAMES.includes(gameId)) {
+      return res.status(400).json({ success: false, error: 'Jeu invalide' });
+    }
+
+    const jeuEnum = GAME_ID_TO_ENUM[gameId];
+
+    const stats = await prisma.score.aggregate({
+      where: { jeu: jeuEnum },
+      _count: true,
+      _max: { valeur: true },
+      _avg: { valeur: true },
+      _min: { valeur: true },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        totalPlays: stats._count,
+        bestScore: stats._max.valeur || 0,
+        avgScore: Math.round(stats._avg.valeur || 0),
+        worstScore: stats._min.valeur || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des stats:', error);
+    res.status(500).json({ success: false, error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * GET /api/scores/:gameId
+ * Récupère les meilleurs scores pour un jeu spécifique
+ * IMPORTANT: Cette route doit être définie EN DERNIER car elle capture tous les paramètres
+ */
+router.get('/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit) || 10, 100);
+
+    if (!VALID_GAMES.includes(gameId)) {
+      return res.status(400).json({ success: false, error: 'Jeu invalide' });
+    }
+
+    const jeuEnum = GAME_ID_TO_ENUM[gameId];
+
+    const scores = await prisma.score.findMany({
+      where: { jeu: jeuEnum },
+      orderBy: { valeur: 'desc' },
+      take: limit,
+      include: {
+        joueur: {
+          select: { pseudo: true },
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: scores.map((s, index) => ({
+        rank: index + 1,
+        id: s.id_score,
+        playerName: s.joueur.pseudo,
+        score: s.valeur,
+        date: s.date_score,
+      })),
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des scores:', error);
     res.status(500).json({ success: false, error: 'Erreur serveur' });
   }
 });

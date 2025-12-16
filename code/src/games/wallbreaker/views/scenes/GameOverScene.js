@@ -75,11 +75,8 @@ export default class GameOverScene extends Phaser.Scene {
       this.updateButtonSelection();
     });
 
-    // Notifier le système de l'arcade du game over
-    const onGameOver = this.game.registry.get('onGameOver');
-    if (onGameOver && typeof onGameOver === 'function') {
-      onGameOver(this.finalScore);
-    }
+    // Note: onGameOver est déjà appelé dans GameController.setupGameStateCallbacks()
+    // Ne pas appeler ici pour éviter un double enregistrement du score
   }
 
   /**

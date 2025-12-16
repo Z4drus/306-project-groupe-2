@@ -18,14 +18,14 @@ check_port() {
 }
 
 # Vérifier si les ports sont déjà utilisés
-if check_port 3000; then
-  echo -e "${YELLOW}Port 3000 déjà utilisé. Arrêt du processus...${NC}"
-  kill $(lsof -t -i:3000) 2>/dev/null
+if check_port 8080; then
+  echo -e "${YELLOW}Port 8080 (backend) déjà utilisé. Arrêt du processus...${NC}"
+  kill $(lsof -t -i:8080) 2>/dev/null
 fi
 
-if check_port 5173; then
-  echo -e "${YELLOW}Port 5173 déjà utilisé. Arrêt du processus...${NC}"
-  kill $(lsof -t -i:5173) 2>/dev/null
+if check_port 3000; then
+  echo -e "${YELLOW}Port 3000 (frontend) déjà utilisé. Arrêt du processus...${NC}"
+  kill $(lsof -t -i:3000) 2>/dev/null
 fi
 
 # Démarrer le serveur backend en arrière-plan
@@ -38,13 +38,13 @@ echo -e "${BLUE}[2/3]${NC} Attente du serveur..."
 sleep 2
 
 # Vérifier que le serveur est bien lancé
-if ! check_port 3000; then
+if ! check_port 8080; then
   echo -e "${YELLOW}Serveur en cours de démarrage...${NC}"
   sleep 2
 fi
 
-if check_port 3000; then
-  echo -e "${GREEN}✓ Serveur backend prêt sur http://localhost:3000${NC}"
+if check_port 8080; then
+  echo -e "${GREEN}✓ Serveur backend prêt sur http://localhost:8080${NC}"
 else
   echo -e "${YELLOW}⚠ Le serveur met du temps à démarrer...${NC}"
 fi
@@ -55,8 +55,8 @@ echo ""
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}   ✓ ArcadiaBox prêt !${NC}"
 echo -e "${GREEN}========================================${NC}"
-echo -e "   Backend:  ${BLUE}http://localhost:3000${NC}"
-echo -e "   Frontend: ${BLUE}http://localhost:5173${NC}"
+echo -e "   Backend:  ${BLUE}http://localhost:8080${NC}"
+echo -e "   Frontend: ${BLUE}http://localhost:3000${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 

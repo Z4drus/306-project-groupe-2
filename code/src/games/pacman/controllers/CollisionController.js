@@ -26,6 +26,9 @@ export default class CollisionController {
     this.onPillEaten = null;
     this.onGhostEaten = null;
     this.onPacmanKilled = null;
+
+    // Flag pour activer/désactiver les collisions
+    this.collisionsEnabled = true;
   }
 
   /**
@@ -154,6 +157,9 @@ export default class CollisionController {
    * @param {Phaser.Physics.Arcade.Sprite} ghostSprite
    */
   handleGhostCollision(pacmanSprite, ghostSprite) {
+    // Ignorer les collisions si désactivées (transition de niveau)
+    if (!this.collisionsEnabled) return;
+
     const ghostController = this.ghostControllers.find(
       gc => gc.getSprite() === ghostSprite
     );
@@ -191,5 +197,19 @@ export default class CollisionController {
     this.onPillEaten = callbacks.onPillEaten;
     this.onGhostEaten = callbacks.onGhostEaten;
     this.onPacmanKilled = callbacks.onPacmanKilled;
+  }
+
+  /**
+   * Désactive les collisions (fin de niveau)
+   */
+  disableCollisions() {
+    this.collisionsEnabled = false;
+  }
+
+  /**
+   * Active les collisions
+   */
+  enableCollisions() {
+    this.collisionsEnabled = true;
   }
 }

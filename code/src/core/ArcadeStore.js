@@ -144,7 +144,6 @@ export function createArcadeStore() {
       logout();
       this.isAuthenticated = false;
       this.user = null;
-      this.currentGameToken = null;
     },
 
     /**
@@ -265,7 +264,7 @@ export function createArcadeStore() {
           (score) => this.handleGameOver(gameName, score),
           (score, lives, level) => this.handleScoreUpdate(score, lives, level),
           this.currentBestScore,
-          this.isAuthenticated ? this.user?.pseudo : null
+          this.isAuthenticated ? this.user?.username : null
         );
       } catch (error) {
         console.error(`Erreur lors du chargement du jeu ${gameName}:`, error);

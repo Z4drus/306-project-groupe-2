@@ -17,6 +17,14 @@ export default defineConfig({
     port: 3000,
     host: true, // Permet l'accès depuis d'autres appareils du réseau
     open: true, // Ouvre automatiquement le navigateur
+    // Proxy pour rediriger les requêtes API vers le serveur Express
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 
   // Configuration du build de production

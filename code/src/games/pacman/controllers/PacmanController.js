@@ -152,6 +152,15 @@ export default class PacmanController {
   }
 
   /**
+   * Arrête Pacman (fin de niveau)
+   */
+  stop() {
+    this.model.currentDirection = Phaser.NONE;
+    this.model.turningDirection = Phaser.NONE;
+    this.view.move(Phaser.NONE);
+  }
+
+  /**
    * Réinitialise Pacman
    */
   reset() {

@@ -91,9 +91,43 @@ function update(time, delta) {
 
 /**
  * Initialise et lance le jeu Santa Cruz Runner
+ * @param {HTMLElement} container - Container DOM pour le canvas
+ * @param {Function} onGameOver - Callback appelé à la fin du jeu avec le score
+ * @param {Function} onScoreUpdate - Callback appelé à chaque mise à jour du score
+ * @param {number} bestScore - Meilleur score du joueur
+ * @param {string|null} username - Pseudo du joueur connecté
+ * @param {Function} onLoadProgress - Callback pour la progression du chargement
+ * @returns {Phaser.Game} Instance du jeu Phaser
  */
-export function startSantaCruzRunner() {
+export function startSantaCruzRunner(container = null, onGameOver = null, onScoreUpdate = null, bestScore = 0, username = null, onLoadProgress = null) {
   console.log('Démarrage de Santa Cruz Runner...');
-  const game = new Phaser.Game(SantaCruzRunnerConfig);
+
+  // Configurer le container si fourni
+  const config = { ...SantaCruzRunnerConfig };
+  if (container) {
+    config.parent = container;
+  }
+
+  // Notifier la progression
+  if (onLoadProgress) {
+    onLoadProgress(50, 'Chargement de Santa Cruz Runner...');
+  }
+
+  const game = new Phaser.Game(config);
+
+  // Stocker les callbacks dans le registry
+  if (onGameOver) {
+    game.registry.set('onGameOver', onGameOver);
+  }
+  if (onScoreUpdate) {
+    game.registry.set('onScoreUpdate', onScoreUpdate);
+  }
+  game.registry.set('bestScore', bestScore);
+  game.registry.set('username', username);
+
+  if (onLoadProgress) {
+    onLoadProgress(100, 'Pret !');
+  }
+
   return game;
 }

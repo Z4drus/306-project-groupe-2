@@ -26,6 +26,7 @@ import {
   generateBrickLayout,
   getDifficultyParams
 } from '../config/GameConfig.js';
+import ExitConfirmDialog from '../../../core/ExitConfirmDialog.js';
 
 export default class GameController {
   /**
@@ -57,6 +58,9 @@ export default class GameController {
     // État interne
     this.isInitialized = false;
     this.levelTransitionInProgress = false;
+
+    // Dialogue de confirmation de sortie
+    this.exitDialog = null;
   }
 
   /**
@@ -211,6 +215,14 @@ export default class GameController {
       this.paddleModel.x,
       this.paddleModel.y
     );
+
+    // Dialogue de confirmation de sortie
+    this.exitDialog = new ExitConfirmDialog(this.scene, {
+      onConfirm: () => this.confirmExit(),
+      onCancel: () => this.cancelExit(),
+      message: 'Quitter la partie ?',
+      subMessage: 'Ta progression ne sera pas sauvegardee'
+    });
   }
 
   /**
@@ -266,9 +278,18 @@ export default class GameController {
    * Boucle de mise à jour principale
    */
   update() {
+    // Mettre à jour le dialogue de confirmation si visible
+    if (this.exitDialog?.isShowing()) {
+      this.exitDialog.updateGamepad();
+      return; // Bloquer les autres inputs
+    }
+
     if (!this.isInitialized || this.levelTransitionInProgress) return;
 
     const delta = this.scene.game.loop.delta;
+
+    // Mettre à jour l'InputController (boutons manette)
+    this.inputController.update();
 
     // Vérifier le lancement
     if (this.gameState.isBallOnPaddle() && this.inputController.isLaunchPressed()) {
@@ -405,13 +426,30 @@ export default class GameController {
   }
 
   /**
-   * Gère l'appui sur Escape
+   * Gère l'appui sur Escape - affiche le dialogue de confirmation
    */
   handleEscape() {
-    // Retourner au menu principal
+    // Ne pas afficher si déjà visible
+    if (this.exitDialog?.isShowing()) return;
+
+    // Afficher le dialogue de confirmation
+    this.exitDialog?.show();
+  }
+
+  /**
+   * Confirme la sortie du jeu
+   */
+  confirmExit() {
     window.Alpine?.store('arcade')?.backToMenu();
     this.scene.scene.stop();
     this.scene.game.destroy(true);
+  }
+
+  /**
+   * Annule la sortie du jeu
+   */
+  cancelExit() {
+    // Le dialogue se ferme automatiquement, rien d'autre à faire
   }
 
   /**
@@ -424,5 +462,6 @@ export default class GameController {
     if (this.collisionController) this.collisionController.destroy();
     if (this.brickViewManager) this.brickViewManager.destroy();
     if (this.hudView) this.hudView.destroy();
+    if (this.exitDialog) this.exitDialog.destroy();
   }
 }

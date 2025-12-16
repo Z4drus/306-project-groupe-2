@@ -170,6 +170,25 @@ export default class InputController {
   }
 
   /**
+   * Vérifie les boutons de la manette (à appeler dans update)
+   */
+  checkGamepadButtons() {
+    // Bouton B = ESC (retour/quitter)
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      if (this.onEscape) {
+        this.onEscape();
+      }
+    }
+  }
+
+  /**
+   * Met à jour le contrôleur (à appeler chaque frame)
+   */
+  update() {
+    this.checkGamepadButtons();
+  }
+
+  /**
    * Nettoie les contrôles
    */
   destroy() {

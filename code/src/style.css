@@ -1287,8 +1287,17 @@ button.cursor-hover,
   color: var(--darker-bg) !important;
 }
 
-/* User status indicator */
-.user-status {
+/* Header right section (user + gamepads) */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  position: relative;
+  z-index: 1;
+}
+
+/* Header user indicator */
+.header-user {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -1296,19 +1305,30 @@ button.cursor-hover,
   background: rgba(0, 255, 255, 0.1);
   border: 1px solid var(--neon-cyan);
   border-radius: var(--border-radius);
-  margin-top: var(--spacing-md);
-  justify-content: center;
 }
 
-.user-icon {
-  font-size: 1.2rem;
+.header-user-icon {
+  font-size: 1rem;
 }
 
-.user-name {
+.header-user-name {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--neon-cyan);
   text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+/* Header separator */
+.header-separator {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--neon-purple),
+    transparent
+  );
+  opacity: 0.6;
 }
 
 /* ================================

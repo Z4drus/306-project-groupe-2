@@ -2,7 +2,10 @@
  * GameLoader - Chargeur dynamique de jeux
  *
  * Gère le chargement et l'initialisation des différents jeux
+ * avec un système de progression visuelle.
  */
+
+import { getLoadingOverlay } from './LoadingOverlay.js';
 
 /**
  * Configuration des jeux disponibles
@@ -57,17 +60,52 @@ export async function loadGame(gameId, container, onGameOver, onScoreUpdate, bes
     throw new Error(`Jeu inconnu: ${gameId}`);
   }
 
+  const loadingOverlay = getLoadingOverlay();
+
   try {
+    // Afficher l'overlay de chargement
+    loadingOverlay.show(gameConfig.displayName);
+    loadingOverlay.update(10, 'Chargement du module...');
+
+    // Charger le module du jeu
     const gameModule = await gameConfig.module();
+    loadingOverlay.update(40, 'Module charge, initialisation...');
+
     const startFunction = gameModule[gameConfig.startFunction];
 
     if (!startFunction) {
       throw new Error(`Fonction de démarrage non trouvée: ${gameConfig.startFunction}`);
     }
 
-    return startFunction(container, onGameOver, onScoreUpdate, bestScore, username);
+    loadingOverlay.update(60, 'Demarrage du jeu...');
+
+    // Callback pour mettre à jour la progression depuis le jeu
+    const onLoadProgress = (progress, status) => {
+      // Mapper la progression du jeu (0-100) vers notre progression (60-95)
+      const mappedProgress = 60 + (progress * 0.35);
+      loadingOverlay.update(mappedProgress, status);
+    };
+
+    // Démarrer le jeu avec le callback de progression
+    const gameInstance = await startFunction(
+      container,
+      onGameOver,
+      onScoreUpdate,
+      bestScore,
+      username,
+      onLoadProgress
+    );
+
+    loadingOverlay.update(100, 'Pret !');
+
+    // Cacher l'overlay après un court délai
+    await new Promise(resolve => setTimeout(resolve, 300));
+    await loadingOverlay.hide();
+
+    return gameInstance;
   } catch (error) {
     console.error(`Erreur lors du chargement du jeu ${gameId}:`, error);
+    loadingOverlay.destroy();
     throw error;
   }
 }

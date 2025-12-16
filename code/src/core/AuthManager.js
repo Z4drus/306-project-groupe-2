@@ -58,6 +58,13 @@ export async function register(username, password) {
       body: JSON.stringify({ username, password }),
     });
 
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue:', await response.text());
+      return { success: false, error: 'Erreur serveur - réponse invalide' };
+    }
+
     const data = await response.json();
 
     if (data.success) {
@@ -87,6 +94,13 @@ export async function login(username, password) {
       },
       body: JSON.stringify({ username, password }),
     });
+
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue:', await response.text());
+      return { success: false, error: 'Erreur serveur - réponse invalide' };
+    }
 
     const data = await response.json();
 
@@ -126,6 +140,14 @@ export async function verifyToken() {
         'Authorization': `Bearer ${token}`,
       },
     });
+
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue lors de la vérification du token');
+      clearAuthData();
+      return { success: false };
+    }
 
     const data = await response.json();
 
@@ -167,6 +189,13 @@ export async function submitScore(gameId, score) {
       body: JSON.stringify({ gameId, score }),
     });
 
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue lors de l\'envoi du score');
+      return { success: false, error: 'Erreur serveur' };
+    }
+
     const data = await response.json();
 
     if (data.success) {
@@ -188,6 +217,14 @@ export async function submitScore(gameId, score) {
 export async function getLeaderboard(limit = 20) {
   try {
     const response = await fetch(`/api/scores/leaderboard?limit=${limit}`);
+
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue lors de la récupération du leaderboard');
+      return { success: false, error: 'Erreur serveur' };
+    }
+
     const data = await response.json();
 
     if (data.success) {
@@ -210,6 +247,14 @@ export async function getLeaderboard(limit = 20) {
 export async function getGameScores(gameId, limit = 10) {
   try {
     const response = await fetch(`/api/scores/${gameId}?limit=${limit}`);
+
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue lors de la récupération des scores');
+      return { success: false, error: 'Erreur serveur' };
+    }
+
     const data = await response.json();
 
     if (data.success) {
@@ -241,6 +286,13 @@ export async function getUserBestScore(gameId) {
         'Authorization': `Bearer ${token}`,
       },
     });
+
+    // Vérifier si la réponse est du JSON valide
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Réponse non-JSON reçue lors de la récupération du best score');
+      return { success: false, bestScore: 0 };
+    }
 
     const data = await response.json();
 
