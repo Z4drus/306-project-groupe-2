@@ -21,14 +21,19 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8080.*LISTENING"') do (
     echo Port 8080 utilise, arret du processus %%a...
     taskkill /F /PID %%a >nul 2>nul
 )
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000.*LISTENING"') do (
-    echo Port 3000 utilise, arret du processus %%a...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5173.*LISTENING"') do (
+    echo Port 5173 utilise, arret du processus %%a...
     taskkill /F /PID %%a >nul 2>nul
 )
 
-:: Demarrer le serveur backend
+:: Determiner les chemins
+set "SCRIPTDIR=%~dp0"
+set "ROOT=%SCRIPTDIR%.."
+
+:: Demarrer le serveur backend depuis la racine du projet
 echo [2/4] Demarrage du serveur backend...
-start /b cmd /c "node --experimental-strip-types server/index.js"
+REM start en tache de fond ; pushd vers la racine puis execution si le fichier existe
+start /b "" cmd /c "pushd \"%ROOT%\" && if exist server\index.js ( node --experimental-strip-types server\index.js ) else ( echo [ERREUR] \"%ROOT%\\server\\index.js\" introuvable && exit /b 1 )"
 
 :: Attendre que le serveur soit pret
 echo [3/4] Attente du serveur...
@@ -48,7 +53,7 @@ echo ========================================
 echo    ArcadiaBox pret !
 echo ========================================
 echo    Backend:  http://localhost:8080
-echo    Frontend: http://localhost:3000
+echo    Frontend: http://localhost:5173
 echo ========================================
 echo.
 echo Appuyez sur Ctrl+C pour arreter les serveurs
@@ -61,6 +66,9 @@ npx vite --host
 echo.
 echo Arret des serveurs...
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8080.*LISTENING"') do (
+    taskkill /F /PID %%a >nul 2>nul
+)
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5173.*LISTENING"') do (
     taskkill /F /PID %%a >nul 2>nul
 )
 
