@@ -37,7 +37,7 @@ export function getMainMenuTemplate() {
         <img src="/assets/images/home-menu/controller_icon.webp" alt="Controller" class="header-icon" />
         <div class="header-text">
           <h1 class="arcade-title">Arcadia Box</h1>
-          <p class="arcade-subtitle">Borne d'Arcade Moderne</p>
+          <p class="arcade-subtitle">Borne d'Arcade</p>
         </div>
       </div>
       <!-- Partie droite du header -->
@@ -269,41 +269,86 @@ export function getMainMenuTemplate() {
           Chargement des scores...
         </div>
 
-        <!-- Leaderboard Global -->
-        <div x-show="!$store.arcade.scoresLoading" class="leaderboard-section">
-          <h3>Classement Global</h3>
-          <div class="leaderboard-table" x-show="$store.arcade.leaderboard.length > 0">
-            <div class="leaderboard-header">
-              <span class="rank-col">#</span>
-              <span class="player-col">Joueur</span>
-              <span class="score-col">Meilleur Score</span>
-              <span class="games-col">Parties</span>
-            </div>
-            <template x-for="(player, index) in $store.arcade.leaderboard" :key="player.username">
-              <div class="leaderboard-row" :class="{ 'top-3': index < 3 }">
-                <span class="rank-col" :class="'rank-' + (index + 1)" x-text="player.rank"></span>
-                <span class="player-col" x-text="player.username"></span>
-                <span class="score-col" x-text="player.bestScore.toLocaleString()"></span>
-                <span class="games-col" x-text="player.totalGames"></span>
-              </div>
-            </template>
+        <!-- Bandeau des scores du joueur connecté -->
+        <div x-show="!$store.arcade.scoresLoading && $store.arcade.isAuthenticated && Object.keys($store.arcade.userScores).length > 0" class="user-scores-banner">
+          <div class="user-scores-title">
+            <span class="user-icon">&#128100;</span>
+            <span x-text="'Mes meilleurs scores - ' + ($store.arcade.user?.username || '')"></span>
           </div>
-          <p x-show="$store.arcade.leaderboard.length === 0" class="no-scores">
-            Aucun score enregistre. Sois le premier !
-          </p>
+          <div class="user-scores-row">
+            <div class="user-score-item">
+              <span class="user-score-game">Pac-Man</span>
+              <span class="user-score-value" x-text="($store.arcade.userScores['pacman']?.bestScore || 0).toLocaleString()"></span>
+              <span class="user-score-plays" x-text="'(' + ($store.arcade.userScores['pacman']?.totalPlays || 0) + ' parties)'"></span>
+            </div>
+            <div class="user-score-item">
+              <span class="user-score-game">Wallbreaker</span>
+              <span class="user-score-value" x-text="($store.arcade.userScores['wallbreaker']?.bestScore || 0).toLocaleString()"></span>
+              <span class="user-score-plays" x-text="'(' + ($store.arcade.userScores['wallbreaker']?.totalPlays || 0) + ' parties)'"></span>
+            </div>
+            <div class="user-score-item">
+              <span class="user-score-game">Santa Cruz</span>
+              <span class="user-score-value" x-text="($store.arcade.userScores['santa-cruz-runner']?.bestScore || 0).toLocaleString()"></span>
+              <span class="user-score-plays" x-text="'(' + ($store.arcade.userScores['santa-cruz-runner']?.totalPlays || 0) + ' parties)'"></span>
+            </div>
+          </div>
         </div>
 
         <!-- Scores par jeu -->
         <div x-show="!$store.arcade.scoresLoading" class="game-scores-section">
-          <h3>Scores par Jeu</h3>
           <div class="game-scores-grid">
             <!-- Pac-Man -->
             <div class="game-score-card">
               <h4>Pac-Man</h4>
-              <div class="game-score-list" x-show="$store.arcade.gameScores['pacman']?.length > 0">
-                <template x-for="(score, idx) in ($store.arcade.gameScores['pacman'] || []).slice(0, 10)" :key="score.id">
-                  <div class="game-score-row" :class="{ 'top-score': idx < 3 }">
-                    <span class="score-rank" :class="'rank-' + (idx + 1)" x-text="idx + 1 + '.'"></span>
+              <!-- Podium pour le top 3 -->
+              <div class="podium-container" x-show="$store.arcade.gameScores['pacman']?.length >= 3">
+                <div class="podium">
+                  <!-- 2ème place -->
+                  <div class="podium-place second">
+                    <div class="podium-medal silver">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">2</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['pacman']?.[1]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['pacman']?.[1]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar second-bar"></div>
+                  </div>
+                  <!-- 1ère place -->
+                  <div class="podium-place first">
+                    <div class="podium-medal gold">
+                      <svg viewBox="0 0 24 24" class="medal-icon crown">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/>
+                        <rect x="5" y="16" width="14" height="3" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">1</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['pacman']?.[0]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['pacman']?.[0]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar first-bar"></div>
+                  </div>
+                  <!-- 3ème place -->
+                  <div class="podium-place third">
+                    <div class="podium-medal bronze">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">3</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['pacman']?.[2]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['pacman']?.[2]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar third-bar"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Liste des autres scores -->
+              <div class="game-score-list" x-show="$store.arcade.gameScores['pacman']?.length > 3">
+                <template x-for="(score, idx) in ($store.arcade.gameScores['pacman'] || []).slice(3, 10)" :key="score.id">
+                  <div class="game-score-row">
+                    <span class="score-rank" x-text="(idx + 4) + '.'"></span>
                     <span class="score-player" x-text="score.playerName"></span>
                     <span class="score-value" x-text="score.score.toLocaleString()"></span>
                   </div>
@@ -312,15 +357,65 @@ export function getMainMenuTemplate() {
               <p x-show="!$store.arcade.gameScores['pacman']?.length" class="no-game-scores">
                 Pas encore de scores
               </p>
+              <!-- Stats partie -->
+              <div class="game-stats" x-show="$store.arcade.gameScores['pacman']?.length > 0">
+                <span class="stats-label">Parties jouees</span>
+                <span class="stats-value" x-text="($store.arcade.gameScores['pacman'] || []).reduce((sum, s) => sum + (s.totalPlays || 0), 0)"></span>
+              </div>
             </div>
 
             <!-- Wallbreaker -->
             <div class="game-score-card">
               <h4>Wallbreaker</h4>
-              <div class="game-score-list" x-show="$store.arcade.gameScores['wallbreaker']?.length > 0">
-                <template x-for="(score, idx) in ($store.arcade.gameScores['wallbreaker'] || []).slice(0, 10)" :key="score.id">
-                  <div class="game-score-row" :class="{ 'top-score': idx < 3 }">
-                    <span class="score-rank" :class="'rank-' + (idx + 1)" x-text="idx + 1 + '.'"></span>
+              <!-- Podium pour le top 3 -->
+              <div class="podium-container" x-show="$store.arcade.gameScores['wallbreaker']?.length >= 3">
+                <div class="podium">
+                  <!-- 2ème place -->
+                  <div class="podium-place second">
+                    <div class="podium-medal silver">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">2</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['wallbreaker']?.[1]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['wallbreaker']?.[1]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar second-bar"></div>
+                  </div>
+                  <!-- 1ère place -->
+                  <div class="podium-place first">
+                    <div class="podium-medal gold">
+                      <svg viewBox="0 0 24 24" class="medal-icon crown">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/>
+                        <rect x="5" y="16" width="14" height="3" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">1</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['wallbreaker']?.[0]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['wallbreaker']?.[0]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar first-bar"></div>
+                  </div>
+                  <!-- 3ème place -->
+                  <div class="podium-place third">
+                    <div class="podium-medal bronze">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">3</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['wallbreaker']?.[2]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['wallbreaker']?.[2]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar third-bar"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Liste des autres scores -->
+              <div class="game-score-list" x-show="$store.arcade.gameScores['wallbreaker']?.length > 3">
+                <template x-for="(score, idx) in ($store.arcade.gameScores['wallbreaker'] || []).slice(3, 10)" :key="score.id">
+                  <div class="game-score-row">
+                    <span class="score-rank" x-text="(idx + 4) + '.'"></span>
                     <span class="score-player" x-text="score.playerName"></span>
                     <span class="score-value" x-text="score.score.toLocaleString()"></span>
                   </div>
@@ -329,15 +424,65 @@ export function getMainMenuTemplate() {
               <p x-show="!$store.arcade.gameScores['wallbreaker']?.length" class="no-game-scores">
                 Pas encore de scores
               </p>
+              <!-- Stats partie -->
+              <div class="game-stats" x-show="$store.arcade.gameScores['wallbreaker']?.length > 0">
+                <span class="stats-label">Parties jouees</span>
+                <span class="stats-value" x-text="($store.arcade.gameScores['wallbreaker'] || []).reduce((sum, s) => sum + (s.totalPlays || 0), 0)"></span>
+              </div>
             </div>
 
             <!-- Santa Cruz Runner -->
             <div class="game-score-card">
               <h4>Santa Cruz Runner</h4>
-              <div class="game-score-list" x-show="$store.arcade.gameScores['santa-cruz-runner']?.length > 0">
-                <template x-for="(score, idx) in ($store.arcade.gameScores['santa-cruz-runner'] || []).slice(0, 10)" :key="score.id">
-                  <div class="game-score-row" :class="{ 'top-score': idx < 3 }">
-                    <span class="score-rank" :class="'rank-' + (idx + 1)" x-text="idx + 1 + '.'"></span>
+              <!-- Podium pour le top 3 -->
+              <div class="podium-container" x-show="$store.arcade.gameScores['santa-cruz-runner']?.length >= 3">
+                <div class="podium">
+                  <!-- 2ème place -->
+                  <div class="podium-place second">
+                    <div class="podium-medal silver">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">2</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[1]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[1]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar second-bar"></div>
+                  </div>
+                  <!-- 1ère place -->
+                  <div class="podium-place first">
+                    <div class="podium-medal gold">
+                      <svg viewBox="0 0 24 24" class="medal-icon crown">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" fill="currentColor"/>
+                        <rect x="5" y="16" width="14" height="3" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">1</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[0]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[0]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar first-bar"></div>
+                  </div>
+                  <!-- 3ème place -->
+                  <div class="podium-place third">
+                    <div class="podium-medal bronze">
+                      <svg viewBox="0 0 24 24" class="medal-icon">
+                        <circle cx="12" cy="9" r="6" fill="currentColor"/>
+                        <path d="M12 15 L8 22 L12 19 L16 22 Z" fill="currentColor"/>
+                      </svg>
+                      <span class="podium-rank">3</span>
+                    </div>
+                    <span class="podium-player" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[2]?.playerName || ''"></span>
+                    <span class="podium-score" x-text="$store.arcade.gameScores['santa-cruz-runner']?.[2]?.score?.toLocaleString() || ''"></span>
+                    <div class="podium-bar third-bar"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Liste des autres scores -->
+              <div class="game-score-list" x-show="$store.arcade.gameScores['santa-cruz-runner']?.length > 3">
+                <template x-for="(score, idx) in ($store.arcade.gameScores['santa-cruz-runner'] || []).slice(3, 10)" :key="score.id">
+                  <div class="game-score-row">
+                    <span class="score-rank" x-text="(idx + 4) + '.'"></span>
                     <span class="score-player" x-text="score.playerName"></span>
                     <span class="score-value" x-text="score.score.toLocaleString()"></span>
                   </div>
@@ -346,6 +491,62 @@ export function getMainMenuTemplate() {
               <p x-show="!$store.arcade.gameScores['santa-cruz-runner']?.length" class="no-game-scores">
                 Pas encore de scores
               </p>
+              <!-- Stats partie -->
+              <div class="game-stats" x-show="$store.arcade.gameScores['santa-cruz-runner']?.length > 0">
+                <span class="stats-label">Parties jouees</span>
+                <span class="stats-value" x-text="($store.arcade.gameScores['santa-cruz-runner'] || []).reduce((sum, s) => sum + (s.totalPlays || 0), 0)"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Classement par nombre de parties jouées -->
+        <div x-show="!$store.arcade.scoresLoading" class="plays-ranking-section">
+          <h3>Joueurs les plus actifs</h3>
+          <div class="plays-ranking-grid">
+            <!-- Pac-Man -->
+            <div class="plays-ranking-card">
+              <h4>Pac-Man</h4>
+              <div class="plays-ranking-list" x-show="$store.arcade.gameScores['pacman']?.length > 0">
+                <template x-for="(player, idx) in ($store.arcade.gameScores['pacman'] || []).slice().sort((a, b) => (b.totalPlays || 0) - (a.totalPlays || 0)).slice(0, 5)" :key="player.playerName + '-plays'">
+                  <div class="plays-ranking-row" :class="{ 'top-active': idx < 3 }">
+                    <span class="plays-rank" :class="'active-rank-' + (idx + 1)" x-text="(idx + 1) + '.'"></span>
+                    <span class="plays-player" x-text="player.playerName"></span>
+                    <span class="plays-count" x-text="(player.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                </template>
+              </div>
+              <p x-show="!$store.arcade.gameScores['pacman']?.length" class="no-game-scores">Pas de donnees</p>
+            </div>
+
+            <!-- Wallbreaker -->
+            <div class="plays-ranking-card">
+              <h4>Wallbreaker</h4>
+              <div class="plays-ranking-list" x-show="$store.arcade.gameScores['wallbreaker']?.length > 0">
+                <template x-for="(player, idx) in ($store.arcade.gameScores['wallbreaker'] || []).slice().sort((a, b) => (b.totalPlays || 0) - (a.totalPlays || 0)).slice(0, 5)" :key="player.playerName + '-plays'">
+                  <div class="plays-ranking-row" :class="{ 'top-active': idx < 3 }">
+                    <span class="plays-rank" :class="'active-rank-' + (idx + 1)" x-text="(idx + 1) + '.'"></span>
+                    <span class="plays-player" x-text="player.playerName"></span>
+                    <span class="plays-count" x-text="(player.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                </template>
+              </div>
+              <p x-show="!$store.arcade.gameScores['wallbreaker']?.length" class="no-game-scores">Pas de donnees</p>
+            </div>
+
+            <!-- Santa Cruz Runner -->
+            <div class="plays-ranking-card">
+              <h4>Santa Cruz</h4>
+              <div class="plays-ranking-list" x-show="$store.arcade.gameScores['santa-cruz-runner']?.length > 0">
+                <template x-for="(player, idx) in ($store.arcade.gameScores['santa-cruz-runner'] || []).slice().sort((a, b) => (b.totalPlays || 0) - (a.totalPlays || 0)).slice(0, 5)" :key="player.playerName + '-plays'">
+                  <div class="plays-ranking-row" :class="{ 'top-active': idx < 3 }">
+                    <span class="plays-rank" :class="'active-rank-' + (idx + 1)" x-text="(idx + 1) + '.'"></span>
+                    <span class="plays-player" x-text="player.playerName"></span>
+                    <span class="plays-count" x-text="(player.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                </template>
+              </div>
+              <p x-show="!$store.arcade.gameScores['santa-cruz-runner']?.length" class="no-game-scores">Pas de donnees</p>
             </div>
           </div>
         </div>

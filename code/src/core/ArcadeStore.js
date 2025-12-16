@@ -18,6 +18,7 @@ import {
   getLeaderboard,
   getGameScores,
   getUserBestScore,
+  getUserScores,
 } from './AuthManager.js';
 
 /**
@@ -61,6 +62,9 @@ export function createArcadeStore() {
     leaderboard: [],
     gameScores: {},
     scoresLoading: false,
+
+    // Scores du joueur connecté
+    userScores: {},
 
     // Meilleur score du joueur pour le jeu en cours
     currentBestScore: 0,
@@ -356,6 +360,7 @@ export function createArcadeStore() {
       this.scoresLoading = true;
       this.leaderboard = [];
       this.gameScores = {};
+      this.userScores = {};
 
       const result = await getLeaderboard(20);
 
@@ -370,6 +375,14 @@ export function createArcadeStore() {
           this.gameScores[gameId] = gameResult.data;
         } else {
           this.gameScores[gameId] = [];
+        }
+      }
+
+      // Charger les scores du joueur connecté
+      if (this.isAuthenticated) {
+        const userResult = await getUserScores();
+        if (userResult.success && userResult.data) {
+          this.userScores = userResult.data;
         }
       }
 

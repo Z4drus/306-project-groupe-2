@@ -306,3 +306,39 @@ export async function getUserBestScore(gameId) {
     return { success: false, bestScore: 0 };
   }
 }
+
+/**
+ * Récupère tous les scores de l'utilisateur connecté
+ * @returns {Promise<{success: boolean, data?: Object}>}
+ */
+export async function getUserScores() {
+  const token = getStoredToken();
+
+  if (!token) {
+    return { success: false };
+  }
+
+  try {
+    const response = await fetch('/api/scores/user/me', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return { success: false };
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      return { success: true, data: data.data.byGame };
+    } else {
+      return { success: false };
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des scores utilisateur:', error);
+    return { success: false };
+  }
+}

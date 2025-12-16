@@ -56,7 +56,7 @@ function authMiddleware(req, res, next) {
 
 /**
  * GET /api/scores
- * Récupère les scores pour tous les jeux
+ * Récupère les meilleurs scores pour tous les jeux (1 seul score par joueur par jeu)
  */
 router.get('/', async (req, res) => {
   try {
@@ -67,23 +67,26 @@ router.get('/', async (req, res) => {
     for (const gameId of VALID_GAMES) {
       const jeuEnum = GAME_ID_TO_ENUM[gameId];
 
-      const scores = await prisma.score.findMany({
-        where: { jeu: jeuEnum },
-        orderBy: { valeur: 'desc' },
-        take: limit,
-        include: {
-          joueur: {
-            select: { pseudo: true },
-          },
-        },
-      });
+      // Requête SQL pour récupérer le meilleur score de chaque joueur
+      const scores = await prisma.$queryRawUnsafe(`
+        SELECT
+          j.pseudo as player_name,
+          MAX(s.valeur) as best_score,
+          COUNT(s.id_score) as total_plays
+        FROM "Score" s
+        JOIN "Joueur" j ON s.id_joueur = j.id_joueur
+        WHERE s.jeu = $1::"Jeu"
+        GROUP BY j.id_joueur, j.pseudo
+        ORDER BY best_score DESC
+        LIMIT $2
+      `, jeuEnum, limit);
 
       results[gameId] = scores.map((s, index) => ({
         rank: index + 1,
-        id: s.id_score,
-        playerName: s.joueur.pseudo,
-        score: s.valeur,
-        date: s.date_score,
+        id: index + 1,
+        playerName: s.player_name,
+        score: Number(s.best_score),
+        totalPlays: Number(s.total_plays),
       }));
     }
 
@@ -282,7 +285,7 @@ router.get('/:gameId/stats', async (req, res) => {
 
 /**
  * GET /api/scores/:gameId
- * Récupère les meilleurs scores pour un jeu spécifique
+ * Récupère les meilleurs scores pour un jeu spécifique (1 seul score par joueur)
  * IMPORTANT: Cette route doit être définie EN DERNIER car elle capture tous les paramètres
  */
 router.get('/:gameId', async (req, res) => {
@@ -296,25 +299,28 @@ router.get('/:gameId', async (req, res) => {
 
     const jeuEnum = GAME_ID_TO_ENUM[gameId];
 
-    const scores = await prisma.score.findMany({
-      where: { jeu: jeuEnum },
-      orderBy: { valeur: 'desc' },
-      take: limit,
-      include: {
-        joueur: {
-          select: { pseudo: true },
-        },
-      },
-    });
+    // Requête SQL pour récupérer le meilleur score de chaque joueur
+    const scores = await prisma.$queryRawUnsafe(`
+      SELECT
+        j.pseudo as player_name,
+        MAX(s.valeur) as best_score,
+        COUNT(s.id_score) as total_plays
+      FROM "Score" s
+      JOIN "Joueur" j ON s.id_joueur = j.id_joueur
+      WHERE s.jeu = $1::"Jeu"
+      GROUP BY j.id_joueur, j.pseudo
+      ORDER BY best_score DESC
+      LIMIT $2
+    `, jeuEnum, limit);
 
     res.json({
       success: true,
       data: scores.map((s, index) => ({
         rank: index + 1,
-        id: s.id_score,
-        playerName: s.joueur.pseudo,
-        score: s.valeur,
-        date: s.date_score,
+        id: index + 1,
+        playerName: s.player_name,
+        score: Number(s.best_score),
+        totalPlays: Number(s.total_plays),
       })),
     });
   } catch (error) {
