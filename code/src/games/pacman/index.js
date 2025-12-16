@@ -18,9 +18,11 @@ import GameOverScene from './views/scenes/GameOverScene.js';
  * @param {HTMLElement} container - Container DOM pour le canvas
  * @param {Function} onGameOver - Callback appelé à la fin du jeu avec le score
  * @param {Function} onScoreUpdate - Callback appelé à chaque mise à jour du score
+ * @param {number} bestScore - Meilleur score du joueur
+ * @param {string|null} username - Pseudo du joueur connecté
  * @returns {Phaser.Game} Instance du jeu Phaser
  */
-export function startPacman(container = null, onGameOver = null, onScoreUpdate = null) {
+export function startPacman(container = null, onGameOver = null, onScoreUpdate = null, bestScore = 0, username = null) {
   // Créer la configuration Phaser
   const config = createPhaserConfig(container);
 
@@ -37,6 +39,10 @@ export function startPacman(container = null, onGameOver = null, onScoreUpdate =
   if (onScoreUpdate) {
     game.registry.set('onScoreUpdate', onScoreUpdate);
   }
+
+  // Passer le best score et le username
+  game.registry.set('bestScore', bestScore);
+  game.registry.set('username', username);
 
   return game;
 }

@@ -1043,3 +1043,487 @@ button.cursor-hover,
 .back-btn.cursor-hover {
   transform: scale(1.05);
 }
+
+/* ================================
+   AUTHENTIFICATION
+   ================================ */
+
+.auth-view {
+  padding: var(--spacing-md);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.auth-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.auth-header h2 {
+  font-size: 2rem;
+  font-family: var(--font-title);
+  color: var(--neon-purple);
+  text-shadow:
+    0 0 10px var(--neon-purple),
+    0 0 20px var(--neon-purple);
+  text-align: center;
+  margin-top: var(--spacing-md);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.auth-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-box {
+  background-color: var(--card-bg);
+  border: 2px solid var(--neon-purple);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow:
+    0 0 15px rgba(189, 0, 255, 0.4),
+    inset 0 0 20px rgba(189, 0, 255, 0.05);
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--neon-purple);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  color: var(--neon-cyan);
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-tab:hover {
+  color: var(--neon-purple);
+}
+
+.auth-tab.active {
+  color: var(--neon-purple);
+  background: rgba(189, 0, 255, 0.2);
+  text-shadow: 0 0 10px var(--neon-purple);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.auth-field label {
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-field input {
+  padding: var(--spacing-sm);
+  background: var(--darker-bg);
+  border: 2px solid var(--neon-blue);
+  border-radius: var(--border-radius);
+  color: var(--neon-cyan);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 10px rgba(189, 0, 255, 0.5);
+}
+
+.auth-field input::placeholder {
+  color: rgba(0, 212, 255, 0.5);
+}
+
+.auth-error {
+  padding: var(--spacing-sm);
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid #ff4444;
+  border-radius: var(--border-radius);
+  color: #ff6666;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.auth-submit {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--neon-purple);
+  border: 2px solid var(--neon-purple);
+  border-radius: var(--border-radius);
+  color: var(--darker-bg);
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: var(--spacing-sm);
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: transparent;
+  color: var(--neon-purple);
+  box-shadow:
+    0 0 20px rgba(189, 0, 255, 0.8),
+    inset 0 0 10px rgba(189, 0, 255, 0.3);
+}
+
+.auth-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-info {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--neon-cyan);
+}
+
+.auth-info a {
+  color: var(--neon-purple);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.auth-info a:hover {
+  text-shadow: 0 0 10px var(--neon-purple);
+}
+
+.auth-benefits {
+  background-color: var(--card-bg);
+  border: 2px solid var(--neon-blue);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow:
+    0 0 15px rgba(0, 212, 255, 0.4),
+    inset 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+.auth-benefits h3 {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-benefits ul {
+  list-style: none;
+  padding: 0;
+}
+
+.auth-benefits li {
+  padding: var(--spacing-sm) 0;
+  color: var(--neon-cyan);
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.auth-benefits li::before {
+  content: "★";
+  color: var(--neon-purple);
+}
+
+.auth-benefits li:last-child {
+  border-bottom: none;
+}
+
+/* Bouton auth dans le menu */
+.auth-btn {
+  border-color: var(--neon-purple) !important;
+  color: var(--neon-purple) !important;
+}
+
+.auth-btn:hover {
+  background-color: var(--neon-purple) !important;
+  color: var(--darker-bg) !important;
+}
+
+.logout-btn {
+  border-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  font-size: 0.7rem !important;
+}
+
+.logout-btn:hover {
+  background-color: var(--neon-cyan) !important;
+  color: var(--darker-bg) !important;
+}
+
+/* User status indicator */
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid var(--neon-cyan);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing-md);
+  justify-content: center;
+}
+
+.user-icon {
+  font-size: 1.2rem;
+}
+
+.user-name {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+/* ================================
+   LEADERBOARD & SCORES
+   ================================ */
+
+.scores-loading {
+  text-align: center;
+  padding: var(--spacing-xl);
+  font-family: var(--font-title);
+  color: var(--neon-cyan);
+  animation: blink 1s infinite;
+}
+
+.leaderboard-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.leaderboard-section h3,
+.game-scores-section h3 {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: var(--neon-purple);
+  text-shadow: 0 0 10px var(--neon-purple);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.leaderboard-table {
+  background: var(--card-bg);
+  border: 2px solid var(--neon-purple);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.leaderboard-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 150px 80px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(189, 0, 255, 0.2);
+  border-bottom: 2px solid var(--neon-purple);
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 150px 80px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid rgba(189, 0, 255, 0.2);
+  transition: var(--transition);
+}
+
+.leaderboard-row:hover {
+  background: rgba(189, 0, 255, 0.1);
+}
+
+.leaderboard-row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-row.top-3 {
+  background: rgba(189, 0, 255, 0.15);
+}
+
+.rank-col {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+}
+
+.rank-1 {
+  color: #ffd700 !important;
+  text-shadow: 0 0 10px #ffd700;
+}
+
+.rank-2 {
+  color: #c0c0c0 !important;
+  text-shadow: 0 0 10px #c0c0c0;
+}
+
+.rank-3 {
+  color: #cd7f32 !important;
+  text-shadow: 0 0 10px #cd7f32;
+}
+
+.player-col {
+  font-family: var(--font-body);
+  color: var(--neon-blue);
+}
+
+.score-col {
+  font-family: var(--font-title);
+  color: #ffff00;
+  text-shadow: 0 0 5px #ffff00;
+  text-align: right;
+}
+
+.games-col {
+  font-family: var(--font-body);
+  color: var(--neon-cyan);
+  text-align: center;
+}
+
+.no-scores {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--neon-cyan);
+  font-style: italic;
+}
+
+/* Game Scores Grid */
+.game-scores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.game-score-card {
+  background: var(--card-bg);
+  border: 2px solid var(--neon-blue);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  box-shadow:
+    0 0 10px rgba(0, 212, 255, 0.3),
+    inset 0 0 15px rgba(0, 212, 255, 0.05);
+}
+
+.game-score-card h4 {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  padding-bottom: var(--spacing-sm);
+}
+
+.game-score-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.game-score-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.game-score-row:last-child {
+  border-bottom: none;
+}
+
+.score-rank {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  color: var(--neon-purple);
+  width: 30px;
+}
+
+.score-player {
+  flex: 1;
+  font-family: var(--font-body);
+  color: var(--neon-cyan);
+}
+
+.score-value {
+  font-family: var(--font-title);
+  color: #ffff00;
+  text-shadow: 0 0 5px #ffff00;
+}
+
+.no-game-scores {
+  text-align: center;
+  color: var(--neon-cyan);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.game-score-row.top-score {
+  background: rgba(189, 0, 255, 0.1);
+}
+
+.game-score-row .rank-1 {
+  color: #ffd700 !important;
+  text-shadow: 0 0 8px #ffd700;
+}
+
+.game-score-row .rank-2 {
+  color: #c0c0c0 !important;
+  text-shadow: 0 0 8px #c0c0c0;
+}
+
+.game-score-row .rank-3 {
+  color: #cd7f32 !important;
+  text-shadow: 0 0 8px #cd7f32;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-header,
+  .leaderboard-row {
+    grid-template-columns: 40px 1fr 100px;
+  }
+
+  .games-col {
+    display: none;
+  }
+}

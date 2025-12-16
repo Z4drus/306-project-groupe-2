@@ -40,3 +40,6 @@ Thumbs.db
 debug/
 tmp/
 temp/
+
+/src/generated/prisma
+/server/generated/prisma
