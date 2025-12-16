@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:full": "bash scripts/start-dev.sh",
+    "dev:full": "node scripts/start-dev.js",
+    "dev:linux": "bash scripts/start-dev.sh",
+    "dev:win": "scripts\\start-dev.bat",
+    "dev:ps": "powershell -ExecutionPolicy Bypass -File scripts/start-dev.ps1",
     "build": "vite build",
     "preview": "vite preview",
     "server": "node --experimental-strip-types server/index.js",
