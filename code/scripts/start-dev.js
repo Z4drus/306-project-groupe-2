@@ -1,193 +1,274 @@
 /**
- * Script de demarrage cross-platform pour ArcadiaBox
- * Detecte automatiquement l'OS et lance le frontend + backend
+ * Script de démarrage dev cross-platform pour ArcadiaBox
  *
- * Usage: node scripts/start-dev.js
- *        npm run dev:full
+ * Lance le frontend (Vite) et le backend (Express) simultanément.
+ * Vérifie les prérequis avant de démarrer.
+ *
+ * Usage: npm run dev:full
  */
 
 import { spawn, exec } from 'child_process';
 import { platform } from 'os';
-import { createInterface } from 'readline';
+import { existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT_DIR = join(__dirname, '..');
+
+const isWindows = platform() === 'win32';
+
+// Configuration des ports
+const BACKEND_PORT = 8080;
+const FRONTEND_PORT = 3000;
 
 // Couleurs ANSI
-const colors = {
+const c = {
   reset: '\x1b[0m',
-  blue: '\x1b[34m',
+  bold: '\x1b[1m',
+  red: '\x1b[31m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
+  blue: '\x1b[34m',
   cyan: '\x1b[36m',
-  red: '\x1b[31m',
   gray: '\x1b[90m'
 };
 
-function log(color, message) {
-  console.log(`${colors[color]}${message}${colors.reset}`);
+let backendProcess = null;
+let frontendProcess = null;
+
+/**
+ * Vérifie si le client Prisma est généré
+ */
+function checkPrismaClient() {
+  const prismaPath = join(ROOT_DIR, 'server', 'generated', 'prisma');
+  return existsSync(prismaPath);
 }
 
-function logStep(step, total, message) {
-  console.log(`${colors.cyan}[${step}/${total}]${colors.reset} ${message}`);
+/**
+ * Vérifie si node_modules existe
+ */
+function checkNodeModules() {
+  return existsSync(join(ROOT_DIR, 'node_modules'));
 }
 
-// Afficher le header
-console.log('');
-log('blue', '========================================');
-log('blue', '   ArcadiaBox - Demarrage Dev');
-log('blue', '========================================');
-console.log('');
-
-const isWindows = platform() === 'win32';
-let serverProcess = null;
-let viteProcess = null;
-
-// Fonction pour tuer un processus sur un port
-function killProcessOnPort(port) {
+/**
+ * Tue un processus sur un port donné
+ */
+function killPort(port) {
   return new Promise((resolve) => {
     if (isWindows) {
       exec(`netstat -ano | findstr :${port}`, (err, stdout) => {
         if (stdout) {
           const lines = stdout.trim().split('\n');
+          const pids = new Set();
           lines.forEach(line => {
             const match = line.match(/LISTENING\s+(\d+)/);
-            if (match) {
-              exec(`taskkill /F /PID ${match[1]}`, () => {});
-            }
+            if (match) pids.add(match[1]);
+          });
+          pids.forEach(pid => {
+            exec(`taskkill /F /PID ${pid}`, () => {});
           });
         }
-        setTimeout(resolve, 500);
+        setTimeout(resolve, 300);
       });
     } else {
       exec(`lsof -ti:${port}`, (err, stdout) => {
         if (stdout) {
-          exec(`kill -9 ${stdout.trim()}`, () => {});
+          exec(`kill -9 ${stdout.trim().split('\n').join(' ')}`, () => {});
         }
-        setTimeout(resolve, 500);
+        setTimeout(resolve, 300);
       });
     }
   });
 }
 
-// Fonction pour verifier si un port est utilise
-function isPortInUse(port) {
-  return new Promise((resolve) => {
-    if (isWindows) {
-      exec(`netstat -ano | findstr :${port} | findstr LISTENING`, (err, stdout) => {
-        resolve(!!stdout);
+/**
+ * Attend qu'un port soit disponible
+ */
+function waitForPort(port, timeout = 10000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+
+    const check = () => {
+      const cmd = isWindows
+        ? `netstat -ano | findstr :${port} | findstr LISTENING`
+        : `lsof -i:${port} | grep LISTEN`;
+
+      exec(cmd, (err, stdout) => {
+        if (stdout && stdout.trim()) {
+          resolve(true);
+        } else if (Date.now() - start > timeout) {
+          reject(new Error(`Timeout: port ${port} non disponible`));
+        } else {
+          setTimeout(check, 500);
+        }
       });
-    } else {
-      exec(`lsof -i:${port}`, (err, stdout) => {
-        resolve(!!stdout);
-      });
-    }
+    };
+
+    check();
   });
 }
 
-// Fonction pour attendre
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+/**
+ * Lance le backend Express
+ */
+function startBackend() {
+  return new Promise((resolve, reject) => {
+    console.log(`${c.cyan}[backend]${c.reset} Démarrage sur port ${BACKEND_PORT}...`);
+
+    backendProcess = spawn('node', ['--experimental-strip-types', 'server/index.js'], {
+      cwd: ROOT_DIR,
+      shell: isWindows,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env }
+    });
+
+    let started = false;
+    let errorOutput = '';
+
+    backendProcess.stdout.on('data', (data) => {
+      const text = data.toString();
+      process.stdout.write(`${c.gray}${text}${c.reset}`);
+
+      // Détecte le message de démarrage réussi
+      if (text.includes('Serveur démarré') || text.includes('ArcadiaBox Server')) {
+        started = true;
+        resolve(true);
+      }
+    });
+
+    backendProcess.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+      process.stderr.write(`${c.red}[backend] ${data}${c.reset}`);
+    });
+
+    backendProcess.on('error', (err) => {
+      reject(new Error(`Erreur backend: ${err.message}`));
+    });
+
+    backendProcess.on('close', (code) => {
+      if (!started && code !== 0) {
+        reject(new Error(`Backend crash (code ${code})\n${errorOutput}`));
+      }
+    });
+
+    // Timeout de sécurité
+    setTimeout(() => {
+      if (!started) {
+        reject(new Error('Timeout: le backend n\'a pas démarré'));
+      }
+    }, 15000);
+  });
 }
 
-// Cleanup a la fermeture
+/**
+ * Lance le frontend Vite
+ */
+function startFrontend() {
+  console.log(`${c.cyan}[frontend]${c.reset} Démarrage Vite sur port ${FRONTEND_PORT}...`);
+
+  frontendProcess = spawn('npx', ['vite', '--host', '--port', String(FRONTEND_PORT)], {
+    cwd: ROOT_DIR,
+    shell: isWindows,
+    stdio: 'inherit'
+  });
+
+  frontendProcess.on('error', (err) => {
+    console.error(`${c.red}Erreur frontend: ${err.message}${c.reset}`);
+  });
+}
+
+/**
+ * Nettoie les processus à la fermeture
+ */
 function cleanup() {
-  console.log('');
-  log('yellow', 'Arret des serveurs...');
+  console.log(`\n${c.yellow}Arrêt des serveurs...${c.reset}`);
 
-  if (serverProcess) {
-    serverProcess.kill();
+  if (backendProcess) {
+    backendProcess.kill();
   }
-  if (viteProcess) {
-    viteProcess.kill();
+  if (frontendProcess) {
+    frontendProcess.kill();
   }
 
-  // Tuer les processus sur les ports
   Promise.all([
-    killProcessOnPort(8080),
-    killProcessOnPort(3000)
+    killPort(BACKEND_PORT),
+    killPort(FRONTEND_PORT)
   ]).then(() => {
-    log('green', 'Serveurs arretes.');
+    console.log(`${c.green}Serveurs arrêtés.${c.reset}`);
     process.exit(0);
   });
 }
 
-// Gerer les signaux de fermeture
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
-process.on('exit', cleanup);
 
+/**
+ * Point d'entrée principal
+ */
 async function main() {
-  try {
-    // Etape 1: Nettoyer les ports
-    logStep(1, 4, 'Verification des ports...');
+  console.log('');
+  console.log(`${c.blue}${c.bold}══════════════════════════════════════${c.reset}`);
+  console.log(`${c.blue}${c.bold}     ArcadiaBox - Mode Développement${c.reset}`);
+  console.log(`${c.blue}${c.bold}══════════════════════════════════════${c.reset}`);
+  console.log('');
 
-    if (await isPortInUse(8080)) {
-      log('yellow', 'Port 8080 utilise, arret du processus...');
-      await killProcessOnPort(8080);
-    }
+  // Vérification des prérequis
+  console.log(`${c.cyan}[check]${c.reset} Vérification des prérequis...`);
 
-    if (await isPortInUse(3000)) {
-      log('yellow', 'Port 3000 utilise, arret du processus...');
-      await killProcessOnPort(3000);
-    }
-
-    // Etape 2: Demarrer le backend
-    logStep(2, 4, 'Demarrage du serveur backend...');
-
-    serverProcess = spawn('node', ['--experimental-strip-types', 'server/index.js'], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      shell: isWindows
-    });
-
-    serverProcess.stdout.on('data', (data) => {
-      process.stdout.write(`${colors.gray}[backend] ${data}${colors.reset}`);
-    });
-
-    serverProcess.stderr.on('data', (data) => {
-      process.stderr.write(`${colors.red}[backend] ${data}${colors.reset}`);
-    });
-
-    serverProcess.on('error', (err) => {
-      log('red', `Erreur backend: ${err.message}`);
-    });
-
-    // Etape 3: Attendre le serveur
-    logStep(3, 4, 'Attente du serveur...');
-    await sleep(3000);
-
-    if (await isPortInUse(8080)) {
-      log('green', '✓ Serveur backend pret sur http://localhost:8080');
-    } else {
-      log('yellow', '⚠ Le serveur met du temps a demarrer...');
-    }
-
-    // Etape 4: Demarrer Vite
-    logStep(4, 4, 'Demarrage du frontend Vite...');
-    console.log('');
-    log('green', '========================================');
-    log('green', '   ✓ ArcadiaBox pret !');
-    log('green', '========================================');
-    console.log(`   Backend:  ${colors.blue}http://localhost:8080${colors.reset}`);
-    console.log(`   Frontend: ${colors.blue}http://localhost:3000${colors.reset}`);
-    log('green', '========================================');
-    console.log('');
-    log('gray', 'Appuyez sur Ctrl+C pour arreter les serveurs');
-    console.log('');
-
-    // Lancer Vite
-    viteProcess = spawn('npx', ['vite', '--host'], {
-      stdio: 'inherit',
-      shell: isWindows
-    });
-
-    viteProcess.on('close', (code) => {
-      if (code !== null) {
-        cleanup();
-      }
-    });
-
-  } catch (error) {
-    log('red', `Erreur: ${error.message}`);
-    cleanup();
+  if (!checkNodeModules()) {
+    console.error(`${c.red}✗ node_modules manquant${c.reset}`);
+    console.log(`  Exécutez d'abord: ${c.cyan}npm run setup${c.reset}`);
+    process.exit(1);
   }
+  console.log(`${c.green}✓${c.reset} node_modules OK`);
+
+  if (!checkPrismaClient()) {
+    console.error(`${c.red}✗ Client Prisma non généré${c.reset}`);
+    console.log(`  Exécutez d'abord: ${c.cyan}npm run setup${c.reset}`);
+    process.exit(1);
+  }
+  console.log(`${c.green}✓${c.reset} Client Prisma OK`);
+
+  // Libération des ports
+  console.log('');
+  console.log(`${c.cyan}[ports]${c.reset} Libération des ports...`);
+  await killPort(BACKEND_PORT);
+  await killPort(FRONTEND_PORT);
+  console.log(`${c.green}✓${c.reset} Ports libérés`);
+
+  // Lancement du backend
+  console.log('');
+  try {
+    await startBackend();
+    console.log(`${c.green}✓ Backend prêt sur http://localhost:${BACKEND_PORT}${c.reset}`);
+  } catch (error) {
+    console.error(`${c.red}✗ ${error.message}${c.reset}`);
+    console.log('');
+    console.log(`${c.yellow}Vérifiez:${c.reset}`);
+    console.log(`  - Le fichier .env contient DATABASE_URL`);
+    console.log(`  - Exécutez: ${c.cyan}npm run setup${c.reset}`);
+    process.exit(1);
+  }
+
+  // Lancement du frontend
+  console.log('');
+  console.log(`${c.blue}══════════════════════════════════════${c.reset}`);
+  console.log(`${c.green}${c.bold}  ArcadiaBox prêt !${c.reset}`);
+  console.log(`${c.blue}══════════════════════════════════════${c.reset}`);
+  console.log(`  Backend:  ${c.cyan}http://localhost:${BACKEND_PORT}${c.reset}`);
+  console.log(`  Frontend: ${c.cyan}http://localhost:${FRONTEND_PORT}${c.reset}`);
+  console.log(`${c.blue}══════════════════════════════════════${c.reset}`);
+  console.log('');
+  console.log(`${c.gray}Ctrl+C pour arrêter${c.reset}`);
+  console.log('');
+
+  startFrontend();
 }
 
-main();
+main().catch((error) => {
+  console.error(`${c.red}Erreur fatale: ${error.message}${c.reset}`);
+  cleanup();
+});

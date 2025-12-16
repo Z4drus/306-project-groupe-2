@@ -60,20 +60,45 @@ export default class LoadingOverlay {
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(135deg, #0a0014 0%, #1a0f2e 50%, #050008 100%);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
-        animation: fadeIn 0.3s ease-out;
+        animation: loaderFadeIn 0.3s ease-out;
       }
 
-      @keyframes fadeIn {
+      #loading-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          repeating-linear-gradient(
+            0deg,
+            rgba(189, 0, 255, 0.03) 0px,
+            transparent 1px,
+            transparent 2px,
+            rgba(189, 0, 255, 0.03) 3px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(0, 212, 255, 0.03) 0px,
+            transparent 1px,
+            transparent 2px,
+            rgba(0, 212, 255, 0.03) 3px
+          );
+        pointer-events: none;
+      }
+
+      @keyframes loaderFadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
       }
 
-      @keyframes fadeOut {
+      @keyframes loaderFadeOut {
         from { opacity: 1; }
         to { opacity: 0; }
       }
@@ -81,65 +106,125 @@ export default class LoadingOverlay {
       .loading-content {
         text-align: center;
         color: white;
-        font-family: 'Arial', sans-serif;
+        font-family: 'Arcade', 'Courier New', monospace;
+        position: relative;
+        z-index: 1;
       }
 
       .loading-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
         margin-bottom: 2rem;
-        color: #ff6b35;
-        text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
-        animation: pulse 2s ease-in-out infinite;
+        color: #bd00ff;
+        text-shadow:
+          0 0 10px #bd00ff,
+          0 0 20px #bd00ff,
+          0 0 30px #8b00ff;
+        animation: loaderPulse 2s ease-in-out infinite, loaderFlicker 4s infinite alternate;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
       }
 
-      @keyframes pulse {
+      @keyframes loaderPulse {
         0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+        50% { transform: scale(1.03); }
+      }
+
+      @keyframes loaderFlicker {
+        0%, 100% {
+          opacity: 1;
+          text-shadow:
+            0 0 10px #bd00ff,
+            0 0 20px #bd00ff,
+            0 0 30px #8b00ff;
+        }
+        50% {
+          opacity: 0.95;
+          text-shadow:
+            0 0 8px #bd00ff,
+            0 0 15px #bd00ff,
+            0 0 25px #8b00ff;
+        }
       }
 
       .loading-bar-container {
-        width: 300px;
-        height: 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
+        width: 320px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 2px;
         overflow: hidden;
-        margin: 0 auto 1rem;
-        border: 2px solid rgba(255, 107, 53, 0.5);
+        margin: 0 auto 1.5rem;
+        border: 2px solid #bd00ff;
+        box-shadow:
+          0 0 15px rgba(189, 0, 255, 0.5),
+          inset 0 0 10px rgba(189, 0, 255, 0.1);
+        position: relative;
       }
 
       .loading-bar {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg, #ff6b35, #f7931e);
-        border-radius: 8px;
+        background: linear-gradient(90deg, #8b00ff, #bd00ff, #00d4ff);
+        border-radius: 0;
         transition: width 0.3s ease-out;
-        box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        box-shadow:
+          0 0 15px rgba(189, 0, 255, 0.8),
+          0 0 25px rgba(0, 212, 255, 0.5);
+        position: relative;
+      }
+
+      .loading-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 100%
+        );
+        animation: loaderShine 1.5s infinite;
+      }
+
+      @keyframes loaderShine {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
       }
 
       .loading-progress {
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: bold;
-        color: #00ffe4;
+        color: #00d4ff;
         margin-bottom: 0.5rem;
+        text-shadow:
+          0 0 10px #00d4ff,
+          0 0 20px #00d4ff;
+        font-family: 'Arcade', 'Courier New', monospace;
+        letter-spacing: 0.15em;
       }
 
       .loading-status {
-        font-size: 0.9rem;
-        color: #888;
-        animation: blink 1.5s ease-in-out infinite;
+        font-size: 0.85rem;
+        color: #00ffff;
+        animation: loaderBlink 1.5s ease-in-out infinite;
+        font-family: 'Born2bSportyFS', 'Courier New', sans-serif;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        letter-spacing: 0.05em;
       }
 
-      @keyframes blink {
+      @keyframes loaderBlink {
         0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+        50% { opacity: 0.4; }
       }
 
       .loading-dots::after {
         content: '';
-        animation: dots 1.5s steps(4, end) infinite;
+        animation: loaderDots 1.5s steps(4, end) infinite;
       }
 
-      @keyframes dots {
+      @keyframes loaderDots {
         0% { content: ''; }
         25% { content: '.'; }
         50% { content: '..'; }
@@ -187,7 +272,7 @@ export default class LoadingOverlay {
         return;
       }
 
-      this.overlay.style.animation = 'fadeOut 0.3s ease-out forwards';
+      this.overlay.style.animation = 'loaderFadeOut 0.3s ease-out forwards';
 
       setTimeout(() => {
         if (this.overlay) {

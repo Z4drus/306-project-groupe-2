@@ -47,31 +47,58 @@ export default class LoadingScene extends Phaser.Scene {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
 
-    // Fond
-    this.cameras.main.setBackgroundColor('#1a1a2e');
+    // Fond sombre arcade
+    this.cameras.main.setBackgroundColor('#0a0014');
 
-    // Titre
+    // Grille de fond subtile
+    this.createBackgroundGrid();
+
+    // Titre avec style néon
     this.titleText = this.add.text(centerX, centerY - 100, `Chargement de ${this.gameName}`, {
-      fontSize: '28px',
-      fontFamily: 'Arial Black, Arial',
-      fill: '#ff6b35'
+      fontSize: '24px',
+      fontFamily: 'Arcade, Courier New, monospace',
+      fill: '#bd00ff',
+      stroke: '#8b00ff',
+      strokeThickness: 1
     });
     this.titleText.setOrigin(0.5);
+    this.titleText.setShadow(0, 0, '#bd00ff', 15, true, true);
 
-    // Animation du titre
+    // Animation du titre (pulse + flicker)
     this.tweens.add({
       targets: this.titleText,
-      scaleX: 1.05,
-      scaleY: 1.05,
+      scaleX: 1.03,
+      scaleY: 1.03,
       duration: 1000,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
 
+    // Effet flicker sur le titre
+    this.tweens.add({
+      targets: this.titleText,
+      alpha: { from: 1, to: 0.95 },
+      duration: 100,
+      yoyo: true,
+      repeat: -1,
+      repeatDelay: 2000
+    });
+
     // Container de la barre de progression
-    const barWidth = 300;
-    const barHeight = 25;
+    const barWidth = 320;
+    const barHeight = 24;
+
+    // Bordure extérieure glow
+    this.progressGlow = this.add.rectangle(
+      centerX,
+      centerY,
+      barWidth + 12,
+      barHeight + 12,
+      0x000000,
+      0
+    );
+    this.progressGlow.setStrokeStyle(1, 0xbd00ff, 0.3);
 
     // Fond de la barre
     this.progressBg = this.add.rectangle(
@@ -79,63 +106,100 @@ export default class LoadingScene extends Phaser.Scene {
       centerY,
       barWidth + 4,
       barHeight + 4,
-      0x333333
+      0x0a0014
     );
-    this.progressBg.setStrokeStyle(2, 0xff6b35);
+    this.progressBg.setStrokeStyle(2, 0xbd00ff);
 
-    // Barre de progression
+    // Barre de progression avec dégradé violet -> cyan
     this.progressBar = this.add.rectangle(
       centerX - barWidth / 2,
       centerY,
       0,
       barHeight,
-      0xff6b35
+      0xbd00ff
     );
     this.progressBar.setOrigin(0, 0.5);
 
-    // Texte de pourcentage
-    this.percentText = this.add.text(centerX, centerY + 40, '0%', {
-      fontSize: '24px',
-      fontFamily: 'Arial Black, Arial',
-      fill: '#00ffe4'
+    // Effet de brillance sur la barre
+    this.progressShine = this.add.rectangle(
+      centerX - barWidth / 2,
+      centerY,
+      0,
+      barHeight / 2,
+      0xffffff,
+      0.15
+    );
+    this.progressShine.setOrigin(0, 0.5);
+
+    // Texte de pourcentage style arcade
+    this.percentText = this.add.text(centerX, centerY + 45, '0%', {
+      fontSize: '28px',
+      fontFamily: 'Arcade, Courier New, monospace',
+      fill: '#00d4ff'
     });
     this.percentText.setOrigin(0.5);
+    this.percentText.setShadow(0, 0, '#00d4ff', 12, true, true);
 
     // Texte de statut (fichier en cours)
-    this.statusText = this.add.text(centerX, centerY + 80, 'Initialisation...', {
+    this.statusText = this.add.text(centerX, centerY + 85, 'Initialisation...', {
       fontSize: '14px',
-      fontFamily: 'Arial',
-      fill: '#888888'
+      fontFamily: 'Born2bSportyFS, Courier New, sans-serif',
+      fill: '#00ffff'
     });
     this.statusText.setOrigin(0.5);
+    this.statusText.setShadow(0, 0, '#00ffff', 5, true, true);
 
     // Animation de clignotement du statut
     this.tweens.add({
       targets: this.statusText,
-      alpha: 0.5,
-      duration: 800,
+      alpha: 0.4,
+      duration: 750,
       yoyo: true,
       repeat: -1
     });
 
     // Compteur de fichiers
-    this.fileCountText = this.add.text(centerX, centerY + 110, '', {
+    this.fileCountText = this.add.text(centerX, centerY + 115, '', {
       fontSize: '12px',
-      fontFamily: 'Arial',
-      fill: '#666666'
+      fontFamily: 'Born2bSportyFS, Courier New, sans-serif',
+      fill: '#8b00ff'
     });
     this.fileCountText.setOrigin(0.5);
+  }
+
+  /**
+   * Crée une grille de fond subtile style arcade
+   */
+  createBackgroundGrid() {
+    const graphics = this.add.graphics();
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Lignes verticales
+    graphics.lineStyle(1, 0xbd00ff, 0.03);
+    for (let x = 0; x < width; x += 3) {
+      graphics.lineBetween(x, 0, x, height);
+    }
+
+    // Lignes horizontales
+    graphics.lineStyle(1, 0x00d4ff, 0.03);
+    for (let y = 0; y < height; y += 3) {
+      graphics.lineBetween(0, y, width, y);
+    }
   }
 
   /**
    * Configure les événements de progression du loader Phaser
    */
   setupProgressEvents() {
-    const barWidth = 300;
+    const barWidth = 320;
 
     // Progression globale
     this.load.on('progress', (value) => {
       this.progressBar.width = barWidth * value;
+      if (this.progressShine) {
+        this.progressShine.width = barWidth * value;
+      }
       this.percentText.setText(`${Math.round(value * 100)}%`);
     });
 
@@ -153,7 +217,8 @@ export default class LoadingScene extends Phaser.Scene {
 
     // Chargement terminé
     this.load.on('complete', () => {
-      this.statusText.setText('Chargement termine !');
+      this.statusText.setText('Chargement terminé !');
+      this.statusText.setColor('#00d4ff');
       this.fileCountText.setText('');
 
       // Animation de transition
