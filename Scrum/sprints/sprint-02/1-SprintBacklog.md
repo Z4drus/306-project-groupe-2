@@ -1,4 +1,4 @@
-**Sprint goal**
+## Sprint goal
 
 Disposer d’une borne arcade avec 3 jeux accessibles depuis le menu,
 fluides, avec scores fonctionnels et mode attract basique.
@@ -11,3 +11,7 @@ fluides, avec scores fonctionnels et mode attract basique.
 | **US16**       | En tant que joueur, je veux une expérience fluide                            | Optimisation Canvas 2D Jeux 2 & 3       | Haute        |
 | **US18**       | En tant que joueur, je veux accéder aux jeux depuis le menu                  | Intégration Jeux 2 & 3 dans menu arcade | Haute        |
 | **US19**       | En tant que joueur, je veux que mes scores soient comptabilisés              | Logique scoring Jeux 2 & 3              | Haute        |
+
+## Définition des critères de réussite (Definition of Done)
+
+## Risques / Points à surveiller
