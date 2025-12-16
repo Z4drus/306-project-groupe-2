@@ -26,7 +26,7 @@ import {
   generateBrickLayout,
   getDifficultyParams
 } from '../config/GameConfig.js';
-import ExitConfirmDialog from '../../../core/ExitConfirmDialog.js';
+import DOMExitConfirmDialog from '../../../core/DOMExitConfirmDialog.js';
 
 export default class GameController {
   /**
@@ -216,10 +216,12 @@ export default class GameController {
       this.paddleModel.y
     );
 
-    // Dialogue de confirmation de sortie
-    this.exitDialog = new ExitConfirmDialog(this.scene, {
+    // Dialogue de confirmation de sortie (DOM)
+    this.exitDialog = new DOMExitConfirmDialog({
       onConfirm: () => this.confirmExit(),
       onCancel: () => this.cancelExit(),
+      onShow: () => this.pauseGame(),
+      onHide: () => this.resumeGame(),
       message: 'Quitter la partie ?',
       subMessage: 'Ta progression ne sera pas sauvegardee'
     });
@@ -278,10 +280,9 @@ export default class GameController {
    * Boucle de mise à jour principale
    */
   update() {
-    // Mettre à jour le dialogue de confirmation si visible
+    // Bloquer les inputs si le dialogue de confirmation est visible
     if (this.exitDialog?.isShowing()) {
-      this.exitDialog.updateGamepad();
-      return; // Bloquer les autres inputs
+      return;
     }
 
     if (!this.isInitialized || this.levelTransitionInProgress) return;
@@ -450,6 +451,40 @@ export default class GameController {
    */
   cancelExit() {
     // Le dialogue se ferme automatiquement, rien d'autre à faire
+  }
+
+  /**
+   * Met le jeu en pause (freeze tous les éléments)
+   */
+  pauseGame() {
+    // Mettre en pause la physique
+    this.scene.physics.world.pause();
+
+    // Mettre en pause les timers
+    this.scene.time.paused = true;
+
+    // Mettre en pause les tweens
+    this.scene.tweens.pauseAll();
+
+    // Mettre en pause les animations
+    this.scene.anims.pauseAll();
+  }
+
+  /**
+   * Reprend le jeu après une pause
+   */
+  resumeGame() {
+    // Reprendre la physique
+    this.scene.physics.world.resume();
+
+    // Reprendre les timers
+    this.scene.time.paused = false;
+
+    // Reprendre les tweens
+    this.scene.tweens.resumeAll();
+
+    // Reprendre les animations
+    this.scene.anims.resumeAll();
   }
 
   /**
