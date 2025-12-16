@@ -7,12 +7,15 @@ ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par 
 
 
 ### AXELLE
+- Creation db
+- documentation
+- diagramme de classe
 
 
 
 
 ### NOE
-
+- code 1
 
 
 ### DIOGO
