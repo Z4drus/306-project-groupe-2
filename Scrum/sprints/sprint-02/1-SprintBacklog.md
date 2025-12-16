@@ -1,3 +1,8 @@
+**Sprint goal**
+
+Disposer d’une borne arcade avec 3 jeux accessibles depuis le menu,
+fluides, avec scores fonctionnels et mode attract basique.
+
 | **User Story** | **Description**                                                              | **Tâches associées (issues)**           | **Priorité** |
 | -------------- | ---------------------------------------------------------------------------- | --------------------------------------- | ------------ |
 | **US13**       | En tant que joueur, je veux voir un menu attract quand la borne est inactive | Menu attract                            | Haute        |
