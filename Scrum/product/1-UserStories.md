@@ -1,10 +1,12 @@
 # SCRUM : User-stories
 
 ## Contexte
+
 ArcadiaLabs développe une borne d’arcade moderne, accessible depuis un navigateur web, fonctionnant sur Raspberry Pi, et offrant au moins 3 mini-jeux jouables avec clavier ou manette Xbox.
 L’objectif est de proposer une expérience simple, fluide, intuitive, adaptée à des utilisateurs non techniques (élèves, visiteurs, collaborateurs).
 
 ## User-stories
+
 ### **US01 – Utiliser la manette**
 
 En tant que joueur,
@@ -122,3 +124,57 @@ En tant que joueur,
 Je veux une interface adaptée à l’écran (PC, tablette, RPi),
 
 Afin de jouer confortablement sur n’importe quel device.
+
+### **US13 – Afficher un menu attract**
+
+En tant que joueur,
+Je veux voir un menu attract lorsque la borne est inactive,
+Afin d’attirer l’attention et donner envie de jouer.
+
+---
+
+### **US14 – Jouer aux jeux 2 et 3 sans bug**
+
+En tant que joueur,
+Je veux que les jeux 2 et 3 fonctionnent correctement,
+Afin de jouer sans collisions ou comportements incohérents.
+
+---
+
+### **US15 – Charger dynamiquement les assets**
+
+En tant que système,
+Je veux charger dynamiquement les assets des jeux,
+Afin d’optimiser les temps de chargement.
+
+---
+
+### **US16 – Optimiser les performances**
+
+En tant que joueur,
+Je veux que les jeux 2 et 3 soient optimisés,
+Afin d’avoir une expérience fluide sur Raspberry Pi.
+
+---
+
+### **US17 – Sécuriser la logique de jeu**
+
+En tant que système,
+Je veux sécuriser la logique de jeu et du score,
+Afin d’éviter la triche ou les incohérences.
+
+---
+
+### **US18 – Intégrer les jeux dans le menu**
+
+En tant que joueur,
+Je veux accéder aux jeux 2 et 3 depuis le menu arcade,
+Afin de les lancer facilement comme les autres jeux.
+
+---
+
+### **US19 – Gérer le scoring des jeux 2 et 3**
+
+En tant que joueur,
+Je veux que mes scores dans les jeux 2 et 3 soient correctement enregistrés,
+Afin de pouvoir les consulter dans le tableau des scores.
