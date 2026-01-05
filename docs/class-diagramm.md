@@ -194,4 +194,27 @@ classDiagram
     SantaCruzRunner --> Enemy
     Level --> Collectible
 ```
-
+```mermaid
+graph TD
+subgraph U[Utilisateur]
+  Gamepad[Manette Xbox / PS]
+  Keyboard[Clavier]
+end
+subgraph Borne[ArcadiaBox - Raspberry Pi]
+  Browser[Navigateur en plein écran kiosk]
+  LocalServer[Serveur local Node.js]
+  App[Application web<br/>menu + mini-jeux]
+  LocalScores[Stockage local des scores]
+end
+subgraph ScoreServer[Serveur de scores central]
+  API[API HTTP/S]
+  DB[Base de données des scores]
+end
+Gamepad --> Browser
+Keyboard --> Browser
+Browser --> LocalServer
+LocalServer --> App
+App --> LocalScores
+App -->|Envoi score + token| API
+API --> DB
+```
