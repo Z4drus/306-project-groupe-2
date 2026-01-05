@@ -50,6 +50,10 @@ export function createArcadeStore() {
     // État de transition (verrouillage contre les doubles actions)
     isTransitioning: false,
     currentGameInstance: null,
+    // Identifiant unique de la transition en cours (pour annulation)
+    currentTransitionId: 0,
+    // Flag pour annuler le chargement en cours
+    cancelLoading: false,
 
     // État des manettes
     connectedGamepads: [],
@@ -260,11 +264,22 @@ export function createArcadeStore() {
       }
 
       this.isTransitioning = true;
+      this.cancelLoading = false;
+      // Créer un identifiant unique pour cette transition
+      const transitionId = ++this.currentTransitionId;
 
       // Importer et afficher l'overlay AVANT de changer de vue
       const { getLoadingOverlay } = await import('./LoadingOverlay.js');
       const loadingOverlay = getLoadingOverlay();
       loadingOverlay.show(getGameDisplayName(gameName));
+
+      // Vérifier si la transition a été annulée
+      if (this.cancelLoading || transitionId !== this.currentTransitionId) {
+        console.log('Chargement annulé (transition obsolète)');
+        loadingOverlay.destroy();
+        this.isTransitioning = false;
+        return;
+      }
 
       // Maintenant changer la vue (le container sera masqué par l'overlay)
       this.currentGame = gameName;
@@ -295,6 +310,19 @@ export function createArcadeStore() {
         }
       }
 
+      // Vérifier si la transition a été annulée pendant le fetch du score
+      if (this.cancelLoading || transitionId !== this.currentTransitionId) {
+        console.log('Chargement annulé après récupération du score');
+        loadingOverlay.destroy();
+        if (gameContainer) {
+          gameContainer.classList.remove('loading');
+        }
+        this.isTransitioning = false;
+        this.currentView = 'menu';
+        cursorManager.show();
+        return;
+      }
+
       try {
         const gameInstance = await loadGame(
           gameName,
@@ -304,6 +332,29 @@ export function createArcadeStore() {
           this.currentBestScore,
           this.isAuthenticated ? this.user?.username : null
         );
+
+        // Vérifier si la transition a été annulée pendant le chargement du jeu
+        if (this.cancelLoading || transitionId !== this.currentTransitionId) {
+          console.log('Chargement annulé, destruction du jeu chargé');
+          // Détruire le jeu qui vient d'être chargé
+          if (gameInstance) {
+            try {
+              if (gameInstance.sound) gameInstance.sound.stopAll();
+              gameInstance.destroy(true, false);
+            } catch (e) {
+              console.warn('Erreur lors de la destruction du jeu annulé:', e);
+            }
+          }
+          loadingOverlay.destroy();
+          if (gameContainer) {
+            gameContainer.innerHTML = '';
+            gameContainer.classList.remove('loading');
+          }
+          this.isTransitioning = false;
+          this.currentView = 'menu';
+          cursorManager.show();
+          return;
+        }
 
         // Stocker l'instance du jeu pour pouvoir la détruire proprement
         this.currentGameInstance = gameInstance;
@@ -317,11 +368,13 @@ export function createArcadeStore() {
         this.isTransitioning = false;
       } catch (error) {
         console.error(`Erreur lors du chargement du jeu ${gameName}:`, error);
+        loadingOverlay.destroy();
         if (gameContainer) {
+          gameContainer.innerHTML = '';
           gameContainer.classList.remove('loading');
         }
         this.isTransitioning = false;
-        this.backToMenu();
+        this.backToMenu(false);
       }
     },
 
@@ -378,13 +431,24 @@ export function createArcadeStore() {
      * @param {boolean} showOverlay - Afficher l'overlay de transition (par défaut true)
      */
     async backToMenu(showOverlay = true) {
-      // Bloquer si une transition est déjà en cours
+      // Si un chargement est en cours, le signaler pour annulation
+      if (this.isTransitioning && this.currentView !== 'menu') {
+        console.log('Annulation du chargement en cours...');
+        this.cancelLoading = true;
+        // Incrémenter l'ID de transition pour invalider les transitions en cours
+        this.currentTransitionId++;
+        // Attendre un petit délai pour permettre aux checks d'annulation de s'exécuter
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      // Si toujours en transition après le délai, forcer le reset
       if (this.isTransitioning) {
-        console.log('Transition déjà en cours, action ignorée');
-        return;
+        console.log('Forçage du reset de transition');
+        this.isTransitioning = false;
       }
 
       this.isTransitioning = true;
+      this.cancelLoading = false;
 
       // Afficher l'overlay de chargement pour le retour (instant pour eviter le flash)
       let loadingOverlay = null;

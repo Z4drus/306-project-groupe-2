@@ -20,6 +20,8 @@ export default class LoadingOverlay {
     this.particles = [];
     this.tipIndex = 0;
     this.tipInterval = null;
+    this.isHiding = false;
+    this.hidePromise = null;
   }
 
   /**
@@ -40,6 +42,12 @@ export default class LoadingOverlay {
    * @param {boolean} options.instant - Si true, affiche sans animation de fade-in
    */
   show(gameName = 'jeu', options = {}) {
+    // Si l'overlay est en train de se cacher, le detruire immediatement
+    if (this.isHiding && this.overlay) {
+      this.forceDestroy();
+    }
+
+    // Si l'overlay existe deja et n'est pas en train de se cacher, ne rien faire
     if (this.overlay) return;
 
     const { instant = false } = options;
@@ -704,11 +712,20 @@ export default class LoadingOverlay {
    * @returns {Promise} Promise qui se resout quand l'animation est terminee
    */
   hide() {
-    return new Promise(resolve => {
+    // Si deja en train de se cacher, retourner la promise existante
+    if (this.isHiding && this.hidePromise) {
+      return this.hidePromise;
+    }
+
+    this.hidePromise = new Promise(resolve => {
       if (!this.overlay) {
+        this.isHiding = false;
+        this.hidePromise = null;
         resolve();
         return;
       }
+
+      this.isHiding = true;
 
       // Arreter les animations
       if (this.tipInterval) {
@@ -719,19 +736,25 @@ export default class LoadingOverlay {
       this.overlay.style.animation = 'loaderFadeOut 0.4s ease-out forwards';
 
       setTimeout(() => {
-        if (this.overlay) {
+        if (this.overlay && this.isHiding) {
           this.overlay.remove();
           this.overlay = null;
         }
+        this.isHiding = false;
+        this.hidePromise = null;
         resolve();
       }, 400);
     });
+
+    return this.hidePromise;
   }
 
   /**
-   * Detruit l'overlay immediatement
+   * Detruit l'overlay immediatement (annule toute animation en cours)
    */
-  destroy() {
+  forceDestroy() {
+    this.isHiding = false;
+    this.hidePromise = null;
     if (this.tipInterval) {
       clearInterval(this.tipInterval);
       this.tipInterval = null;
@@ -740,6 +763,13 @@ export default class LoadingOverlay {
       this.overlay.remove();
       this.overlay = null;
     }
+  }
+
+  /**
+   * Detruit l'overlay immediatement (alias pour forceDestroy)
+   */
+  destroy() {
+    this.forceDestroy();
   }
 }
 
