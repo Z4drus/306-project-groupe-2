@@ -482,7 +482,7 @@ body::before {
 
 .game-thumbnail {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 4/3;
   background: var(--darker-bg);
   display: flex;
   align-items: center;
@@ -525,7 +525,7 @@ body::before {
 }
 
 .game-name {
-  font-size: 1.8rem;
+  font-size: 2.4rem;
   font-weight: 400;
   font-family: var(--font-title);
   margin-bottom: var(--spacing-sm);
@@ -538,7 +538,7 @@ body::before {
 }
 
 .game-description {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   margin-bottom: var(--spacing-sm);
   color: var(--neon-purple);
   line-height: 1.5;
@@ -547,7 +547,7 @@ body::before {
 }
 
 .game-players {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--neon-cyan);
   margin-bottom: var(--spacing-md);
   font-family: var(--font-body);
@@ -558,12 +558,12 @@ body::before {
 
 .game-play-btn {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-lg) var(--spacing-xl);
   background-color: var(--darker-bg);
   color: var(--neon-purple);
   border: 3px solid var(--neon-purple);
   border-radius: var(--border-radius);
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   font-family: var(--font-title);
   font-weight: 400;
   cursor: pointer;
@@ -907,21 +907,21 @@ body::before {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: transparent;
   border: 2px solid var(--neon-cyan);
   border-radius: var(--border-radius);
   color: var(--neon-cyan);
   font-family: var(--font-title);
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: var(--transition);
   text-transform: uppercase;
 }
 
 .back-btn-compact svg {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
 }
 
 .back-btn-compact:hover {
@@ -931,7 +931,7 @@ body::before {
 
 .scores-title {
   font-family: var(--font-title);
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   color: var(--neon-purple);
   text-shadow: 0 0 15px var(--neon-purple);
   letter-spacing: 0.1em;
@@ -956,7 +956,7 @@ body::before {
   align-items: center;
   gap: var(--spacing-xs);
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: var(--neon-purple);
   text-shadow: 0 0 8px var(--neon-purple);
   padding-right: var(--spacing-sm);
@@ -965,13 +965,13 @@ body::before {
 }
 
 .user-icon-svg {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
 }
 
 .my-scores-guest {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   color: var(--neon-cyan);
   opacity: 0.7;
   font-style: italic;
@@ -981,7 +981,7 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4px 12px;
+  padding: 6px 16px;
   background: rgba(255, 255, 0, 0.1);
   border: 1px solid rgba(255, 255, 0, 0.4);
   border-radius: var(--border-radius);
@@ -990,14 +990,14 @@ body::before {
 
 .chip-game {
   font-family: var(--font-title);
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   color: var(--neon-cyan);
   letter-spacing: 0.1em;
 }
 
 .chip-value {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: #ffff00;
   text-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
 }
@@ -1042,7 +1042,7 @@ body::before {
 
 .score-column-header h3 {
   font-family: var(--font-title);
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   color: var(--neon-blue);
   text-shadow: 0 0 10px var(--neon-blue);
   margin: 0;
@@ -1082,20 +1082,20 @@ body::before {
 }
 
 .score-position {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-title);
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: var(--neon-cyan);
   flex-shrink: 0;
 }
 
 .medal-svg {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
 
 .medal-svg.gold {
@@ -1116,7 +1116,7 @@ body::before {
 .score-name {
   flex: 1;
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: var(--neon-cyan);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1125,7 +1125,7 @@ body::before {
 
 .score-pts {
   font-family: var(--font-title);
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   color: #ffff00;
   text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
   flex-shrink: 0;
@@ -1200,7 +1200,7 @@ body::before {
 
 .help-title {
   font-family: var(--font-title);
-  font-size: 1.5rem;
+  font-size: 2.5rem;
   color: var(--neon-purple);
   text-shadow: 0 0 15px var(--neon-purple);
   letter-spacing: 0.1em;
@@ -1254,7 +1254,7 @@ body::before {
 
 .help-card-header h3 {
   font-family: var(--font-title);
-  font-size: 0.85rem;
+  font-size: 1.4rem;
   color: var(--neon-blue);
   text-shadow: 0 0 8px var(--neon-blue);
   margin: 0;
@@ -1263,8 +1263,8 @@ body::before {
 }
 
 .help-card-icon {
-  width: 18px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
   color: var(--neon-cyan);
   flex-shrink: 0;
 }
@@ -1281,22 +1281,22 @@ body::before {
 .help-key-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   color: var(--neon-cyan);
 }
 
 .help-key {
   background: var(--darker-bg);
-  border: 1px solid var(--neon-purple);
+  border: 2px solid var(--neon-purple);
   border-radius: var(--border-radius);
-  padding: 1px 6px;
+  padding: 4px 12px;
   font-family: var(--font-title);
-  font-size: 0.65rem;
+  font-size: 1rem;
   color: var(--neon-purple);
   text-shadow: 0 0 5px var(--neon-purple);
-  min-width: 55px;
+  min-width: 80px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -1314,15 +1314,15 @@ body::before {
 .help-step {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 1.2rem;
   color: var(--neon-cyan);
 }
 
 .help-step-num {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1330,14 +1330,14 @@ body::before {
   color: var(--darker-bg);
   border-radius: 50%;
   font-family: var(--font-title);
-  font-size: 0.65rem;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
 .help-step-bullet {
   color: var(--neon-cyan);
-  font-size: 0.85rem;
-  width: 16px;
+  font-size: 1.4rem;
+  width: 24px;
   flex-shrink: 0;
 }
 
@@ -1351,24 +1351,24 @@ body::before {
 .help-game-item {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 4px 8px;
+  gap: 4px;
+  padding: 8px 12px;
   background: rgba(189, 0, 255, 0.08);
   border-radius: var(--border-radius);
   flex: 1;
-  min-width: 120px;
+  min-width: 150px;
 }
 
 .help-game-name {
   font-family: var(--font-title);
-  font-size: 0.75rem;
+  font-size: 1.2rem;
   color: var(--neon-purple);
   text-shadow: 0 0 5px var(--neon-purple);
 }
 
 .help-game-desc {
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: var(--neon-cyan);
   opacity: 0.85;
 }
@@ -2278,6 +2278,12 @@ button.cursor-hover,
 /* ================================
    VIRTUAL KEYBOARD
    ================================ */
+
+/* Cache le curseur quand le clavier virtuel est actif */
+html.keyboard-cursor-hidden,
+html.keyboard-cursor-hidden * {
+  cursor: none !important;
+}
 
 .virtual-keyboard-overlay {
   position: fixed;

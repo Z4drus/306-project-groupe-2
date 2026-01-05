@@ -7,6 +7,7 @@
 import Alpine from 'alpinejs';
 import { getAvailableGames } from './GameLoader.js';
 import { virtualKeyboard } from './VirtualKeyboard.js';
+import { gamepadManager, GamepadButton } from './GamepadManager.js';
 
 /**
  * Crée le composant menu Alpine.js
@@ -22,13 +23,49 @@ export function createArcadeMenuComponent() {
     selectedOptionIndex: 0,
     // Liste des actions des options
     optionActions: ['scores', 'help', 'auth', 'fullscreen'],
+    // ID du polling gamepad
+    gamepadPollId: null,
+    // État précédent du bouton B pour détecter le front montant
+    prevButtonBState: false,
 
     /**
-     * Initialise le composant et configure les écouteurs clavier
+     * Initialise le composant et configure les écouteurs clavier et manette
      */
     init() {
       this.handleKeydown = this.handleKeydown.bind(this);
       document.addEventListener('keydown', this.handleKeydown);
+
+      // Démarrer le polling de la manette pour les pages secondaires
+      this.startGamepadPolling();
+    },
+
+    /**
+     * Démarre le polling de la manette pour gérer le bouton B (retour)
+     */
+    startGamepadPolling() {
+      const poll = () => {
+        const store = Alpine.store('arcade');
+
+        // Vérifier le bouton B uniquement sur les pages secondaires
+        if (store.currentView === 'scores' || store.currentView === 'help') {
+          const isButtonBPressed = gamepadManager.isButtonPressed(GamepadButton.B, 0) ||
+                                   gamepadManager.isButtonPressed(GamepadButton.B, 1);
+
+          // Détecter le front montant (bouton vient d'être pressé)
+          if (isButtonBPressed && !this.prevButtonBState) {
+            store.backToMenu();
+          }
+
+          this.prevButtonBState = isButtonBPressed;
+        } else {
+          // Reset l'état quand on n'est pas sur une page secondaire
+          this.prevButtonBState = false;
+        }
+
+        this.gamepadPollId = requestAnimationFrame(poll);
+      };
+
+      this.gamepadPollId = requestAnimationFrame(poll);
     },
 
     /**
@@ -37,6 +74,13 @@ export function createArcadeMenuComponent() {
      */
     handleKeydown(event) {
       const store = Alpine.store('arcade');
+
+      // Gestion du retour avec Escape depuis les pages secondaires
+      if (event.key === 'Escape' && (store.currentView === 'scores' || store.currentView === 'help')) {
+        event.preventDefault();
+        store.backToMenu();
+        return;
+      }
 
       // Ne réagir qu'en vue menu et hors mode attract
       if (store.currentView !== 'menu' || store.attractMode) {

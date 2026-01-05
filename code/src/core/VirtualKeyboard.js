@@ -83,8 +83,19 @@ export default class VirtualKeyboard {
     this.selectedRow = 0;
     this.selectedCol = 0;
     this.keyElements = [];
-    this.lastDirection = null;
     this.animationFrameId = null;
+
+    // Navigation fluide style PlayStation
+    this.moveState = {
+      direction: null,
+      lastMoveTime: 0,
+      initialDelay: 300,    // Délai avant repeat (ms)
+      repeatDelay: 80,      // Intervalle de repeat rapide (ms)
+      isRepeating: false
+    };
+
+    // Gestion souris
+    this.previousCursorStyle = null;
 
     // Bindings
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -113,6 +124,9 @@ export default class VirtualKeyboard {
     this.label = options.label || 'Saisie';
     this.doneLabel = options.doneLabel || 'OK ✓';
 
+    // Cacher la souris complètement
+    this.hideCursor();
+
     this.createDOM();
     this.createKeyboard();
     this.setupEventListeners();
@@ -124,6 +138,28 @@ export default class VirtualKeyboard {
     });
 
     this.isVisible = true;
+  }
+
+  /**
+   * Cache le curseur de souris
+   */
+  hideCursor() {
+    // Sauvegarder le style actuel
+    this.previousCursorStyle = document.body.style.cursor;
+    // Cacher le curseur sur tout le document
+    document.body.style.cursor = 'none';
+    // Ajouter une classe pour forcer le curseur caché partout
+    document.documentElement.classList.add('keyboard-cursor-hidden');
+  }
+
+  /**
+   * Réaffiche le curseur de souris
+   */
+  showCursor() {
+    // Restaurer le style précédent
+    document.body.style.cursor = this.previousCursorStyle || '';
+    // Retirer la classe
+    document.documentElement.classList.remove('keyboard-cursor-hidden');
   }
 
   /**
@@ -361,30 +397,58 @@ export default class VirtualKeyboard {
   }
 
   /**
-   * Met à jour la navigation via gamepad
+   * Met à jour la navigation via gamepad avec repeat fluide style PlayStation
    */
   updateGamepad() {
     if (!this.isVisible) return;
 
-    const direction = gamepadManager.getDirection(0);
+    const now = performance.now();
 
-    // Navigation avec tracking "just pressed"
-    if (direction !== this.lastDirection) {
-      if (direction === 'up') this.moveSelection('up');
-      else if (direction === 'down') this.moveSelection('down');
-      else if (direction === 'left') this.moveSelection('left');
-      else if (direction === 'right') this.moveSelection('right');
-      this.lastDirection = direction;
+    // Vérifier les deux manettes
+    const direction = gamepadManager.getDirection(0) || gamepadManager.getDirection(1);
+
+    if (direction) {
+      // Une direction est active
+      if (direction !== this.moveState.direction) {
+        // Nouvelle direction : mouvement immédiat
+        this.moveSelection(direction);
+        this.moveState.direction = direction;
+        this.moveState.lastMoveTime = now;
+        this.moveState.isRepeating = false;
+      } else {
+        // Même direction maintenue : gérer le repeat
+        const timeSinceLastMove = now - this.moveState.lastMoveTime;
+
+        if (!this.moveState.isRepeating) {
+          // Attendre le délai initial avant de commencer le repeat
+          if (timeSinceLastMove >= this.moveState.initialDelay) {
+            this.moveSelection(direction);
+            this.moveState.lastMoveTime = now;
+            this.moveState.isRepeating = true;
+          }
+        } else {
+          // En mode repeat : mouvement rapide
+          if (timeSinceLastMove >= this.moveState.repeatDelay) {
+            this.moveSelection(direction);
+            this.moveState.lastMoveTime = now;
+          }
+        }
+      }
+    } else {
+      // Aucune direction : reset
+      this.moveState.direction = null;
+      this.moveState.isRepeating = false;
     }
 
-    // Bouton A ou X = Sélectionner
+    // Bouton A = Sélectionner (sur les deux manettes)
     if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
-        gamepadManager.isButtonJustPressed(GamepadButton.X, 0)) {
+        gamepadManager.isButtonJustPressed(GamepadButton.A, 1)) {
       this.activateSelectedKey();
     }
 
-    // Bouton B = Fermer
-    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+    // Bouton B = Fermer (sur les deux manettes)
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.B, 1)) {
       this.close();
     }
   }
@@ -605,6 +669,9 @@ export default class VirtualKeyboard {
     if (!this.isVisible) return;
 
     this.isVisible = false;
+
+    // Réafficher le curseur
+    this.showCursor();
 
     // Arrêter la boucle gamepad
     if (this.animationFrameId) {

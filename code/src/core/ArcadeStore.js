@@ -25,7 +25,7 @@ import { getAttractMode } from './AttractMode.js';
 /**
  * Durée d'inactivité avant le mode attract (ms)
  */
-const ATTRACT_MODE_DELAY = 60000;
+const ATTRACT_MODE_DELAY = 20000;
 
 /**
  * Crée le store Alpine.js
@@ -232,7 +232,13 @@ export function createArcadeStore() {
      * Configure les listeners d'activité
      */
     setupActivityListeners() {
-      const resetTimer = () => this.resetAttractTimer();
+      const resetTimer = (e) => {
+        // En mode attract, seul le bouton START peut sortir (géré par AttractMode)
+        if (this.attractMode && e.type === 'click') {
+          return;
+        }
+        this.resetAttractTimer();
+      };
       ['click', 'keydown', 'gamepadconnected'].forEach(event => {
         document.addEventListener(event, resetTimer);
       });
@@ -428,101 +434,11 @@ export function createArcadeStore() {
     },
 
     /**
-     * Retourne au menu principal avec destruction propre du jeu
-     * @param {boolean} showOverlay - Afficher l'overlay de transition (par défaut true)
+     * Retourne au menu principal en rafraîchissant la page
+     * Le refresh complet évite les bugs d'état résiduel lors des futurs chargements de jeux
      */
-    async backToMenu(showOverlay = true) {
-      // Si un chargement est en cours, le signaler pour annulation
-      if (this.isTransitioning && this.currentView !== 'menu') {
-        console.log('Annulation du chargement en cours...');
-        this.cancelLoading = true;
-        // Incrémenter l'ID de transition pour invalider les transitions en cours
-        this.currentTransitionId++;
-        // Attendre un petit délai pour permettre aux checks d'annulation de s'exécuter
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-
-      // Si toujours en transition après le délai, forcer le reset
-      if (this.isTransitioning) {
-        console.log('Forçage du reset de transition');
-        this.isTransitioning = false;
-      }
-
-      this.isTransitioning = true;
-      this.cancelLoading = false;
-
-      // Afficher l'overlay de chargement pour le retour (instant pour eviter le flash)
-      let loadingOverlay = null;
-      if (showOverlay && this.currentView === 'game') {
-        const { getLoadingOverlay } = await import('./LoadingOverlay.js');
-        loadingOverlay = getLoadingOverlay();
-        loadingOverlay.show('MENU', { instant: true });
-        loadingOverlay.update(20, 'Fermeture du jeu...');
-        // Attendre le prochain frame pour s'assurer que l'overlay est rendu
-        await new Promise(resolve => requestAnimationFrame(resolve));
-      }
-
-      // Détruire proprement l'instance du jeu si elle existe
-      if (this.currentGameInstance) {
-        try {
-          if (loadingOverlay) loadingOverlay.update(40, 'Nettoyage des ressources...');
-
-          // Arrêter tous les sons
-          if (this.currentGameInstance.sound) {
-            this.currentGameInstance.sound.stopAll();
-          }
-
-          // Arrêter toutes les scènes
-          if (this.currentGameInstance.scene) {
-            this.currentGameInstance.scene.getScenes(true).forEach(scene => {
-              try {
-                if (scene.shutdown) scene.shutdown();
-                this.currentGameInstance.scene.stop(scene.scene.key);
-              } catch (e) {
-                // Ignorer les erreurs de scène
-              }
-            });
-          }
-
-          if (loadingOverlay) loadingOverlay.update(60, 'Destruction du jeu...');
-
-          // Détruire l'instance Phaser
-          this.currentGameInstance.destroy(true, false);
-        } catch (error) {
-          console.warn('Erreur lors de la destruction du jeu:', error);
-        }
-        this.currentGameInstance = null;
-      }
-
-      if (loadingOverlay) loadingOverlay.update(80, 'Retour au menu...');
-
-      // Nettoyer le container
-      const gameContainer = document.getElementById('game-container');
-      if (gameContainer) {
-        gameContainer.innerHTML = '';
-        gameContainer.classList.remove('loading');
-      }
-
-      // Réinitialiser l'état
-      this.currentGame = null;
-      this.currentView = 'menu';
-      this.resetAttractTimer();
-      this.gameScore = 0;
-      this.gameLives = 3;
-      this.gameLevel = 1;
-
-      // Réafficher le curseur custom
-      cursorManager.show();
-
-      // Masquer l'overlay avec animation
-      if (loadingOverlay) {
-        loadingOverlay.update(100, 'Prêt !');
-        await new Promise(resolve => setTimeout(resolve, 200));
-        await loadingOverlay.hide();
-      }
-
-      // Transition terminée
-      this.isTransitioning = false;
+    backToMenu() {
+      window.location.reload();
     },
 
     /**

@@ -42,13 +42,18 @@ export default class AttractMode {
     this.ctx = this.canvas.getContext('2d');
     this.resizeCanvas();
 
-    // Creer les elements
+    // Creer les elements (particules uniquement, pas de formes)
     this.initParticles(80);
-    this.initShapes();
 
     // Event listeners
     window.addEventListener('resize', this.handleResize);
     this.container.addEventListener('mousemove', this.handleMouseMove);
+
+    // Gestionnaire de clic sur le bouton START
+    const startBtn = this.container.querySelector('#attract-start-btn');
+    if (startBtn) {
+      startBtn.addEventListener('click', this.handleStartClick);
+    }
 
     // Demarrer l'animation
     this.animate();
@@ -96,16 +101,7 @@ export default class AttractMode {
           <div class="attract-grid"></div>
         </div>
 
-        <!-- Vortex central -->
-        <div class="attract-vortex">
-          <div class="vortex-ring vortex-ring-1"></div>
-          <div class="vortex-ring vortex-ring-2"></div>
-          <div class="vortex-ring vortex-ring-3"></div>
-          <div class="vortex-ring vortex-ring-4"></div>
-          <div class="vortex-core"></div>
-        </div>
-
-        <!-- Contenu central -->
+        <!-- Contenu gauche -->
         <div class="attract-content">
           <!-- Titre principal avec glitch -->
           <div class="attract-title-container">
@@ -113,43 +109,13 @@ export default class AttractMode {
             <div class="attract-title-underline"></div>
           </div>
 
-          <!-- Message d'action -->
-          <div class="attract-action">
-            <div class="attract-action-wrapper">
-              <!-- Icone manette -->
-              <div class="attract-icon attract-icon-gamepad">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7.97 16L5 19c-.47.47-.51 1.23-.12 1.74.42.54 1.19.68 1.76.28l3.5-2.48c.19-.14.4-.23.62-.28H13.24c.22.05.43.14.62.28l3.5 2.48c.57.4 1.34.26 1.76-.28.39-.51.35-1.27-.12-1.74l-2.97-3H7.97z"/>
-                  <path d="M17 4H7c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM9 13H7v-2h2v2zm0-4H7V7h2v2zm4 4h-2v-2h2v2zm0-4h-2V7h2v2zm4 4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
-                </svg>
-              </div>
-
-              <!-- Texte principal -->
-              <div class="attract-text-block">
-                <span class="attract-press-text">APPUYEZ SUR</span>
-                <span class="attract-button-text">START</span>
-                <span class="attract-or-text">OU CLIQUEZ</span>
-              </div>
-
-              <!-- Icone clavier -->
-              <div class="attract-icon attract-icon-keyboard">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="2" y="4" width="20" height="16" rx="2"/>
-                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01"/>
-                  <path d="M8 12h.01M12 12h.01M16 12h.01"/>
-                  <path d="M7 16h10"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Insert coin style retro -->
-          <div class="attract-insert-coin">
-            <span class="coin-text">INSERT COIN</span>
-            <div class="coin-animation">
-              <div class="coin"></div>
-            </div>
-          </div>
+          <!-- Bouton START cliquable -->
+          <button class="attract-start-btn" id="attract-start-btn">
+            <span class="start-btn-bg"></span>
+            <span class="start-btn-glow"></span>
+            <span class="start-btn-text">START</span>
+            <span class="start-btn-subtext">Cliquez pour jouer</span>
+          </button>
         </div>
 
         <!-- Scanlines overlay -->
@@ -184,6 +150,22 @@ export default class AttractMode {
         <!-- Texte arcade style -->
         <div class="attract-arcade-text attract-arcade-left">PLAYER 1</div>
         <div class="attract-arcade-text attract-arcade-right">PLAYER 2</div>
+
+        <!-- Container moderne avec SVG serveur et crédits -->
+        <div class="attract-credits-panel">
+          <div class="credits-server-svg">
+            <object type="image/svg+xml" data="/assets/images/wait/server.svg" class="server-svg-obj">Server</object>
+          </div>
+          <div class="credits-info">
+            <div class="credits-year">EMF 2026</div>
+            <div class="credits-names">
+              <span>Noé Romanens</span>
+              <span>Valentin Gremaud</span>
+              <span>Diogo Da Silva</span>
+              <span>Axelle Hertig</span>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -329,96 +311,17 @@ export default class AttractMode {
         pointer-events: none;
       }
 
-      /* ========== VORTEX CENTRAL ========== */
-      .attract-vortex {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 600px;
-        height: 600px;
-        z-index: 3;
-        pointer-events: none;
-      }
-
-      .vortex-ring {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        border-radius: 50%;
-        border: 2px solid;
-        transform: translate(-50%, -50%);
-        animation: vortexRotate 4s linear infinite;
-      }
-
-      .vortex-ring-1 {
-        width: 100%;
-        height: 100%;
-        border-color: rgba(0, 255, 255, 0.1);
-        animation-duration: 20s;
-      }
-
-      .vortex-ring-2 {
-        width: 75%;
-        height: 75%;
-        border-color: rgba(189, 0, 255, 0.15);
-        animation-duration: 15s;
-        animation-direction: reverse;
-      }
-
-      .vortex-ring-3 {
-        width: 50%;
-        height: 50%;
-        border-color: rgba(0, 255, 200, 0.2);
-        animation-duration: 10s;
-      }
-
-      .vortex-ring-4 {
-        width: 25%;
-        height: 25%;
-        border-color: rgba(255, 0, 200, 0.25);
-        animation-duration: 7s;
-        animation-direction: reverse;
-      }
-
-      @keyframes vortexRotate {
-        from { transform: translate(-50%, -50%) rotate(0deg); }
-        to { transform: translate(-50%, -50%) rotate(360deg); }
-      }
-
-      .vortex-core {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 150px;
-        height: 150px;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(circle,
-          rgba(0, 255, 255, 0.3) 0%,
-          rgba(189, 0, 255, 0.2) 30%,
-          transparent 70%
-        );
-        border-radius: 50%;
-        animation: corePulse 2s ease-in-out infinite;
-        filter: blur(20px);
-      }
-
-      @keyframes corePulse {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-        50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-      }
-
-      /* ========== CONTENU CENTRAL ========== */
+      /* ========== CONTENU GAUCHE ========== */
       .attract-content {
         position: absolute;
         top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        left: 10%;
+        transform: translateY(-50%);
         z-index: 10;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3rem;
+        gap: 2.5rem;
         text-align: center;
       }
 
@@ -516,164 +419,121 @@ export default class AttractMode {
         50% { opacity: 1; transform: scaleX(1); }
       }
 
-      /* ========== ZONE D'ACTION ========== */
-      .attract-action {
-        padding: 2rem 3rem;
-        background: rgba(0, 10, 30, 0.6);
-        border: 2px solid rgba(0, 255, 255, 0.3);
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        animation: actionPulse 2s ease-in-out infinite;
-        box-shadow:
-          0 0 30px rgba(0, 255, 255, 0.2),
-          0 0 60px rgba(189, 0, 255, 0.1),
-          inset 0 0 30px rgba(0, 255, 255, 0.05);
+      /* ========== BOUTON START STYLISE ========== */
+      .attract-start-btn {
+        position: relative;
+        padding: 1.5rem 4rem;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 16px;
+        transition: transform 0.2s ease;
       }
 
-      @keyframes actionPulse {
+      .attract-start-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .attract-start-btn:active {
+        transform: scale(0.98);
+      }
+
+      .start-btn-bg {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg,
+          rgba(0, 255, 255, 0.15) 0%,
+          rgba(99, 102, 241, 0.2) 50%,
+          rgba(168, 85, 247, 0.15) 100%
+        );
+        border: 2px solid rgba(0, 255, 255, 0.4);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .attract-start-btn:hover .start-btn-bg {
+        border-color: rgba(0, 255, 255, 0.8);
+        background: linear-gradient(135deg,
+          rgba(0, 255, 255, 0.25) 0%,
+          rgba(99, 102, 241, 0.3) 50%,
+          rgba(168, 85, 247, 0.25) 100%
+        );
+      }
+
+      .start-btn-glow {
+        position: absolute;
+        inset: -4px;
+        background: linear-gradient(135deg, #00ffff, #6366f1, #a855f7, #00ffff);
+        background-size: 300% 300%;
+        border-radius: 20px;
+        filter: blur(15px);
+        opacity: 0.5;
+        z-index: -1;
+        animation: glowRotate 3s linear infinite, glowPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes glowRotate {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      @keyframes glowPulse {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.05); }
+      }
+
+      .attract-start-btn:hover .start-btn-glow {
+        opacity: 0.8;
+        filter: blur(20px);
+      }
+
+      .start-btn-text {
+        position: relative;
+        display: block;
+        font-family: 'Arcade', 'Orbitron', 'Courier New', monospace;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.15em;
+        text-shadow:
+          0 0 10px rgba(0, 255, 255, 0.8),
+          0 0 30px rgba(0, 255, 255, 0.6),
+          0 0 50px rgba(99, 102, 241, 0.4);
+        animation: textPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes textPulse {
         0%, 100% {
-          border-color: rgba(0, 255, 255, 0.3);
-          box-shadow:
-            0 0 30px rgba(0, 255, 255, 0.2),
-            0 0 60px rgba(189, 0, 255, 0.1),
-            inset 0 0 30px rgba(0, 255, 255, 0.05);
+          text-shadow:
+            0 0 10px rgba(0, 255, 255, 0.8),
+            0 0 30px rgba(0, 255, 255, 0.6),
+            0 0 50px rgba(99, 102, 241, 0.4);
         }
         50% {
-          border-color: rgba(189, 0, 255, 0.5);
-          box-shadow:
-            0 0 50px rgba(189, 0, 255, 0.3),
-            0 0 100px rgba(0, 255, 255, 0.2),
-            inset 0 0 40px rgba(189, 0, 255, 0.08);
+          text-shadow:
+            0 0 20px rgba(0, 255, 255, 1),
+            0 0 40px rgba(0, 255, 255, 0.8),
+            0 0 70px rgba(168, 85, 247, 0.6);
         }
       }
 
-      .attract-action-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-      }
-
-      .attract-icon {
-        width: 60px;
-        height: 60px;
-        color: #00ffff;
-        filter: drop-shadow(0 0 10px currentColor);
-        animation: iconFloat 3s ease-in-out infinite;
-      }
-
-      .attract-icon-gamepad {
-        animation-delay: 0s;
-      }
-
-      .attract-icon-keyboard {
-        animation-delay: 1.5s;
-      }
-
-      @keyframes iconFloat {
-        0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-8px) scale(1.05); }
-      }
-
-      .attract-text-block {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .attract-press-text {
-        font-family: 'Born2bSportyFS', 'Courier New', sans-serif;
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.7);
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-      }
-
-      .attract-button-text {
-        font-family: 'Arcade', 'Orbitron', 'Courier New', monospace;
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #00ffff;
-        text-shadow:
-          0 0 10px #00ffff,
-          0 0 20px #00ffff,
-          0 0 40px #bd00ff;
-        animation: buttonBlink 1s ease-in-out infinite;
-        letter-spacing: 0.2em;
-      }
-
-      @keyframes buttonBlink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
-
-      .attract-or-text {
-        font-family: 'Born2bSportyFS', 'Courier New', sans-serif;
-        font-size: 0.9rem;
-        color: rgba(189, 0, 255, 0.8);
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-      }
-
-      /* ========== INSERT COIN ========== */
-      .attract-insert-coin {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        animation: insertCoinBlink 1.2s ease-in-out infinite;
-      }
-
-      @keyframes insertCoinBlink {
-        0%, 49%, 100% { opacity: 1; }
-        50%, 99% { opacity: 0.3; }
-      }
-
-      .coin-text {
-        font-family: 'Arcade', 'Courier New', monospace;
-        font-size: 1.5rem;
-        color: #ffd700;
-        text-shadow:
-          0 0 10px rgba(255, 215, 0, 0.8),
-          0 0 20px rgba(255, 215, 0, 0.5);
-        letter-spacing: 0.15em;
-      }
-
-      .coin-animation {
+      .start-btn-subtext {
         position: relative;
-        width: 30px;
-        height: 40px;
-        overflow: hidden;
+        display: block;
+        margin-top: 0.5rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.6);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
       }
 
-      .coin {
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        background: linear-gradient(135deg, #ffd700 0%, #ffaa00 50%, #ffd700 100%);
-        border-radius: 50%;
-        border: 2px solid #cc9900;
-        animation: coinDrop 1.5s ease-in infinite;
-        box-shadow:
-          0 0 10px rgba(255, 215, 0, 0.6),
-          inset 0 -3px 6px rgba(0, 0, 0, 0.3);
-      }
-
-      .coin::after {
-        content: '$';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 12px;
-        font-weight: bold;
-        color: #996600;
-      }
-
-      @keyframes coinDrop {
-        0% { top: -30px; opacity: 0; }
-        20% { opacity: 1; }
-        80% { opacity: 1; }
-        100% { top: 40px; opacity: 0; }
+      .attract-start-btn:hover .start-btn-subtext {
+        color: rgba(255, 255, 255, 0.9);
       }
 
       /* ========== SCANLINES ========== */
@@ -760,28 +620,120 @@ export default class AttractMode {
         50% { opacity: 1; }
       }
 
+      /* ========== CONTAINER CREDITS MODERNE ========== */
+      .attract-credits-panel {
+        position: absolute;
+        top: 50%;
+        right: 5%;
+        transform: translateY(-50%);
+        z-index: 15;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 3rem;
+        padding: 3rem 3.5rem;
+        background: linear-gradient(135deg,
+          rgba(15, 23, 42, 0.85) 0%,
+          rgba(30, 41, 59, 0.75) 50%,
+          rgba(15, 23, 42, 0.85) 100%
+        );
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 24px;
+        backdrop-filter: blur(20px);
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      .attract-credits-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        padding: 1px;
+        background: linear-gradient(135deg,
+          rgba(99, 102, 241, 0.3) 0%,
+          transparent 50%,
+          rgba(168, 85, 247, 0.3) 100%
+        );
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .credits-server-svg {
+        width: 280px;
+        height: 340px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .server-svg-obj {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 10px 25px rgba(39, 198, 253, 0.3));
+        pointer-events: none;
+      }
+
+      .credits-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      .credits-year {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .credits-names {
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+
+      .credits-names span {
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: #cbd5e1;
+        letter-spacing: 0.02em;
+        line-height: 1.5;
+        transition: color 0.2s ease;
+      }
+
+      .credits-names span:hover {
+        color: #f1f5f9;
+      }
+
+
       /* ========== RESPONSIVE ========== */
       @media (max-width: 768px) {
         .attract-main-title {
           font-size: clamp(1.8rem, 8vw, 3rem);
         }
 
-        .attract-action {
-          padding: 1.5rem 2rem;
+        .attract-start-btn {
+          padding: 1rem 2.5rem;
         }
 
-        .attract-action-wrapper {
-          flex-direction: column;
-          gap: 1rem;
+        .start-btn-text {
+          font-size: 2rem;
         }
 
-        .attract-icon {
-          width: 40px;
-          height: 40px;
-        }
-
-        .attract-button-text {
-          font-size: 1.8rem;
+        .start-btn-subtext {
+          font-size: 0.75rem;
         }
 
         .attract-corner {
@@ -793,9 +745,44 @@ export default class AttractMode {
           display: none;
         }
 
-        .attract-vortex {
-          width: 300px;
-          height: 300px;
+        .attract-credits-panel {
+          right: 50%;
+          transform: translate(50%, -50%);
+          bottom: auto;
+          top: auto;
+          margin-top: 60vh;
+          padding: 1.5rem;
+          gap: 1rem;
+        }
+
+        .credits-server-svg {
+          width: 100px;
+          height: 120px;
+        }
+
+        .credits-year {
+          font-size: 1.2rem;
+        }
+
+        .credits-names span {
+          font-size: 0.85rem;
+        }
+      }
+
+      @media (max-width: 1200px) and (min-width: 769px) {
+        .attract-content {
+          left: 5%;
+        }
+
+        .attract-credits-panel {
+          right: 3%;
+          padding: 1.5rem 2rem;
+          gap: 1.5rem;
+        }
+
+        .credits-server-svg {
+          width: 140px;
+          height: 170px;
         }
       }
     `;
@@ -824,6 +811,19 @@ export default class AttractMode {
   handleMouseMove = (e) => {
     this.mouseX = e.clientX;
     this.mouseY = e.clientY;
+  };
+
+  /**
+   * Gere le clic sur le bouton START
+   */
+  handleStartClick = () => {
+    // Importer Alpine dynamiquement pour accéder au store
+    import('alpinejs').then((Alpine) => {
+      const store = Alpine.default.store('arcade');
+      if (store) {
+        store.resetAttractTimer();
+      }
+    });
   };
 
   /**
@@ -924,19 +924,6 @@ export default class AttractMode {
 
     this.time += 0.016;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Dessiner les formes
-    this.shapes.forEach((shape) => {
-      shape.x += shape.speedX;
-      shape.y += shape.speedY;
-      shape.rotation += shape.rotationSpeed;
-
-      // Rebondir sur les bords
-      if (shape.x < 0 || shape.x > this.canvas.width) shape.speedX *= -1;
-      if (shape.y < 0 || shape.y > this.canvas.height) shape.speedY *= -1;
-
-      this.drawShape(shape);
-    });
 
     // Dessiner les particules
     this.particles.forEach((p) => {
