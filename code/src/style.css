@@ -391,56 +391,11 @@ body::before {
     inset 0 0 12px rgba(255, 107, 107, 0.1);
 }
 
-/* Mode attract */
-.attract-mode {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-height: 50vh;
-}
-
-.arcade-menu .attract-mode {
-  height: 100%;
-  min-height: auto;
-}
-
-.attract-text {
-  font-size: 2.2rem;
-  font-family: var(--font-title);
-  text-align: center;
-  color: var(--neon-cyan);
-  text-shadow:
-    0 0 15px var(--neon-cyan),
-    0 0 30px var(--neon-cyan),
-    0 0 45px var(--neon-blue);
-  animation: blink 1.5s infinite, colorshift 3s infinite;
-  padding: var(--spacing-lg);
-  border: 3px solid var(--neon-cyan);
-  box-shadow:
-    0 0 20px var(--neon-cyan),
-    0 0 40px rgba(0, 255, 255, 0.3),
-    inset 0 0 15px rgba(0, 255, 255, 0.1);
-}
-
-@keyframes blink {
-  0%, 49%, 100% {
-    opacity: 1;
-  }
-  50%, 99% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes colorshift {
-  0%, 100% {
-    color: var(--neon-cyan);
-    border-color: var(--neon-cyan);
-  }
-  50% {
-    color: var(--neon-purple);
-    border-color: var(--neon-purple);
-  }
+/* Mode attract - Conteneur pour l'ecran d'attente immersif */
+.attract-mode-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
 }
 
 /* Grille des jeux (ancien - conserve pour compatibilite) */
@@ -1227,7 +1182,7 @@ body::before {
   height: calc(100vh - 85px);
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   overflow: hidden;
 }
 
@@ -1235,17 +1190,17 @@ body::before {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
   background: var(--card-bg);
   border: 2px solid var(--neon-purple);
   border-radius: var(--border-radius);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
   flex-shrink: 0;
 }
 
 .help-title {
   font-family: var(--font-title);
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: var(--neon-purple);
   text-shadow: 0 0 15px var(--neon-purple);
   letter-spacing: 0.1em;
@@ -1256,9 +1211,12 @@ body::before {
 .help-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: var(--spacing-sm);
+  grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "clavier clavier manette connexion"
+    "navigation jeux jeux compte";
+  gap: var(--spacing-xs);
   min-height: 0;
   overflow: hidden;
 }
@@ -1272,15 +1230,23 @@ body::before {
   overflow: hidden;
 }
 
+/* Assignation des zones du bento */
+.help-card:nth-child(1) { grid-area: clavier; }
+.help-card:nth-child(2) { grid-area: manette; }
+.help-card:nth-child(3) { grid-area: connexion; }
+.help-card:nth-child(4) { grid-area: navigation; }
+.help-card:nth-child(5) { grid-area: jeux; }
+.help-card:nth-child(6) { grid-area: compte; }
+
 .help-card-wide {
-  grid-column: span 2;
+  /* Plus besoin de span, gere par grid-area */
 }
 
 .help-card-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
   background: rgba(0, 212, 255, 0.1);
   border-bottom: 2px solid var(--neon-blue);
   flex-shrink: 0;
@@ -1288,7 +1254,7 @@ body::before {
 
 .help-card-header h3 {
   font-family: var(--font-title);
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--neon-blue);
   text-shadow: 0 0 8px var(--neon-blue);
   margin: 0;
@@ -1297,27 +1263,27 @@ body::before {
 }
 
 .help-card-icon {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   color: var(--neon-cyan);
   flex-shrink: 0;
 }
 
 .help-card-content {
   flex: 1;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  overflow-y: auto;
+  gap: 2px;
+  overflow: hidden;
 }
 
 .help-key-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--neon-cyan);
 }
 
@@ -1325,12 +1291,12 @@ body::before {
   background: var(--darker-bg);
   border: 1px solid var(--neon-purple);
   border-radius: var(--border-radius);
-  padding: 2px 8px;
+  padding: 1px 6px;
   font-family: var(--font-title);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--neon-purple);
   text-shadow: 0 0 5px var(--neon-purple);
-  min-width: 70px;
+  min-width: 55px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -1342,21 +1308,21 @@ body::before {
 }
 
 .help-steps {
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
 .help-step {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--neon-cyan);
 }
 
 .help-step-num {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1364,42 +1330,45 @@ body::before {
   color: var(--darker-bg);
   border-radius: 50%;
   font-family: var(--font-title);
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   flex-shrink: 0;
 }
 
 .help-step-bullet {
   color: var(--neon-cyan);
-  font-size: 1rem;
-  width: 20px;
+  font-size: 0.85rem;
+  width: 16px;
   flex-shrink: 0;
 }
 
 .help-games-info {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
 }
 
 .help-game-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: 1px;
+  padding: 4px 8px;
   background: rgba(189, 0, 255, 0.08);
   border-radius: var(--border-radius);
+  flex: 1;
+  min-width: 120px;
 }
 
 .help-game-name {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--neon-purple);
   text-shadow: 0 0 5px var(--neon-purple);
 }
 
 .help-game-desc {
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--neon-cyan);
   opacity: 0.85;
 }
@@ -1407,27 +1376,31 @@ body::before {
 /* Responsive Aide */
 @media (max-width: 900px) {
   .help-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
+    grid-template-areas:
+      "clavier manette"
+      "connexion navigation"
+      "jeux jeux"
+      "compte compte";
     overflow-y: auto;
-  }
-
-  .help-card-wide {
-    grid-column: span 2;
   }
 }
 
 @media (max-width: 600px) {
   .help-grid {
     grid-template-columns: 1fr;
-  }
-
-  .help-card-wide {
-    grid-column: span 1;
+    grid-template-areas:
+      "clavier"
+      "manette"
+      "connexion"
+      "navigation"
+      "jeux"
+      "compte";
   }
 
   .help-title {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
 }
 

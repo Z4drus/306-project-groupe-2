@@ -381,9 +381,11 @@ export function getMainMenuTemplate() {
 
     <!-- Menu principal -->
     <div x-data="arcadeMenu" x-show="$store.arcade.currentView === 'menu'" class="arcade-menu">
-      <!-- Mode attract -->
-      <div x-show="$store.arcade.attractMode" class="attract-mode">
-        <p class="attract-text">Appuyez sur un bouton ou cliquez pour commencer</p>
+      <!-- Mode attract - Conteneur pour l'ecran d'attente immersif -->
+      <div x-show="$store.arcade.attractMode"
+           x-effect="$store.arcade.attractMode ? $store.arcade.showAttractScreen() : $store.arcade.hideAttractScreen()"
+           id="attract-mode-container"
+           class="attract-mode-container">
       </div>
 
       <!-- Layout principal: jeux a gauche, options a droite -->

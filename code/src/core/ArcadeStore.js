@@ -20,6 +20,7 @@ import {
   getUserBestScore,
   getUserScores,
 } from './AuthManager.js';
+import { getAttractMode } from './AttractMode.js';
 
 /**
  * Durée d'inactivité avant le mode attract (ms)
@@ -576,11 +577,16 @@ export function createArcadeStore() {
     },
 
     /**
-     * Affiche l'erreur de connexion au serveur
+     * Affiche l'erreur de connexion au serveur (auto-dismiss apres 6s)
      */
     showConnectionError() {
       this.connectionError = true;
       this.connectionErrorMessage = 'Connexion au serveur impossible depuis le réseau de l\'État de Fribourg. Pour sauvegarder vos scores et accéder aux classements, connectez-vous à un réseau non restreint (ex: EMF Net ou réseau privé). Vous pouvez continuer à jouer, mais vos scores ne seront pas enregistrés.';
+
+      // Auto-dismiss apres 6 secondes
+      setTimeout(() => {
+        this.dismissConnectionError();
+      }, 6000);
     },
 
     /**
@@ -611,6 +617,25 @@ export function createArcadeStore() {
         document.exitFullscreen();
         this.isFullscreen = false;
       }
+    },
+
+    /**
+     * Affiche l'ecran d'attente immersif
+     */
+    showAttractScreen() {
+      const container = document.getElementById('attract-mode-container');
+      if (container) {
+        const attractMode = getAttractMode();
+        attractMode.show(container);
+      }
+    },
+
+    /**
+     * Cache l'ecran d'attente immersif
+     */
+    hideAttractScreen() {
+      const attractMode = getAttractMode();
+      attractMode.hide();
     }
   };
 }
