@@ -40,16 +40,6 @@ export const GAMES_CONFIG = {
     thumbnail: '/assets/images/home-menu/santacruz.webp',
     module: () => import('../games/santa-cruz-runner/index.js'),
     startFunction: 'startSantaCruzRunner'
-  },
-  'pong-duel': {
-    id: 'pong-duel',
-    name: 'Pong Duel',
-    displayName: 'PONG DUEL',
-    description: 'Affrontez votre adversaire dans ce classique revisité',
-    players: '2 joueurs',
-    thumbnail: '/assets/images/home-menu/pong.webp',
-    module: () => import('../games/pong-duel/index.js'),
-    startFunction: 'startPongDuel'
   }
 };
 
@@ -73,8 +63,7 @@ export async function loadGame(gameId, container, onGameOver, onScoreUpdate, bes
   const loadingOverlay = getLoadingOverlay();
 
   try {
-    // Afficher l'overlay de chargement
-    loadingOverlay.show(gameConfig.displayName);
+    // L'overlay est deja affiche par ArcadeStore, on met juste a jour la progression
     loadingOverlay.update(10, 'Chargement du module...');
 
     // Charger le module du jeu

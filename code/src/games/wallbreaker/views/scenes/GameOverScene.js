@@ -8,6 +8,7 @@
 import Phaser from 'phaser';
 import { COLORS, ASSETS_PATH } from '../../config/GameConfig.js';
 import gamepadManager, { GamepadButton } from '../../../../core/GamepadManager.js';
+import cursorManager from '../../../../core/CursorManager.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -47,6 +48,9 @@ export default class GameOverScene extends Phaser.Scene {
     this.canAct = false;
     this.selectedButton = 0;
     this.buttons = [];
+
+    // Afficher le curseur pour permettre l'interaction souris
+    cursorManager.show();
 
     // Fond
     this.cameras.main.setBackgroundColor(COLORS.BACKGROUND);
@@ -490,6 +494,9 @@ export default class GameOverScene extends Phaser.Scene {
   restartGame() {
     if (!this.canAct) return;
     this.canAct = false;
+
+    // Masquer le curseur car on retourne en jeu
+    cursorManager.hide();
 
     // Réinitialiser le score dans l'interface externe
     const onScoreUpdate = this.game.registry.get('onScoreUpdate');

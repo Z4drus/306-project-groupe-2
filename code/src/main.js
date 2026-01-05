@@ -11,7 +11,7 @@
 import Alpine from 'alpinejs';
 import './style.css';
 import { createArcadeStore } from './core/ArcadeStore.js';
-import { createArcadeMenuComponent, getMainMenuTemplate } from './core/ArcadeMenu.js';
+import { createArcadeMenuComponent, createAuthFormComponent, getMainMenuTemplate } from './core/ArcadeMenu.js';
 import cursorManager from './core/CursorManager.js';
 
 /**
@@ -23,6 +23,9 @@ function initializeApp() {
 
   // Enregistrer le composant menu
   Alpine.data('arcadeMenu', createArcadeMenuComponent);
+
+  // Enregistrer le composant formulaire d'authentification avec clavier virtuel
+  Alpine.data('authForm', createAuthFormComponent);
 
   // Exposer Alpine globalement (pour le debugging)
   window.Alpine = Alpine;

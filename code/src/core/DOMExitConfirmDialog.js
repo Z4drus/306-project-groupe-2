@@ -42,6 +42,9 @@ export default class DOMExitConfirmDialog {
 
     // Animation frame pour gamepad
     this.animationFrameId = null;
+
+    // Tracking pour eviter les selections repetees avec la manette
+    this.lastDirection = null;
   }
 
   /**
@@ -52,6 +55,7 @@ export default class DOMExitConfirmDialog {
     this.isVisible = true;
     this.selectedButton = 1; // Non par defaut
     this.canAct = false;
+    this.lastDirection = null; // Reset du tracking direction
 
     // Notifier que le dialogue s'affiche (pour mettre le jeu en pause)
     this.onShow();
@@ -213,18 +217,24 @@ export default class DOMExitConfirmDialog {
   updateGamepad() {
     if (!this.isVisible || !this.canAct) return;
 
-    // Navigation gauche/droite
+    // Navigation gauche/droite avec tracking "just pressed" pour les directions
     const direction = gamepadManager.getDirection(0);
-    if (direction === 'left' && this.selectedButton !== 0) {
-      this.selectedButton = 0;
-      this.updateButtonSelection();
-    } else if (direction === 'right' && this.selectedButton !== 1) {
-      this.selectedButton = 1;
-      this.updateButtonSelection();
+
+    // Detecter un changement de direction (comme un "just pressed")
+    if (direction !== this.lastDirection) {
+      if (direction === 'left') {
+        this.selectedButton = 0;
+        this.updateButtonSelection();
+      } else if (direction === 'right') {
+        this.selectedButton = 1;
+        this.updateButtonSelection();
+      }
+      this.lastDirection = direction;
     }
 
-    // Bouton A = Valider
-    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0)) {
+    // Bouton A ou X = Valider (support des deux boutons)
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.X, 0)) {
       this.activateSelected();
     }
 

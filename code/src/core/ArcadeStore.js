@@ -237,6 +237,12 @@ export function createArcadeStore() {
      * @param {string} gameName - Identifiant du jeu
      */
     async startGame(gameName) {
+      // Importer et afficher l'overlay AVANT de changer de vue
+      const { getLoadingOverlay } = await import('./LoadingOverlay.js');
+      const loadingOverlay = getLoadingOverlay();
+      loadingOverlay.show(getGameDisplayName(gameName));
+
+      // Maintenant changer la vue (le container sera masqué par l'overlay)
       this.currentGame = gameName;
       this.currentView = 'game';
       this.gameScore = 0;
@@ -249,6 +255,12 @@ export function createArcadeStore() {
       // Masquer le curseur custom pendant le jeu Phaser
       cursorManager.hide();
 
+      // Marquer le container comme en chargement pour le masquer
+      const gameContainer = document.getElementById('game-container');
+      if (gameContainer) {
+        gameContainer.classList.add('loading');
+      }
+
       console.log(`Lancement du jeu: ${gameName}`);
 
       // Récupérer le meilleur score de l'utilisateur si connecté
@@ -260,8 +272,6 @@ export function createArcadeStore() {
       }
 
       try {
-        const gameContainer = document.getElementById('game-container');
-
         await loadGame(
           gameName,
           gameContainer,
@@ -270,8 +280,16 @@ export function createArcadeStore() {
           this.currentBestScore,
           this.isAuthenticated ? this.user?.username : null
         );
+
+        // Retirer la classe loading une fois le jeu pret
+        if (gameContainer) {
+          gameContainer.classList.remove('loading');
+        }
       } catch (error) {
         console.error(`Erreur lors du chargement du jeu ${gameName}:`, error);
+        if (gameContainer) {
+          gameContainer.classList.remove('loading');
+        }
         this.backToMenu();
       }
     },
@@ -288,7 +306,9 @@ export function createArcadeStore() {
         await this.saveScore(gameName, score);
       }
 
-      this.backToMenu();
+      // Note: Ne pas appeler backToMenu() ici.
+      // Le jeu gère lui-même l'affichage de l'écran Game Over
+      // et le retour au menu via sa propre scène GameOverScene.
     },
 
     /**

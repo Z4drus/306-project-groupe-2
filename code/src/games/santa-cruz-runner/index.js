@@ -1,96 +1,61 @@
 /**
- * Jeu Santa Cruz Runner
+ * Santa Cruz Runner - Point d'entrée
  *
- * Courez et évitez les obstacles
+ * Endless runner de Noël avec Santa qui court sur des plateformes
+ * - Architecture MVC complète
+ * - Double saut disponible
+ * - Collectibles (cadeaux) avec système de combo
+ * - Difficulté progressive
+ * - Plateformes de tailles variables
  */
 
 import Phaser from 'phaser';
+import { createPhaserConfig } from './config/GameConfig.js';
+import MenuScene from './views/scenes/MenuScene.js';
+import GameScene from './views/scenes/GameScene.js';
+import GameOverScene from './views/scenes/GameOverScene.js';
+
+// Référence globale au jeu actuel pour le nettoyage
+let currentGame = null;
 
 /**
- * Configuration du jeu Santa Cruz Runner
+ * Nettoie complètement le jeu précédent s'il existe
  */
-export const SantaCruzRunnerConfig = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  parent: 'game-container',
-  backgroundColor: '#87ceeb',
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 300 },
-      debug: false,
-    },
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update,
-  },
-};
+function cleanupPreviousGame() {
+  if (currentGame) {
+    try {
+      // Arrêter toutes les scènes
+      currentGame.scene.getScenes(true).forEach(scene => {
+        if (scene.shutdown) {
+          scene.shutdown();
+        }
+        currentGame.scene.stop(scene.scene.key);
+      });
 
-let score = 0;
-let scoreText;
+      // Nettoyer les animations globales
+      if (currentGame.anims) {
+        currentGame.anims.remove('santa-run');
+        currentGame.anims.remove('santa-jump');
+        currentGame.anims.remove('santa-fall');
+      }
 
-/**
- * Préchargement des assets
- */
-function preload() {
-  // Les assets seront chargés ici
-  console.log('Santa Cruz Runner: Préchargement des assets...');
+      // Arrêter tous les sons
+      if (currentGame.sound) {
+        currentGame.sound.stopAll();
+        currentGame.sound.removeAll();
+      }
+
+      // Détruire le jeu
+      currentGame.destroy(true, false);
+    } catch (e) {
+      console.warn('Erreur lors du nettoyage du jeu précédent:', e);
+    }
+    currentGame = null;
+  }
 }
 
 /**
- * Création de la scène
- */
-function create() {
-  console.log('Santa Cruz Runner: Création de la scène...');
-
-  // Texte de placeholder
-  const title = this.add.text(400, 200, 'SANTA CRUZ RUNNER', {
-    fontSize: '64px',
-    fill: '#004e89',
-    fontStyle: 'bold',
-  });
-  title.setOrigin(0.5);
-
-  const instruction = this.add.text(400, 300, 'Jeu à implémenter', {
-    fontSize: '24px',
-    fill: '#f7931e',
-  });
-  instruction.setOrigin(0.5);
-
-  // Score
-  scoreText = this.add.text(16, 16, 'Score: 0', {
-    fontSize: '32px',
-    fill: '#000',
-  });
-
-  // Instructions contrôles
-  const controls = this.add.text(400, 500, 'Espace: Sauter | ESC: Quitter', {
-    fontSize: '16px',
-    fill: '#333',
-  });
-  controls.setOrigin(0.5);
-
-  // Gestion de la touche ESC pour retourner au menu
-  this.input.keyboard.on('keydown-ESC', () => {
-    this.scene.stop();
-    window.Alpine.store('arcade').backToMenu();
-  });
-}
-
-/**
- * Boucle de mise à jour
- * @param {number} time - Temps écoulé
- * @param {number} delta - Delta depuis la dernière frame
- */
-function update(time, delta) {
-  // Logique du jeu sera implémentée ici
-}
-
-/**
- * Initialise et lance le jeu Santa Cruz Runner
+ * Démarre le jeu Santa Cruz Runner
  * @param {HTMLElement} container - Container DOM pour le canvas
  * @param {Function} onGameOver - Callback appelé à la fin du jeu avec le score
  * @param {Function} onScoreUpdate - Callback appelé à chaque mise à jour du score
@@ -100,34 +65,70 @@ function update(time, delta) {
  * @returns {Phaser.Game} Instance du jeu Phaser
  */
 export function startSantaCruzRunner(container = null, onGameOver = null, onScoreUpdate = null, bestScore = 0, username = null, onLoadProgress = null) {
-  console.log('Démarrage de Santa Cruz Runner...');
+  // Nettoyer le jeu précédent s'il existe
+  cleanupPreviousGame();
 
-  // Configurer le container si fourni
-  const config = { ...SantaCruzRunnerConfig };
-  if (container) {
-    config.parent = container;
-  }
+  // Créer la configuration Phaser
+  const config = createPhaserConfig(container);
 
-  // Notifier la progression
-  if (onLoadProgress) {
-    onLoadProgress(50, 'Chargement de Santa Cruz Runner...');
-  }
+  // Ajouter les scènes
+  config.scene = [MenuScene, GameScene, GameOverScene];
 
+  // Configurer les callbacks de chargement
+  config.callbacks = {
+    preBoot: (game) => {
+      // Configurer le suivi du chargement des assets
+      game.events.on('ready', () => {
+        const scene = game.scene.getScene('MenuScene');
+        if (scene && onLoadProgress) {
+          scene.load.on('progress', (value) => {
+            onLoadProgress(value * 100, `Chargement des assets: ${Math.round(value * 100)}%`);
+          });
+          scene.load.on('fileprogress', (file) => {
+            onLoadProgress(scene.load.progress * 100, `Chargement: ${file.key}`);
+          });
+        }
+      });
+    }
+  };
+
+  // Créer l'instance du jeu
   const game = new Phaser.Game(config);
 
-  // Stocker les callbacks dans le registry
+  // Stocker la référence
+  currentGame = game;
+
+  // Écouter la destruction du jeu pour nettoyer la référence
+  game.events.once('destroy', () => {
+    currentGame = null;
+  });
+
+  // Passer les callbacks via le registry
   if (onGameOver) {
     game.registry.set('onGameOver', onGameOver);
   }
   if (onScoreUpdate) {
     game.registry.set('onScoreUpdate', onScoreUpdate);
   }
+  if (onLoadProgress) {
+    game.registry.set('onLoadProgress', onLoadProgress);
+  }
+
+  // Passer le best score et le username
   game.registry.set('bestScore', bestScore);
   game.registry.set('username', username);
 
-  if (onLoadProgress) {
-    onLoadProgress(100, 'Pret !');
-  }
-
   return game;
 }
+
+/**
+ * Arrête et nettoie complètement le jeu Santa Cruz Runner
+ */
+export function stopSantaCruzRunner() {
+  cleanupPreviousGame();
+}
+
+/**
+ * Exporte la configuration pour référence externe
+ */
+export { createPhaserConfig } from './config/GameConfig.js';
