@@ -415,6 +415,11 @@ export default class GameController {
    * Gère le game over
    */
   handleGameOver() {
+    // Libérer le pointer lock
+    if (this.inputController) {
+      this.inputController.exitPointerLock();
+    }
+
     this.hudView.showGameOverMessage(this.gameState.score);
 
     // Attendre puis passer à la scène de game over
@@ -457,6 +462,11 @@ export default class GameController {
    * Met le jeu en pause (freeze tous les éléments)
    */
   pauseGame() {
+    // Libérer le pointer lock pour pouvoir interagir avec le dialogue
+    if (this.inputController) {
+      this.inputController.exitPointerLock();
+    }
+
     // Mettre en pause la physique
     this.scene.physics.world.pause();
 

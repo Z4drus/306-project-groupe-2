@@ -1,11 +1,13 @@
 /**
  * InputController - Contrôleur des entrées utilisateur
  *
- * Gère les entrées clavier, souris et manette pour Wallbreaker
+ * Gère les entrées clavier, souris et manette pour Wallbreaker.
+ * Utilise l'API Pointer Lock pour capturer la souris pendant le jeu.
  */
 
 import Phaser from 'phaser';
 import gamepadManager, { GamepadButton, GamepadAxis } from '../../../core/GamepadManager.js';
+import { PLAY_AREA } from '../config/GameConfig.js';
 
 export default class InputController {
   /**
@@ -20,12 +22,25 @@ export default class InputController {
     this.escKey = null;
 
     // État de la souris
-    this.mouseX = 0;
+    this.mouseX = PLAY_AREA.x + PLAY_AREA.width / 2; // Position initiale au centre
+    this.mouseDeltaX = 0; // Delta de mouvement pour le pointer lock
     this.useMouseControl = false;
+    this.isPointerLocked = false;
+
+    // Sensibilité du mouvement souris (ajustable)
+    this.mouseSensitivity = 1.0;
 
     // Callbacks
     this.onEscape = null;
     this.onLaunch = null;
+
+    // Référence au canvas pour le pointer lock
+    this.canvas = null;
+
+    // Bound handlers pour pouvoir les retirer
+    this.boundPointerLockChange = this.handlePointerLockChange.bind(this);
+    this.boundPointerLockError = this.handlePointerLockError.bind(this);
+    this.boundMouseMove = this.handleMouseMove.bind(this);
   }
 
   /**
@@ -45,14 +60,23 @@ export default class InputController {
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
 
-    // Suivre la souris
-    this.scene.input.on('pointermove', (pointer) => {
-      this.mouseX = pointer.x;
-      this.useMouseControl = true;
-    });
+    // Récupérer le canvas pour le pointer lock
+    this.canvas = this.scene.game.canvas;
 
-    // Clic pour lancer
+    // Configurer les listeners pour le Pointer Lock API
+    document.addEventListener('pointerlockchange', this.boundPointerLockChange);
+    document.addEventListener('pointerlockerror', this.boundPointerLockError);
+
+    // Listener pour les mouvements souris (fonctionne avec et sans pointer lock)
+    document.addEventListener('mousemove', this.boundMouseMove);
+
+    // Clic pour lancer ET activer le pointer lock
     this.scene.input.on('pointerdown', () => {
+      // Demander le pointer lock si pas déjà actif
+      if (!this.isPointerLocked) {
+        this.requestPointerLock();
+      }
+
       if (this.onLaunch) {
         this.onLaunch();
       }
@@ -64,6 +88,66 @@ export default class InputController {
         this.onEscape();
       }
     });
+  }
+
+  /**
+   * Gère les mouvements de souris (avec ou sans pointer lock)
+   * @param {MouseEvent} event - Événement souris
+   */
+  handleMouseMove(event) {
+    this.useMouseControl = true;
+
+    if (this.isPointerLocked) {
+      // Mode pointer lock : utiliser le mouvement relatif
+      this.mouseDeltaX = event.movementX * this.mouseSensitivity;
+    } else {
+      // Mode normal : convertir la position absolue en position de jeu
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.scene.game.config.width / rect.width;
+      this.mouseX = (event.clientX - rect.left) * scaleX;
+      this.mouseDeltaX = 0;
+    }
+  }
+
+  /**
+   * Demande le verrouillage du pointeur
+   */
+  requestPointerLock() {
+    if (this.canvas && !this.isPointerLocked) {
+      this.canvas.requestPointerLock();
+    }
+  }
+
+  /**
+   * Libère le verrouillage du pointeur
+   */
+  exitPointerLock() {
+    if (document.pointerLockElement) {
+      document.exitPointerLock();
+    }
+  }
+
+  /**
+   * Gère le changement d'état du pointer lock
+   */
+  handlePointerLockChange() {
+    this.isPointerLocked = document.pointerLockElement === this.canvas;
+  }
+
+  /**
+   * Gère les erreurs du pointer lock
+   */
+  handlePointerLockError() {
+    console.warn('Pointer Lock error - falling back to normal mouse control');
+    this.isPointerLocked = false;
+  }
+
+  /**
+   * Vérifie si le pointer lock est actif
+   * @returns {boolean}
+   */
+  hasPointerLock() {
+    return this.isPointerLocked;
   }
 
   /**
@@ -107,14 +191,27 @@ export default class InputController {
   }
 
   /**
-   * Retourne la position X de la souris si contrôle souris actif
+   * Retourne la position X de la souris si contrôle souris actif (mode sans pointer lock)
    * @returns {number|null}
    */
   getMouseX() {
-    if (this.useMouseControl) {
+    if (this.useMouseControl && !this.isPointerLocked) {
       return this.mouseX;
     }
     return null;
+  }
+
+  /**
+   * Retourne le delta de mouvement de la souris (mode pointer lock)
+   * @returns {number} Delta X du mouvement, 0 si pas de mouvement
+   */
+  getMouseDeltaX() {
+    if (this.useMouseControl && this.isPointerLocked) {
+      const delta = this.mouseDeltaX;
+      this.mouseDeltaX = 0; // Consommer le delta
+      return delta;
+    }
+    return 0;
   }
 
   /**
@@ -192,10 +289,17 @@ export default class InputController {
    * Nettoie les contrôles
    */
   destroy() {
+    // Libérer le pointer lock
+    this.exitPointerLock();
+
+    // Retirer les listeners du document
+    document.removeEventListener('pointerlockchange', this.boundPointerLockChange);
+    document.removeEventListener('pointerlockerror', this.boundPointerLockError);
+    document.removeEventListener('mousemove', this.boundMouseMove);
+
     if (this.escKey) {
       this.escKey.removeAllListeners();
     }
-    this.scene.input.off('pointermove');
     this.scene.input.off('pointerdown');
   }
 }

@@ -53,11 +53,20 @@ export default class PaddleModel {
   }
 
   /**
-   * Définit la position X directement (pour le contrôle à la souris)
+   * Définit la position X directement (pour le contrôle à la souris sans pointer lock)
    * @param {number} x - Nouvelle position X
    */
   setPositionX(x) {
     this.x = Math.max(this.minX, Math.min(this.maxX, x));
+  }
+
+  /**
+   * Déplace le paddle par un delta (pour le contrôle souris avec pointer lock)
+   * @param {number} deltaX - Delta de déplacement en pixels
+   */
+  moveByDelta(deltaX) {
+    const newX = this.x + deltaX;
+    this.x = Math.max(this.minX, Math.min(this.maxX, newX));
   }
 
   /**

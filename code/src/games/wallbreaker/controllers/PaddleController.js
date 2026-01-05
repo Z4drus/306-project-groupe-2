@@ -30,16 +30,25 @@ export default class PaddleController {
   update(delta) {
     const deltaSeconds = delta / 1000;
 
-    // Vérifier le contrôle à la souris
-    const mouseX = this.inputController.getMouseX();
-    if (mouseX !== null) {
-      // Contrôle à la souris - position directe
-      this.model.setPositionX(mouseX);
+    // Priorité : Pointer Lock > Souris normale > Clavier/Manette
+
+    // Vérifier le mouvement souris en mode pointer lock (delta relatif)
+    const mouseDeltaX = this.inputController.getMouseDeltaX();
+    if (mouseDeltaX !== 0) {
+      // Contrôle souris avec pointer lock - mouvement relatif
+      this.model.moveByDelta(mouseDeltaX);
     } else {
-      // Contrôle au clavier/manette - direction
-      const direction = this.inputController.getHorizontalDirection();
-      this.model.setDirection(direction);
-      this.model.update(deltaSeconds);
+      // Vérifier le contrôle souris normal (position absolue)
+      const mouseX = this.inputController.getMouseX();
+      if (mouseX !== null) {
+        // Contrôle à la souris sans pointer lock - position directe
+        this.model.setPositionX(mouseX);
+      } else {
+        // Contrôle au clavier/manette - direction
+        const direction = this.inputController.getHorizontalDirection();
+        this.model.setDirection(direction);
+        this.model.update(deltaSeconds);
+      }
     }
 
     // Mettre à jour la vue
