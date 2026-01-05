@@ -22,12 +22,4 @@
 | **US18** | Intégrer les jeux 2 et 3 dans le menu arcade     | ⭐         | Les jeux sont accessibles et lançables depuis le menu.            |
 | **US19** | Gérer le scoring des jeux 2 et 3                 | ⭐         | Scores calculés, envoyés et sauvegardés correctement.             |
 
-## Instructions
 
-Ce document est complété principalement durant la cérémonie du `backlog refinement / pocker planning`.
-
-1. Story Points : Le nombre de points est attribué en fonction de la complexité de la tâche. Les tâches plus complexes ou les tâches nécessitant des tests supplémentaires ont plus de points. Les valeurs de story points indiquent la taille relative de la tâche dans le backlog.
-
-2. Priorité : La priorité de chaque User Story est définie comme Haute ou Moyenne en fonction de l’importance de la fonctionnalité dans le cadre du projet. Les fonctionnalités critiques pour le gameplay (comme la gestion des scores, des profils et de l'interaction avec le matériel) sont classées comme ayant une priorité Haute.
-
-3. Cette liste de tâches évoluera à chaque sprint planning et sera mise à jour en fonction des avancées du projet et des découvertes faites lors des tests.

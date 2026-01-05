@@ -13,5 +13,27 @@ fluides, avec scores fonctionnels et mode attract basique.
 | **US19**       | En tant que joueur, je veux que mes scores soient comptabilisés              | Logique scoring Jeux 2 & 3              | Haute        |
 
 ## Définition des critères de réussite (Definition of Done)
+- Le menu attractif s’affiche automatiquement lorsque la borne est inactive.
+
+- Les jeux 2 et 3 se lancent correctement sans bug ni ralentissement.
+
+- Tous les assets (images, sons, scripts) des jeux 2 et 3 se chargent correctement.
+
+- Les jeux fonctionnent de manière fluide sur le Raspberry Pi.
+
+- Les jeux 2 et 3 sont accessibles depuis le menu principal de la borne.
+
+- Les scores des joueurs sont enregistrés et affichés correctement à la fin des parties.
+
+- La documentation et le code sont à jour et conformes aux standards de l’équipe.
 
 ## Risques / Points à surveiller
+- Possibles ralentissements sur le Raspberry Pi si les assets ne sont pas optimisés.
+
+- Bugs liés à l’intégration des nouveaux jeux dans le menu existant.
+
+- Problèmes de compatibilité entre les contrôles clavier et manette pour les jeux 2 et 3.
+
+- Gestion des scores incorrecte ou incohérente si plusieurs parties sont jouées successivement.
+
+- Tests incomplets ou non réalisés sur certains scénarios du mode attract.
