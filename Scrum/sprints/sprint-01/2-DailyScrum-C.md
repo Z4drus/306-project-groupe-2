@@ -7,48 +7,58 @@ ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par 
 
 
 ### AXELLE
-- Creation db
-- documentation
-- diagramme de classe
+- Création et mise en place de la base de données.
+- Rédaction et mise à jour de la documentation du projet.
+- Réalisation du diagramme de classes.
 
 
 
 
 ### NOE
-- code 1
+- Développement du mini-jeu 1.
+- Contribution à la documentation associée.
 
 
 ### DIOGO
+- Configuration du Raspberry Pi.
+- Implémentation des contrôles à la manette pour le mini-jeu 1.
 
 
 
 ### VALENTIN
-
-
+- Participation au développement du mini-jeu 1.
+- Mise à jour de la documentation du projet.
 
 
 ## Ce qui sera fait aujourd'hui
 
 ### AXELLE
+- Planification Scrum et organisation des tâches.
+- Phase de tests du mini-jeu 1.
+- Poursuite de la documentation.
 
 
 ### Noe
+- Amélioration et optimisation du mini-jeu 1.
+- Mise en place du système de score.
+- Début du développement du mini-jeu 2.
 
 
 
 ### Diogo
-
+- Mise à jour de la documentation.
+- Participation au développement du mini-jeu 2.
 
 
 
 ### Valentin
-
+- Mise à jour de la documentation.
+- Participation au développement du mini-jeu 2.
 
 
 
 ## Problèmes rencontrés
-
-
+- Aucun problème rencontré à ce stade.
 
 # Instructions
 
