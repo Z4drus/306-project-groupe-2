@@ -218,3 +218,39 @@ App --> LocalScores
 App -->|Envoi score + token| API
 API --> DB
 ```
+```mermaid
+graph TD
+
+%% ==== UTILISATEUR ====
+subgraph U[Utilisateur]
+  Gamepad[Manette / Clavier]
+end
+
+%% ==== BORNE ARCADIABOX ====
+subgraph Borne[ArcadiaBox - Raspberry Pi]
+  Browser["Navigateur plein écran - kiosk"]
+  LocalServer[Serveur local Node.js]
+  App[Application web: menu + mini-jeux]
+  LocalScores[Scores locaux]
+end
+
+%% ==== SERVEUR CENTRAL ====
+subgraph ScoreServer[Serveur central]
+  API[API REST]
+  DB[Base de données des scores]
+end
+
+%% ==== FLUX UTILISATEUR ====
+Gamepad --> Browser
+
+%% ==== SUR LA BORNE ====
+Browser --> LocalServer
+LocalServer --> App
+App --> LocalScores
+
+%% ==== COMMUNICATION AVEC LE SERVEUR CENTRAL ====
+App -->|Envoi scores + token| API
+API --> DB
+API -->|Lecture scores| App
+
+```
