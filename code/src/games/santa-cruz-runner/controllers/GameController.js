@@ -19,6 +19,7 @@ import CollisionController from './CollisionController.js';
 
 import { ASSETS_PATH, getDifficultyParams } from '../config/GameConfig.js';
 import DOMExitConfirmDialog from '../../../core/DOMExitConfirmDialog.js';
+import { gamepadManager } from '../../../core/GamepadManager.js';
 
 export default class GameController {
   /**
@@ -290,6 +291,9 @@ export default class GameController {
     this.platformController.stop();
     this.collectibleController.stop();
 
+    // Vibration manette
+    this.vibrateGamepad(200, 1.0);
+
     const isGameOver = this.gameState.loseLife();
 
     if (isGameOver) {
@@ -298,6 +302,24 @@ export default class GameController {
       // Réinitialiser le joueur après un court délai
       this.scene.time.delayedCall(600, () => {
         this.resetAfterDeath();
+      });
+    }
+  }
+
+  /**
+   * Fait vibrer la manette si disponible
+   * @param {number} duration - Durée en ms
+   * @param {number} intensity - Intensité (0-1)
+   */
+  vibrateGamepad(duration = 200, intensity = 1.0) {
+    const gamepad = gamepadManager.getGamepad(0);
+    if (gamepad?.vibrationActuator) {
+      gamepad.vibrationActuator.playEffect('dual-rumble', {
+        duration,
+        strongMagnitude: intensity,
+        weakMagnitude: intensity * 0.5
+      }).catch(() => {
+        // Ignorer les erreurs de vibration
       });
     }
   }
@@ -488,9 +510,8 @@ export default class GameController {
     if (this.music) {
       this.music.stop();
     }
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
     window.Alpine?.store('arcade')?.backToMenu();
-    this.scene.scene.stop();
-    this.scene.game.destroy(true);
   }
 
   /**

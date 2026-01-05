@@ -36,9 +36,13 @@ export default class LoadingOverlay {
   /**
    * Affiche l'overlay de chargement
    * @param {string} gameName - Nom du jeu en cours de chargement
+   * @param {Object} options - Options d'affichage
+   * @param {boolean} options.instant - Si true, affiche sans animation de fade-in
    */
-  show(gameName = 'jeu') {
+  show(gameName = 'jeu', options = {}) {
     if (this.overlay) return;
+
+    const { instant = false } = options;
 
     // Creer l'overlay
     this.overlay = document.createElement('div');
@@ -47,6 +51,12 @@ export default class LoadingOverlay {
 
     // Appliquer les styles
     this.applyStyles();
+
+    // Si instant, desactiver l'animation de fade-in
+    if (instant) {
+      this.overlay.style.animation = 'none';
+      this.overlay.style.opacity = '1';
+    }
 
     // Ajouter au DOM
     document.body.appendChild(this.overlay);
@@ -76,11 +86,8 @@ export default class LoadingOverlay {
       </div>
 
       <div class="loading-content">
-        <!-- Logo/Titre animé -->
+        <!-- Titre animé -->
         <div class="loading-header">
-          <div class="loading-logo">
-            <span class="loading-logo-icon">&#127918;</span>
-          </div>
           <h2 class="loading-title" data-text="${gameName}">${gameName}</h2>
           <div class="loading-subtitle">Preparation en cours</div>
         </div>
@@ -116,7 +123,6 @@ export default class LoadingOverlay {
 
         <!-- Tip -->
         <div class="loading-tip">
-          <span class="loading-tip-icon">&#128161;</span>
           <span class="loading-tip-text">${LoadingOverlay.TIPS[0]}</span>
         </div>
       </div>
@@ -319,18 +325,6 @@ export default class LoadingOverlay {
         text-align: center;
       }
 
-      .loading-logo {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        animation: logoPulse 2s ease-in-out infinite;
-        filter: drop-shadow(0 0 20px rgba(189, 0, 255, 0.8));
-      }
-
-      @keyframes logoPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-      }
-
       .loading-title {
         font-family: 'Arcade', 'Courier New', monospace;
         font-size: 3rem;
@@ -525,22 +519,12 @@ export default class LoadingOverlay {
       .loading-tip {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        justify-content: center;
         padding: 1rem 1.5rem;
         background: rgba(189, 0, 255, 0.1);
         border: 1px solid rgba(189, 0, 255, 0.3);
         border-radius: 4px;
         max-width: 500px;
-      }
-
-      .loading-tip-icon {
-        font-size: 1.5rem;
-        animation: tipIconPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes tipIconPulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
       }
 
       .loading-tip-text {

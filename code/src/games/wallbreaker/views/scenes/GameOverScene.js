@@ -522,16 +522,7 @@ export default class GameOverScene extends Phaser.Scene {
     if (!this.canAct) return;
     this.canAct = false;
 
-    // Transition
-    this.cameras.main.fadeOut(300, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.stop();
-      this.game.destroy(true);
-
-      // Retourner au menu arcade
-      if (window.Alpine?.store('arcade')) {
-        window.Alpine.store('arcade').backToMenu();
-      }
-    });
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
+    window.Alpine?.store('arcade')?.backToMenu();
   }
 }

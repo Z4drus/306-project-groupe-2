@@ -1,10 +1,11 @@
 /**
  * InputController - Gestion des entrées utilisateur
  *
- * Gère le clavier, la souris et la manette
+ * Gère le clavier, la souris et la manette via GamepadManager
  */
 
 import Phaser from 'phaser';
+import { gamepadManager, GamepadButton } from '../../../core/GamepadManager.js';
 
 export default class InputController {
   /**
@@ -30,6 +31,9 @@ export default class InputController {
     // Touch/Click
     this.pointerDown = false;
     this.previousPointerState = false;
+
+    // État manette pour détection "just pressed"
+    this.previousGamepadJumpState = false;
   }
 
   /**
@@ -80,16 +84,24 @@ export default class InputController {
     if (this.pointerDown && !this.previousPointerState) {
       this.jumpJustPressed = true;
     }
+
+    // Vérifier le saut manette avec détection "just pressed"
+    const gamepadJumpPressed = this.isGamepadJumpPressed();
+    if (gamepadJumpPressed && !this.previousGamepadJumpState) {
+      this.jumpJustPressed = true;
+    }
+    this.previousGamepadJumpState = gamepadJumpPressed;
+
+    // Vérifier bouton B pour escape
+    this.checkGamepadEscape();
   }
 
   /**
-   * Vérifie si une touche de saut est enfoncée
+   * Vérifie si une touche de saut est enfoncée (clavier uniquement)
    * @returns {boolean}
    */
   isJumpKeyDown() {
-    return this.spaceKey?.isDown ||
-           this.cursors?.up?.isDown ||
-           this.checkGamepadJump();
+    return this.spaceKey?.isDown || this.cursors?.up?.isDown;
   }
 
   /**
@@ -101,17 +113,25 @@ export default class InputController {
   }
 
   /**
-   * Vérifie le bouton de saut sur la manette
+   * Vérifie si un bouton de saut est pressé sur la manette
    * @returns {boolean}
    */
-  checkGamepadJump() {
-    const gamepad = this.scene.input.gamepad?.getPad(0);
-    if (!gamepad) return false;
+  isGamepadJumpPressed() {
+    // Bouton A, X, ou D-pad haut pour sauter
+    return gamepadManager.isButtonPressed(GamepadButton.A, 0) ||
+           gamepadManager.isButtonPressed(GamepadButton.X, 0) ||
+           gamepadManager.getDirection(0) === 'up';
+  }
 
-    // Bouton A (index 0) ou X (index 2) ou croix directionnelle haut
-    return gamepad.buttons[0]?.pressed ||
-           gamepad.buttons[2]?.pressed ||
-           (gamepad.axes[1] < -0.5);
+  /**
+   * Vérifie le bouton B pour escape/retour
+   */
+  checkGamepadEscape() {
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      if (this.onEscape) {
+        this.onEscape();
+      }
+    }
   }
 
   /**

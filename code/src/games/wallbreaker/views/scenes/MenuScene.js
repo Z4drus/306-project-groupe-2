@@ -8,6 +8,7 @@
 import Phaser from 'phaser';
 import { ASSETS_PATH, COLORS, GAME_WIDTH, GAME_HEIGHT } from '../../config/GameConfig.js';
 import gamepadManager, { GamepadButton } from '../../../../core/GamepadManager.js';
+import cursorManager from '../../../../core/CursorManager.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
@@ -33,6 +34,9 @@ export default class MenuScene extends Phaser.Scene {
     const centerY = this.cameras.main.centerY;
 
     this.canStart = true;
+
+    // Afficher le curseur custom de l'arcade dans le menu
+    cursorManager.show();
 
     // Fond
     this.createBackground();
@@ -276,6 +280,9 @@ export default class MenuScene extends Phaser.Scene {
     if (!this.canStart) return;
     this.canStart = false;
 
+    // Cacher le curseur pour le jeu
+    cursorManager.hide();
+
     // Transition avec fondu
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
@@ -290,15 +297,7 @@ export default class MenuScene extends Phaser.Scene {
     if (!this.canStart) return;
     this.canStart = false;
 
-    this.cameras.main.fadeOut(300, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.stop();
-      this.game.destroy(true);
-
-      // Retourner au menu arcade
-      if (window.Alpine?.store('arcade')) {
-        window.Alpine.store('arcade').backToMenu();
-      }
-    });
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
+    window.Alpine?.store('arcade')?.backToMenu();
   }
 }

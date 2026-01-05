@@ -576,8 +576,8 @@ export default class GameController {
    */
   returnToMenu() {
     this.gameState.notifyGameOver();
-    this.scene.scene.stop();
-    this.scene.game.destroy(true);
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
+    window.Alpine?.store('arcade')?.backToMenu();
   }
 
   /**

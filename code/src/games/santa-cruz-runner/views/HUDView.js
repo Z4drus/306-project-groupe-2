@@ -59,7 +59,7 @@ export default class HUDView {
     this.levelText.setDepth(100);
 
     // Vies (en haut à droite)
-    this.livesText = this.scene.add.text(GAME_WIDTH - 20, 20, '❤️ 3', textStyle);
+    this.livesText = this.scene.add.text(GAME_WIDTH - 20, 20, 'Vies: 3', textStyle);
     this.livesText.setOrigin(1, 0);
     this.livesText.setDepth(100);
 
@@ -154,8 +154,7 @@ export default class HUDView {
    */
   updateLives(lives) {
     if (this.livesText) {
-      const hearts = '❤️'.repeat(Math.max(0, lives));
-      this.livesText.setText(hearts || '💔');
+      this.livesText.setText(`Vies: ${Math.max(0, lives)}`);
 
       // Animation si perte de vie
       if (lives < 3) {
@@ -241,7 +240,7 @@ export default class HUDView {
    * Affiche le message de démarrage
    */
   showReadyMessage() {
-    this.showMessage('PRET ?', 'Appuie sur ESPACE pour commencer');
+    this.showMessage('PRET ?', 'Appuie sur ESPACE ou A pour commencer');
   }
 
   /**

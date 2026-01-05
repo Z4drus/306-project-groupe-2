@@ -21,7 +21,8 @@ export const PLAYER_CONFIG = {
   jumpVelocity: -650,
   doubleJumpVelocity: -550,
   maxJumps: 2,
-  animationSpeed: 12
+  animationSpeed: 12,
+  maxFallVelocity: 800
 };
 
 /** Configuration des plateformes */
@@ -250,7 +251,9 @@ export function createPhaserConfig(container) {
       default: 'arcade',
       arcade: {
         debug: false,
-        gravity: { y: 0 }
+        gravity: { y: 0 },
+        overlapBias: 16,
+        tileBias: 16
       }
     },
     scale: {

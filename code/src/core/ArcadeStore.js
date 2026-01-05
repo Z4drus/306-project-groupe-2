@@ -47,6 +47,10 @@ export function createArcadeStore() {
     attractMode: false,
     attractTimeout: null,
 
+    // État de transition (verrouillage contre les doubles actions)
+    isTransitioning: false,
+    currentGameInstance: null,
+
     // État des manettes
     connectedGamepads: [],
     gamepadPollInterval: null,
@@ -68,6 +72,10 @@ export function createArcadeStore() {
 
     // Meilleur score du joueur pour le jeu en cours
     currentBestScore: 0,
+
+    // Erreur de connexion au serveur (réseau restreint)
+    connectionError: false,
+    connectionErrorMessage: '',
 
     /**
      * Initialise le store
@@ -115,6 +123,10 @@ export function createArcadeStore() {
         this.user = result.user;
         this.backToMenu();
       } else {
+        // Détecter une erreur de connexion au serveur
+        if (result.error === 'Erreur de connexion au serveur' || result.error === 'Erreur serveur - réponse invalide') {
+          this.showConnectionError();
+        }
         this.authError = result.error;
       }
     },
@@ -137,6 +149,10 @@ export function createArcadeStore() {
         this.user = result.user;
         this.backToMenu();
       } else {
+        // Détecter une erreur de connexion au serveur
+        if (result.error === 'Erreur de connexion au serveur' || result.error === 'Erreur serveur - réponse invalide') {
+          this.showConnectionError();
+        }
         this.authError = result.error;
       }
     },
@@ -237,6 +253,14 @@ export function createArcadeStore() {
      * @param {string} gameName - Identifiant du jeu
      */
     async startGame(gameName) {
+      // Bloquer si une transition est déjà en cours
+      if (this.isTransitioning) {
+        console.log('Transition déjà en cours, action ignorée');
+        return;
+      }
+
+      this.isTransitioning = true;
+
       // Importer et afficher l'overlay AVANT de changer de vue
       const { getLoadingOverlay } = await import('./LoadingOverlay.js');
       const loadingOverlay = getLoadingOverlay();
@@ -272,7 +296,7 @@ export function createArcadeStore() {
       }
 
       try {
-        await loadGame(
+        const gameInstance = await loadGame(
           gameName,
           gameContainer,
           (score) => this.handleGameOver(gameName, score),
@@ -281,15 +305,22 @@ export function createArcadeStore() {
           this.isAuthenticated ? this.user?.username : null
         );
 
+        // Stocker l'instance du jeu pour pouvoir la détruire proprement
+        this.currentGameInstance = gameInstance;
+
         // Retirer la classe loading une fois le jeu pret
         if (gameContainer) {
           gameContainer.classList.remove('loading');
         }
+
+        // Transition terminée
+        this.isTransitioning = false;
       } catch (error) {
         console.error(`Erreur lors du chargement du jeu ${gameName}:`, error);
         if (gameContainer) {
           gameContainer.classList.remove('loading');
         }
+        this.isTransitioning = false;
         this.backToMenu();
       }
     },
@@ -343,14 +374,74 @@ export function createArcadeStore() {
     },
 
     /**
-     * Retourne au menu principal
+     * Retourne au menu principal avec destruction propre du jeu
+     * @param {boolean} showOverlay - Afficher l'overlay de transition (par défaut true)
      */
-    backToMenu() {
+    async backToMenu(showOverlay = true) {
+      // Bloquer si une transition est déjà en cours
+      if (this.isTransitioning) {
+        console.log('Transition déjà en cours, action ignorée');
+        return;
+      }
+
+      this.isTransitioning = true;
+
+      // Afficher l'overlay de chargement pour le retour (instant pour eviter le flash)
+      let loadingOverlay = null;
+      if (showOverlay && this.currentView === 'game') {
+        const { getLoadingOverlay } = await import('./LoadingOverlay.js');
+        loadingOverlay = getLoadingOverlay();
+        loadingOverlay.show('MENU', { instant: true });
+        loadingOverlay.update(20, 'Fermeture du jeu...');
+        // Attendre le prochain frame pour s'assurer que l'overlay est rendu
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      }
+
+      // Détruire proprement l'instance du jeu si elle existe
+      if (this.currentGameInstance) {
+        try {
+          if (loadingOverlay) loadingOverlay.update(40, 'Nettoyage des ressources...');
+
+          // Arrêter tous les sons
+          if (this.currentGameInstance.sound) {
+            this.currentGameInstance.sound.stopAll();
+          }
+
+          // Arrêter toutes les scènes
+          if (this.currentGameInstance.scene) {
+            this.currentGameInstance.scene.getScenes(true).forEach(scene => {
+              try {
+                if (scene.shutdown) scene.shutdown();
+                this.currentGameInstance.scene.stop(scene.scene.key);
+              } catch (e) {
+                // Ignorer les erreurs de scène
+              }
+            });
+          }
+
+          if (loadingOverlay) loadingOverlay.update(60, 'Destruction du jeu...');
+
+          // Détruire l'instance Phaser
+          this.currentGameInstance.destroy(true, false);
+        } catch (error) {
+          console.warn('Erreur lors de la destruction du jeu:', error);
+        }
+        this.currentGameInstance = null;
+      }
+
+      if (loadingOverlay) loadingOverlay.update(80, 'Retour au menu...');
+
+      // Nettoyer le container
+      const gameContainer = document.getElementById('game-container');
+      if (gameContainer) {
+        gameContainer.innerHTML = '';
+        gameContainer.classList.remove('loading');
+      }
+
+      // Réinitialiser l'état
       this.currentGame = null;
       this.currentView = 'menu';
       this.resetAttractTimer();
-
-      // Réinitialiser l'affichage du score/niveau
       this.gameScore = 0;
       this.gameLives = 3;
       this.gameLevel = 1;
@@ -358,10 +449,15 @@ export function createArcadeStore() {
       // Réafficher le curseur custom
       cursorManager.show();
 
-      const gameContainer = document.getElementById('game-container');
-      if (gameContainer) {
-        gameContainer.innerHTML = '';
+      // Masquer l'overlay avec animation
+      if (loadingOverlay) {
+        loadingOverlay.update(100, 'Prêt !');
+        await new Promise(resolve => setTimeout(resolve, 200));
+        await loadingOverlay.hide();
       }
+
+      // Transition terminée
+      this.isTransitioning = false;
     },
 
     /**
@@ -381,8 +477,14 @@ export function createArcadeStore() {
       this.leaderboard = [];
       this.gameScores = {};
       this.userScores = {};
+      this.connectionError = false;
 
       const result = await getLeaderboard(20);
+
+      // Détecter une erreur de connexion au serveur
+      if (!result.success && result.error) {
+        this.showConnectionError();
+      }
 
       if (result.success && result.data) {
         this.leaderboard = result.data;
@@ -407,6 +509,21 @@ export function createArcadeStore() {
       }
 
       this.scoresLoading = false;
+    },
+
+    /**
+     * Affiche l'erreur de connexion au serveur
+     */
+    showConnectionError() {
+      this.connectionError = true;
+      this.connectionErrorMessage = 'Connexion au serveur impossible depuis le réseau de l\'État de Fribourg. Pour sauvegarder vos scores et accéder aux classements, connectez-vous à un réseau non restreint (ex: EMF Net ou réseau privé). Vous pouvez continuer à jouer, mais vos scores ne seront pas enregistrés.';
+    },
+
+    /**
+     * Ferme la popup d'erreur de connexion
+     */
+    dismissConnectionError() {
+      this.connectionError = false;
     },
 
     /**

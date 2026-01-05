@@ -7,11 +7,13 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, ASSETS_PATH, COLORS } from '../../config/GameConfig.js';
 import cursorManager from '../../../../core/CursorManager.js';
+import { gamepadManager, GamepadButton } from '../../../../core/GamepadManager.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MenuScene' });
     this.keyboardCallbacks = {};
+    this.canStart = false;
   }
 
   /**
@@ -77,6 +79,11 @@ export default class MenuScene extends Phaser.Scene {
     if (onLoadProgress) {
       onLoadProgress(100, 'Pret !');
     }
+
+    // Permettre le démarrage après un court délai (évite les inputs accidentels)
+    this.time.delayedCall(300, () => {
+      this.canStart = true;
+    });
   }
 
   /**
@@ -219,10 +226,10 @@ export default class MenuScene extends Phaser.Scene {
 
     // Instructions
     const instructions = [
-      '🎮 ESPACE / ⬆️ / CLIC : Sauter',
-      '🦘 Double saut possible !',
-      '🎁 Collecte les cadeaux',
-      '⚠️ Ne tombe pas !'
+      'ESPACE / CLIC / BOUTON A : Sauter',
+      'Double saut possible !',
+      'Collecte les cadeaux',
+      'Ne tombe pas !'
     ];
 
     instructions.forEach((text, index) => {
@@ -243,7 +250,7 @@ export default class MenuScene extends Phaser.Scene {
     const bestScore = this.registry.get('bestScore') || 0;
 
     if (bestScore > 0) {
-      const text = this.add.text(GAME_WIDTH / 2, 430, `🏆 Meilleur score: ${bestScore}`, {
+      const text = this.add.text(GAME_WIDTH / 2, 430, `Meilleur score: ${bestScore}`, {
         fontSize: '22px',
         fontFamily: 'Arial, sans-serif',
         color: '#ffd700',
@@ -317,10 +324,7 @@ export default class MenuScene extends Phaser.Scene {
     // Stocker les callbacks pour pouvoir les retirer plus tard
     this.keyboardCallbacks.space = () => this.startGame();
     this.keyboardCallbacks.enter = () => this.startGame();
-    this.keyboardCallbacks.esc = () => {
-      window.Alpine?.store('arcade')?.backToMenu();
-      this.game.destroy(true);
-    };
+    this.keyboardCallbacks.esc = () => this.backToArcade();
 
     // Espace pour démarrer
     this.input.keyboard.on('keydown-SPACE', this.keyboardCallbacks.space);
@@ -356,6 +360,9 @@ export default class MenuScene extends Phaser.Scene {
    * Démarre le jeu
    */
   startGame() {
+    if (!this.canStart) return;
+    this.canStart = false;
+
     // Cacher le curseur pour le jeu
     cursorManager.hide();
 
@@ -367,5 +374,34 @@ export default class MenuScene extends Phaser.Scene {
         level: 1
       });
     });
+  }
+
+  /**
+   * Retourne au menu principal de l'arcade
+   */
+  backToArcade() {
+    if (!this.canStart) return;
+    this.canStart = false;
+
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
+    window.Alpine?.store('arcade')?.backToMenu();
+  }
+
+  /**
+   * Mise à jour - vérifie les inputs manette
+   */
+  update() {
+    if (!this.canStart) return;
+
+    // Bouton A ou START pour jouer
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.START, 0)) {
+      this.startGame();
+    }
+
+    // Bouton B pour retourner à l'arcade
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      this.backToArcade();
+    }
   }
 }

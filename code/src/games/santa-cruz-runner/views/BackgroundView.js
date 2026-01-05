@@ -14,7 +14,6 @@ export default class BackgroundView {
     this.scene = scene;
     this.backgroundTile = null;
     this.snowEmitter = null;
-    this.mountainsGraphics = null;
     this.scrollSpeed = 0;
   }
 
@@ -32,9 +31,6 @@ export default class BackgroundView {
   create() {
     // Créer le dégradé de fond
     this.createGradientBackground();
-
-    // Créer les montagnes en arrière-plan
-    this.createMountains();
 
     // Créer le fond défilant
     this.backgroundTile = this.scene.add.tileSprite(
@@ -74,73 +70,6 @@ export default class BackgroundView {
       graphics.fillStyle(colorInt, 1);
       graphics.fillRect(0, y, GAME_WIDTH, 1);
     }
-  }
-
-  /**
-   * Crée les montagnes stylisées en arrière-plan
-   */
-  createMountains() {
-    this.mountainsGraphics = this.scene.add.graphics();
-    this.mountainsGraphics.setDepth(-15);
-
-    // Montagnes lointaines (plus claires)
-    this.drawMountainRange(0.2, 0x3d5a80, 300);
-
-    // Montagnes proches (plus sombres)
-    this.drawMountainRange(0.4, 0x293241, 400);
-  }
-
-  /**
-   * Dessine une chaîne de montagnes
-   * @param {number} alpha - Opacité
-   * @param {number} color - Couleur
-   * @param {number} baseY - Position Y de base
-   */
-  drawMountainRange(alpha, color, baseY) {
-    this.mountainsGraphics.fillStyle(color, alpha);
-
-    const peaks = [
-      { x: 0, height: 150 },
-      { x: 150, height: 200 },
-      { x: 300, height: 120 },
-      { x: 450, height: 180 },
-      { x: 600, height: 140 },
-      { x: 750, height: 160 },
-      { x: 900, height: 130 }
-    ];
-
-    this.mountainsGraphics.beginPath();
-    this.mountainsGraphics.moveTo(0, GAME_HEIGHT);
-
-    peaks.forEach((peak, index) => {
-      const x = peak.x;
-      const y = baseY - peak.height;
-
-      if (index === 0) {
-        this.mountainsGraphics.lineTo(x, y);
-      } else {
-        // Point de contrôle pour courbe douce
-        const prevPeak = peaks[index - 1];
-        const midX = (prevPeak.x + x) / 2;
-        this.mountainsGraphics.lineTo(midX, baseY - (prevPeak.height + peak.height) / 2 + 30);
-        this.mountainsGraphics.lineTo(x, y);
-      }
-    });
-
-    this.mountainsGraphics.lineTo(GAME_WIDTH, GAME_HEIGHT);
-    this.mountainsGraphics.closePath();
-    this.mountainsGraphics.fillPath();
-
-    // Ajouter de la neige sur les sommets
-    this.mountainsGraphics.fillStyle(0xffffff, alpha * 0.5);
-    peaks.forEach(peak => {
-      const snowHeight = peak.height * 0.3;
-      this.mountainsGraphics.fillTriangle(
-        peak.x - 20, baseY - peak.height + snowHeight,
-        peak.x, baseY - peak.height,
-        peak.x + 20, baseY - peak.height + snowHeight
-      );
-    });
   }
 
   /**
@@ -227,10 +156,6 @@ export default class BackgroundView {
     if (this.snowEmitter) {
       this.snowEmitter.destroy();
       this.snowEmitter = null;
-    }
-    if (this.mountainsGraphics) {
-      this.mountainsGraphics.destroy();
-      this.mountainsGraphics = null;
     }
   }
 }

@@ -332,11 +332,7 @@ export default class GameOverScene extends Phaser.Scene {
     if (!this.canAct) return;
     this.canAct = false;
 
-    const onGameOver = this.game.registry.get('onGameOver');
-    if (onGameOver && typeof onGameOver === 'function') {
-      onGameOver(this.finalScore);
-    }
-    this.scene.stop();
-    this.game.destroy(true);
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
+    window.Alpine?.store('arcade')?.backToMenu();
   }
 }

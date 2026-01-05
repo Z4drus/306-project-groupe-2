@@ -4,6 +4,8 @@
  * Gère toutes les collisions entre le joueur et les autres éléments
  */
 
+import { PLATFORM_CONFIG } from '../config/GameConfig.js';
+
 export default class CollisionController {
   /**
    * @param {Phaser.Scene} scene - Scène Phaser
@@ -53,6 +55,64 @@ export default class CollisionController {
     // Vérifier les collisions avec les collectibles manuellement
     // (car ils utilisent des Graphics, pas des Sprites avec physique)
     this.checkCollectibleCollisions();
+
+    // Correction anti-tunneling : vérifier si le joueur devrait être sur une plateforme
+    this.checkMissedPlatformCollision();
+  }
+
+  /**
+   * Vérifie si le joueur est passé à travers une plateforme (anti-tunneling)
+   * Corrige la position si nécessaire
+   */
+  checkMissedPlatformCollision() {
+    const playerSprite = this.playerController.getSprite();
+    if (!playerSprite || !playerSprite.body) return;
+
+    const playerModel = this.playerController.model;
+    if (playerModel.isDead || playerModel.isOnGround) return;
+
+    // Seulement si le joueur descend
+    if (playerSprite.body.velocity.y <= 0) return;
+
+    const playerBounds = {
+      x: playerSprite.x - playerSprite.body.halfWidth,
+      y: playerSprite.y - playerSprite.body.halfHeight,
+      width: playerSprite.body.width,
+      height: playerSprite.body.height,
+      bottom: playerSprite.y + playerSprite.body.halfHeight
+    };
+
+    const activePlatforms = this.platformController.getActivePlatforms();
+
+    for (const platform of activePlatforms) {
+      if (!platform.isActive || platform.isCrumbling) continue;
+
+      // Vérifier si le joueur est horizontalement au-dessus de la plateforme
+      const platformLeft = platform.x;
+      const platformRight = platform.x + platform.width;
+      const playerCenterX = playerSprite.x;
+
+      if (playerCenterX < platformLeft || playerCenterX > platformRight) continue;
+
+      // Vérifier si le bas du joueur est légèrement dans ou sous le haut de la plateforme
+      const platformTop = platform.y;
+      const tolerance = PLATFORM_CONFIG.height + 10;
+
+      if (playerBounds.bottom >= platformTop && playerBounds.bottom <= platformTop + tolerance) {
+        // Le joueur devrait être sur cette plateforme - corriger la position
+        playerSprite.y = platformTop - playerSprite.body.halfHeight;
+        playerSprite.body.velocity.y = 0;
+        playerSprite.body.touching.down = true;
+        playerSprite.body.blocked.down = true;
+
+        // Notifier l'atterrissage
+        this.lastLandedPlatform = platform;
+        if (this.onLandOnPlatform) {
+          this.onLandOnPlatform(platform);
+        }
+        break;
+      }
+    }
   }
 
   /**

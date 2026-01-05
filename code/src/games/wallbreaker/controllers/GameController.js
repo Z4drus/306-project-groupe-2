@@ -446,9 +446,8 @@ export default class GameController {
    * Confirme la sortie du jeu
    */
   confirmExit() {
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
     window.Alpine?.store('arcade')?.backToMenu();
-    this.scene.scene.stop();
-    this.scene.game.destroy(true);
   }
 
   /**

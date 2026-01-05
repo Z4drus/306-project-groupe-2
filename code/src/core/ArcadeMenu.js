@@ -334,7 +334,7 @@ export function getMainMenuTemplate() {
       <div class="header-right">
         <!-- Indicateur utilisateur connecté -->
         <div x-show="$store.arcade.isAuthenticated" class="header-user">
-          <span class="header-user-icon">&#128100;</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="header-user-icon"><path d="M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z"/><path d="M8 15H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>
           <span class="header-user-name" x-text="$store.arcade.user?.username"></span>
         </div>
 
@@ -360,6 +360,24 @@ export function getMainMenuTemplate() {
         </div>
       </div>
     </header>
+
+    <!-- Popup d'erreur de connexion au serveur -->
+    <div x-show="$store.arcade.connectionError" x-cloak class="connection-error-overlay" @click.self="$store.arcade.dismissConnectionError()">
+      <div class="connection-error-popup">
+        <div class="connection-error-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3 class="connection-error-title">Connexion au serveur impossible</h3>
+        <p class="connection-error-message" x-text="$store.arcade.connectionErrorMessage"></p>
+        <button @click="$store.arcade.dismissConnectionError()" class="connection-error-btn">
+          Compris
+        </button>
+      </div>
+    </div>
 
     <!-- Menu principal -->
     <div x-data="arcadeMenu" x-show="$store.arcade.currentView === 'menu'" class="arcade-menu">
@@ -744,24 +762,179 @@ export function getMainMenuTemplate() {
 
     <!-- Vue Aide -->
     <div x-show="$store.arcade.currentView === 'help'" class="help-view">
-      <div class="help-header">
-        <button @click="$store.arcade.backToMenu()" class="back-btn">
-          ← Retour au menu
+      <div class="help-topbar">
+        <button @click="$store.arcade.backToMenu()" class="back-btn-compact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Retour
         </button>
-        <h2>Aide</h2>
+        <h2 class="help-title">Aide</h2>
       </div>
-      <div class="help-content">
-        <h3>Comment jouer ?</h3>
-        <ul>
-          <li><strong>Clavier :</strong> Utilisez les flèches directionnelles et la barre d'espace</li>
-          <li><strong>Manette Xbox :</strong> Connectez votre manette et utilisez le stick analogique et les boutons</li>
-        </ul>
-        <h3>Connexion d'une manette</h3>
-        <ol>
-          <li>Branchez votre manette Xbox via USB</li>
-          <li>Attendez quelques secondes que la manette soit reconnue</li>
-          <li>Lancez un jeu et utilisez les contrôles</li>
-        </ol>
+
+      <div class="help-grid">
+        <!-- Controles Clavier -->
+        <div class="help-card">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12"/>
+            </svg>
+            <h3>Clavier</h3>
+          </div>
+          <div class="help-card-content">
+            <div class="help-key-row">
+              <span class="help-key">&#8593; &#8595; &#8592; &#8594;</span>
+              <span>Deplacer</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">Espace</span>
+              <span>Action / Sauter</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">Entree</span>
+              <span>Valider / Jouer</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">Echap</span>
+              <span>Pause / Retour</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles Manette -->
+        <div class="help-card">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.97 16L5 19c-.47.47-.51 1.23-.12 1.74.42.54 1.19.68 1.76.28l3.5-2.48c.19-.14.4-.23.62-.28H13.24c.22.05.43.14.62.28l3.5 2.48c.57.4 1.34.26 1.76-.28.39-.51.35-1.27-.12-1.74l-2.97-3H7.97z"/>
+              <path d="M17 4H7c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/>
+            </svg>
+            <h3>Manette Xbox</h3>
+          </div>
+          <div class="help-card-content">
+            <div class="help-key-row">
+              <span class="help-key gamepad">Stick / D-Pad</span>
+              <span>Deplacer</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key gamepad">A</span>
+              <span>Action / Sauter</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key gamepad">Start</span>
+              <span>Pause</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key gamepad">B</span>
+              <span>Retour</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connexion Manette -->
+        <div class="help-card">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+            <h3>Connexion manette</h3>
+          </div>
+          <div class="help-card-content help-steps">
+            <div class="help-step">
+              <span class="help-step-num">1</span>
+              <span>Branchez la manette en USB</span>
+            </div>
+            <div class="help-step">
+              <span class="help-step-num">2</span>
+              <span>Attendez la detection (voyant P1/P2)</span>
+            </div>
+            <div class="help-step">
+              <span class="help-step-num">3</span>
+              <span>Lancez un jeu et jouez !</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="help-card">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <h3>Navigation menu</h3>
+          </div>
+          <div class="help-card-content">
+            <div class="help-key-row">
+              <span class="help-key">&#8592; &#8594;</span>
+              <span>Changer de jeu</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">Tab</span>
+              <span>Basculer zone</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">&#8593; &#8595;</span>
+              <span>Options</span>
+            </div>
+            <div class="help-key-row">
+              <span class="help-key">Entree</span>
+              <span>Selectionner</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Les jeux -->
+        <div class="help-card help-card-wide">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" x2="12.01" y1="17" y2="17"/>
+            </svg>
+            <h3>Les jeux</h3>
+          </div>
+          <div class="help-card-content help-games-info">
+            <div class="help-game-item">
+              <span class="help-game-name">Pac-Man</span>
+              <span class="help-game-desc">Mangez les pac-gommes et evitez les fantomes</span>
+            </div>
+            <div class="help-game-item">
+              <span class="help-game-name">Wallbreaker</span>
+              <span class="help-game-desc">Detruisez les briques avec la balle et la raquette</span>
+            </div>
+            <div class="help-game-item">
+              <span class="help-game-name">Santa Cruz Runner</span>
+              <span class="help-game-desc">Courez et sautez par-dessus les obstacles</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compte & Scores -->
+        <div class="help-card">
+          <div class="help-card-header">
+            <svg class="help-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h3>Compte & Scores</h3>
+          </div>
+          <div class="help-card-content help-steps">
+            <div class="help-step">
+              <span class="help-step-bullet">&#10003;</span>
+              <span>Connectez-vous pour sauvegarder vos scores</span>
+            </div>
+            <div class="help-step">
+              <span class="help-step-bullet">&#10003;</span>
+              <span>Comparez-vous dans le classement</span>
+            </div>
+            <div class="help-step">
+              <span class="help-step-bullet">&#10003;</span>
+              <span>Defiez les autres joueurs !</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `;

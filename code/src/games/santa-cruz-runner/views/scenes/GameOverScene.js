@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, ASSETS_PATH, COLORS } from '../../config/GameConfig.js';
 import cursorManager from '../../../../core/CursorManager.js';
+import { gamepadManager, GamepadButton } from '../../../../core/GamepadManager.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,12 @@ export default class GameOverScene extends Phaser.Scene {
     this.finalScore = 0;
     this.finalLevel = 1;
     this.keyboardCallbacks = {};
+
+    // Navigation manette
+    this.buttons = [];
+    this.selectedButtonIndex = 0;
+    this.canAct = false;
+    this.lastDirection = null;
   }
 
   /**
@@ -152,7 +159,7 @@ export default class GameOverScene extends Phaser.Scene {
     // Vérifier si nouveau record
     const bestScore = this.registry.get('bestScore') || 0;
     if (this.finalScore > bestScore) {
-      const newRecord = this.add.text(0, -90, '🏆 NOUVEAU RECORD !', {
+      const newRecord = this.add.text(0, -90, 'NOUVEAU RECORD !', {
         fontSize: '22px',
         fontFamily: 'Arial Black, sans-serif',
         color: '#ffd700'
@@ -182,23 +189,28 @@ export default class GameOverScene extends Phaser.Scene {
    * Crée les boutons
    */
   createButtons() {
+    // Réinitialiser la liste des boutons
+    this.buttons = [];
+
     // Bouton Rejouer
     const playAgainButton = this.createButton(
       GAME_WIDTH / 2 - 130,
       450,
-      '🔄 REJOUER',
+      'REJOUER',
       0x2ecc71,
       () => this.restartGame()
     );
+    this.buttons.push({ container: playAgainButton, action: () => this.restartGame() });
 
     // Bouton Menu
     const menuButton = this.createButton(
       GAME_WIDTH / 2 + 130,
       450,
-      '🏠 MENU',
+      'MENU',
       0xe74c3c,
       () => this.backToMenu()
     );
+    this.buttons.push({ container: menuButton, action: () => this.backToMenu() });
 
     // Animation d'entrée
     playAgainButton.setAlpha(0);
@@ -210,7 +222,13 @@ export default class GameOverScene extends Phaser.Scene {
       y: '+=20',
       duration: 500,
       delay: 500,
-      ease: 'Back.easeOut'
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        // Permettre les actions après l'animation
+        this.canAct = true;
+        // Sélectionner le premier bouton par défaut
+        this.updateButtonSelection();
+      }
     });
   }
 
@@ -320,6 +338,9 @@ export default class GameOverScene extends Phaser.Scene {
    * Redémarre le jeu
    */
   restartGame() {
+    if (!this.canAct) return;
+    this.canAct = false;
+
     // Cacher le curseur pour le jeu
     cursorManager.hide();
 
@@ -337,7 +358,73 @@ export default class GameOverScene extends Phaser.Scene {
    * Retourne au menu principal de l'arcade
    */
   backToMenu() {
+    if (!this.canAct) return;
+    this.canAct = false;
+
+    // La destruction du jeu est gérée par ArcadeStore.backToMenu()
     window.Alpine?.store('arcade')?.backToMenu();
-    this.game.destroy(true);
+  }
+
+  /**
+   * Met à jour l'affichage de la sélection des boutons
+   */
+  updateButtonSelection() {
+    this.buttons.forEach((button, index) => {
+      if (index === this.selectedButtonIndex) {
+        // Bouton sélectionné - agrandi
+        this.tweens.add({
+          targets: button.container,
+          scale: 1.15,
+          duration: 100
+        });
+      } else {
+        // Autres boutons - taille normale
+        this.tweens.add({
+          targets: button.container,
+          scale: 1,
+          duration: 100
+        });
+      }
+    });
+  }
+
+  /**
+   * Mise à jour - vérifie les inputs manette
+   */
+  update() {
+    if (!this.canAct) return;
+
+    // Navigation gauche/droite avec D-pad ou stick
+    const direction = gamepadManager.getDirection(0);
+
+    if (direction !== this.lastDirection) {
+      if (direction === 'left' && this.selectedButtonIndex > 0) {
+        this.selectedButtonIndex--;
+        this.updateButtonSelection();
+      } else if (direction === 'right' && this.selectedButtonIndex < this.buttons.length - 1) {
+        this.selectedButtonIndex++;
+        this.updateButtonSelection();
+      }
+      this.lastDirection = direction;
+    }
+
+    // Reset lastDirection quand pas de direction
+    if (!direction) {
+      this.lastDirection = null;
+    }
+
+    // Bouton A ou START pour activer le bouton sélectionné
+    if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.START, 0)) {
+      const selectedButton = this.buttons[this.selectedButtonIndex];
+      if (selectedButton) {
+        selectedButton.action();
+      }
+    }
+
+    // Bouton B pour retourner au menu de l'arcade
+    if (gamepadManager.isButtonJustPressed(GamepadButton.B, 0)) {
+      this.backToMenu();
+    }
   }
 }

@@ -4,6 +4,9 @@
  * Design rétro arcade années 80-90
  */
 
+/* Police Inter pour le clavier virtuel */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* Polices locales */
 @font-face {
   font-family: 'Arcade';
@@ -110,7 +113,7 @@ body::before {
 
 /* Header */
 .arcade-header {
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: var(--darker-bg);
   border-bottom: 3px solid var(--neon-purple);
   box-shadow:
@@ -121,6 +124,10 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+  height: 80px;
+  min-height: 70px;
+  max-height: 90px;
 }
 
 .arcade-header::before {
@@ -149,11 +156,10 @@ body::before {
 }
 
 .header-icon {
-  width: 80px;
-  height: 80px;
+  width: 55px;
+  height: 55px;
   object-fit: contain;
   filter: brightness(0.9) contrast(1.2) drop-shadow(0 0 10px rgba(189, 0, 255, 0.5));
-  margin-top: -5px;
 }
 
 .header-text {
@@ -163,10 +169,10 @@ body::before {
 }
 
 .arcade-title {
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 400;
   font-family: var(--font-title);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 2px;
   color: var(--neon-blue);
   text-shadow:
     0 0 10px var(--neon-blue),
@@ -219,7 +225,7 @@ body::before {
    ================================ */
 
 .arcade-menu {
-  height: calc(100vh - 120px);
+  height: calc(100vh - 85px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -228,8 +234,8 @@ body::before {
 .menu-layout {
   display: flex;
   flex: 1;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
   min-height: 0;
   overflow: hidden;
 }
@@ -245,42 +251,28 @@ body::before {
 
 .games-list {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   overflow-x: auto;
   overflow-y: hidden;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   height: 100%;
   align-items: stretch;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   scrollbar-color: var(--neon-purple) var(--darker-bg);
 }
 
 .games-list::-webkit-scrollbar {
-  height: 8px;
-}
-
-.games-list::-webkit-scrollbar-track {
-  background: var(--darker-bg);
-  border-radius: 4px;
-}
-
-.games-list::-webkit-scrollbar-thumb {
-  background: var(--neon-purple);
-  border-radius: 4px;
-}
-
-.games-list::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-blue);
+  display: none;
 }
 
 /* Panneau d'options (droite) */
 .options-panel {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
   background: var(--card-bg);
   border: 2px solid var(--neon-purple);
   border-radius: var(--border-radius);
@@ -288,6 +280,7 @@ body::before {
     0 0 20px rgba(189, 0, 255, 0.3),
     inset 0 0 30px rgba(189, 0, 255, 0.05);
   align-self: stretch;
+  overflow: hidden;
 }
 
 .options-panel.active {
@@ -481,28 +474,29 @@ body::before {
 }
 
 .games-list .game-info {
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   flex-shrink: 0;
 }
 
 .games-list .game-name {
-  font-size: 1.6rem;
-  margin-bottom: var(--spacing-xs);
+  font-size: 1.3rem;
+  margin-bottom: 4px;
 }
 
 .games-list .game-description {
-  font-size: 1rem;
-  margin-bottom: var(--spacing-xs);
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
 .games-list .game-players {
-  font-size: 0.9rem;
-  margin-bottom: var(--spacing-sm);
+  font-size: 0.75rem;
+  margin-bottom: var(--spacing-xs);
 }
 
 .games-list .game-play-btn {
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: 1.1rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.95rem;
   flex-shrink: 0;
 }
 
@@ -523,7 +517,7 @@ body::before {
 .game-card:hover,
 .game-card:focus,
 .game-card.selected {
-  transform: translateY(-8px) scale(1.02);
+  transform: scale(1.015);
   box-shadow:
     0 0 25px rgba(189, 0, 255, 0.9),
     0 0 35px rgba(189, 0, 255, 0.6),
@@ -568,8 +562,7 @@ body::before {
 
 .game-card:hover .game-thumbnail img,
 .game-card.selected .game-thumbnail img {
-  filter: brightness(1) contrast(1.3);
-  transform: scale(1.05);
+  filter: brightness(1) contrast(1.2);
 }
 
 .game-info {
@@ -935,7 +928,7 @@ body::before {
    ================================ */
 
 .scores-view {
-  height: calc(100vh - 120px);
+  height: calc(100vh - 85px);
   display: flex;
   flex-direction: column;
   padding: var(--spacing-sm);
@@ -1229,98 +1222,239 @@ body::before {
   }
 }
 
-/* Vue Aide */
+/* Vue Aide - Nouvelle version */
 .help-view {
-  padding: var(--spacing-md);
-  max-width: 800px;
-  margin: 0 auto;
+  height: calc(100vh - 85px);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm);
+  overflow: hidden;
 }
 
-.help-header {
-  margin-bottom: var(--spacing-lg);
+.help-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--card-bg);
+  border: 2px solid var(--neon-purple);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
-.help-header h2 {
-  font-size: 2.8rem;
+.help-title {
   font-family: var(--font-title);
+  font-size: 1.8rem;
   color: var(--neon-purple);
-  text-shadow:
-    0 0 15px var(--neon-purple),
-    0 0 30px var(--neon-purple),
-    0 0 45px rgba(189, 0, 255, 0.5);
-  text-align: center;
-  margin-top: var(--spacing-md);
-  letter-spacing: 0.15em;
+  text-shadow: 0 0 15px var(--neon-purple);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.help-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.help-card {
+  background: var(--card-bg);
+  border: 2px solid var(--neon-blue);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.help-card-wide {
+  grid-column: span 2;
+}
+
+.help-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(0, 212, 255, 0.1);
+  border-bottom: 2px solid var(--neon-blue);
+  flex-shrink: 0;
+}
+
+.help-card-header h3 {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-blue);
+  margin: 0;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.help-content {
-  background-color: var(--card-bg);
-  border: 2px solid var(--neon-blue);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-xl);
-  box-shadow:
-    0 0 20px rgba(0, 212, 255, 0.4),
-    inset 0 0 25px rgba(0, 212, 255, 0.05);
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-}
-
-.help-content h3 {
-  font-size: 1.6rem;
-  color: var(--neon-purple);
-  text-shadow:
-    0 0 8px var(--neon-purple),
-    0 0 15px var(--neon-purple);
-  margin-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-md);
-  font-family: var(--font-title);
-  letter-spacing: 0.08em;
-}
-
-.help-content h3:first-child {
-  margin-top: 0;
-}
-
-.help-content ul,
-.help-content ol {
-  margin-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+.help-card-icon {
+  width: 22px;
+  height: 22px;
   color: var(--neon-cyan);
-  font-size: 1.15rem;
+  flex-shrink: 0;
 }
 
-.help-content li {
-  margin-bottom: var(--spacing-sm);
-  line-height: 1.7;
+.help-card-content {
+  flex: 1;
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  overflow-y: auto;
 }
 
-.help-content strong {
-  color: var(--neon-blue);
-  text-shadow: 0 0 5px var(--neon-blue);
+.help-key-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--neon-cyan);
+}
+
+.help-key {
+  background: var(--darker-bg);
+  border: 1px solid var(--neon-purple);
+  border-radius: var(--border-radius);
+  padding: 2px 8px;
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  color: var(--neon-purple);
+  text-shadow: 0 0 5px var(--neon-purple);
+  min-width: 70px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.help-key.gamepad {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+.help-steps {
+  gap: var(--spacing-sm);
+}
+
+.help-step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--neon-cyan);
+}
+
+.help-step-num {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neon-purple);
+  color: var(--darker-bg);
+  border-radius: 50%;
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.help-step-bullet {
+  color: var(--neon-cyan);
+  font-size: 1rem;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.help-games-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.help-game-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(189, 0, 255, 0.08);
+  border-radius: var(--border-radius);
+}
+
+.help-game-name {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  color: var(--neon-purple);
+  text-shadow: 0 0 5px var(--neon-purple);
+}
+
+.help-game-desc {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--neon-cyan);
+  opacity: 0.85;
+}
+
+/* Responsive Aide */
+@media (max-width: 900px) {
+  .help-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    overflow-y: auto;
+  }
+
+  .help-card-wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .help-card-wide {
+    grid-column: span 1;
+  }
+
+  .help-title {
+    font-size: 1.4rem;
+  }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .arcade-header {
-    padding: var(--spacing-sm) var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    height: 60px;
+    min-height: 55px;
+    max-height: 70px;
   }
 
   .header-content {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
 
   .header-icon {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
   }
 
   .arcade-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .arcade-subtitle {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
   }
 
   .games-grid {
@@ -1351,14 +1485,18 @@ body::before {
 
   /* Nouveau layout responsive */
   .arcade-menu {
-    height: auto;
-    min-height: calc(100vh - 100px);
+    height: calc(100vh - 65px);
+  }
+
+  .scores-view,
+  .help-view {
+    height: calc(100vh - 65px);
   }
 
   .menu-layout {
     flex-direction: column;
     overflow-y: auto;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
   }
 
   .games-column {
@@ -1389,8 +1527,8 @@ body::before {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
   }
 
   .options-section {
@@ -2207,22 +2345,30 @@ button.cursor-hover,
   position: absolute;
   top: 0;
   left: 0;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: transparent;
-  border: 2px solid var(--neon-cyan);
-  border-radius: var(--border-radius);
+  padding: 10px 18px;
+  background: linear-gradient(180deg, #0a1520 0%, #051015 50%, #030810 100%);
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  border-radius: 8px;
   color: var(--neon-cyan);
-  font-family: var(--font-title);
-  font-size: 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .virtual-keyboard-back-btn:hover {
-  background: rgba(0, 255, 255, 0.15);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  background: linear-gradient(180deg, #102530 0%, #0a1a20 50%, #051015 100%);
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 6px 20px rgba(0, 255, 255, 0.3),
+    0 0 20px rgba(0, 255, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transform: translateX(-3px);
 }
 
@@ -2235,33 +2381,36 @@ button.cursor-hover,
 }
 
 .virtual-keyboard-label {
-  font-family: var(--font-title);
-  font-size: 1.4rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
   color: var(--neon-cyan);
   text-shadow:
     0 0 10px var(--neon-cyan),
     0 0 20px var(--neon-cyan);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
 }
 
 /* Zone d'affichage de la saisie */
 .virtual-keyboard-input-display {
   width: 100%;
   padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--darker-bg);
-  border: 3px solid var(--neon-purple);
-  border-radius: var(--border-radius);
-  font-family: var(--font-body);
-  font-size: 2rem;
+  background: linear-gradient(180deg, #0a0812 0%, #050508 100%);
+  border: 2px solid rgba(189, 0, 255, 0.5);
+  border-radius: 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
   color: var(--neon-cyan);
   text-align: center;
-  text-shadow: 0 0 10px var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan);
   box-shadow:
-    0 0 20px rgba(189, 0, 255, 0.4),
-    inset 0 0 30px rgba(189, 0, 255, 0.1);
-  min-height: 60px;
-  letter-spacing: 0.1em;
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(189, 0, 255, 0.25),
+    inset 0 0 40px rgba(189, 0, 255, 0.08);
+  min-height: 65px;
+  letter-spacing: 0.08em;
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -2280,27 +2429,29 @@ button.cursor-hover,
 
 /* Wrapper du clavier */
 .virtual-keyboard-wrapper {
-  background: var(--card-bg);
-  border: 3px solid var(--neon-purple);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
+  background: linear-gradient(180deg, #15101f 0%, #0d0812 100%);
+  border: 2px solid rgba(189, 0, 255, 0.4);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
   box-shadow:
-    0 0 30px rgba(189, 0, 255, 0.5),
-    inset 0 0 40px rgba(189, 0, 255, 0.1);
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(189, 0, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 60px rgba(189, 0, 255, 0.05);
 }
 
 /* Override styles simple-keyboard */
 .arcade-keyboard.hg-theme-default {
   background: transparent;
-  font-family: var(--font-title);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 0;
 }
 
 .arcade-keyboard .hg-row {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .arcade-keyboard .hg-row:last-child {
@@ -2308,71 +2459,98 @@ button.cursor-hover,
 }
 
 .arcade-keyboard .hg-button {
-  background: var(--darker-bg);
-  border: 2px solid var(--neon-blue);
-  border-radius: var(--border-radius);
+  background: linear-gradient(180deg, #1a1025 0%, #0d0812 50%, #080510 100%);
+  border: 2px solid rgba(0, 212, 255, 0.6);
+  border-radius: 8px;
   color: var(--neon-blue);
-  font-family: var(--font-title);
-  font-size: 1.3rem;
-  min-width: 50px;
-  height: 55px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  min-width: 52px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.1s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 0 8px rgba(0, 212, 255, 0.2),
-    inset 0 0 10px rgba(0, 212, 255, 0.05);
-  text-shadow: 0 0 5px var(--neon-blue);
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(0, 212, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Effet de reflet subtil sur les touches */
+.arcade-keyboard .hg-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+  border-radius: 6px 6px 0 0;
+  pointer-events: none;
 }
 
 .arcade-keyboard .hg-button:hover {
-  background: rgba(0, 212, 255, 0.15);
+  background: linear-gradient(180deg, #251538 0%, #150d20 50%, #0d0812 100%);
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  transform: scale(1.05);
+  transform: translateY(-2px) scale(1.02);
   box-shadow:
-    0 0 15px rgba(0, 212, 255, 0.5),
-    inset 0 0 15px rgba(0, 212, 255, 0.1);
+    0 6px 20px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 212, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Touche sélectionnée (navigation manette/clavier) */
 .arcade-keyboard .hg-button.key-selected {
-  background: rgba(189, 0, 255, 0.3);
+  background: linear-gradient(180deg, #2d1545 0%, #1a0d28 50%, #120818 100%);
   border-color: var(--neon-purple);
+  border-width: 2px;
   color: #fff;
-  transform: scale(1.1);
+  transform: translateY(-3px) scale(1.08);
   box-shadow:
-    0 0 25px rgba(189, 0, 255, 0.8),
-    0 0 40px rgba(189, 0, 255, 0.4),
-    inset 0 0 20px rgba(189, 0, 255, 0.2);
+    0 8px 25px rgba(189, 0, 255, 0.5),
+    0 0 30px rgba(189, 0, 255, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4);
   text-shadow:
-    0 0 10px #fff,
-    0 0 20px var(--neon-purple);
+    0 0 12px #fff,
+    0 0 25px var(--neon-purple);
   z-index: 10;
 }
 
 /* Touche pressée */
 .arcade-keyboard .hg-button.key-pressed,
 .arcade-keyboard .hg-button:active {
-  background: var(--neon-purple);
+  background: linear-gradient(180deg, var(--neon-purple) 0%, #8a00c7 100%);
   border-color: var(--neon-pink);
-  color: var(--darker-bg);
-  transform: scale(0.95);
+  color: #fff;
+  transform: translateY(1px) scale(0.98);
   box-shadow:
-    0 0 30px rgba(189, 0, 255, 1),
-    inset 0 0 10px rgba(0, 0, 0, 0.3);
+    0 2px 8px rgba(189, 0, 255, 0.8),
+    0 0 20px rgba(189, 0, 255, 0.6),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.08s ease;
 }
 
 /* Touches spéciales */
 .arcade-keyboard .hg-button.key-special {
-  border-color: var(--neon-purple);
+  background: linear-gradient(180deg, #1f1030 0%, #120818 50%, #0a0510 100%);
+  border-color: rgba(189, 0, 255, 0.6);
   color: var(--neon-purple);
-  min-width: 80px;
-  font-size: 1.1rem;
+  min-width: 85px;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .arcade-keyboard .hg-button.key-special:hover {
+  background: linear-gradient(180deg, #2d1545 0%, #1a0d28 50%, #120818 100%);
   border-color: var(--neon-pink);
   color: var(--neon-pink);
 }
@@ -2381,53 +2559,95 @@ button.cursor-hover,
 .arcade-keyboard .hg-button[data-skbtn="{space}"] {
   min-width: 250px;
   flex-grow: 1;
-  max-width: 300px;
+  max-width: 320px;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
 }
 
 /* Touche done (OK) */
 .arcade-keyboard .hg-button[data-skbtn="{done}"] {
-  background: rgba(0, 255, 0, 0.1);
-  border-color: #00ff00;
+  background: linear-gradient(180deg, #0a2515 0%, #051810 50%, #030d08 100%);
+  border-color: rgba(0, 255, 0, 0.6);
   color: #00ff00;
-  min-width: 100px;
+  min-width: 110px;
+  font-weight: 600;
 }
 
-.arcade-keyboard .hg-button[data-skbtn="{done}"]:hover,
-.arcade-keyboard .hg-button[data-skbtn="{done}"].key-selected {
-  background: rgba(0, 255, 0, 0.3);
+.arcade-keyboard .hg-button[data-skbtn="{done}"]:hover {
+  background: linear-gradient(180deg, #0f3520 0%, #082818 50%, #051810 100%);
+  border-color: #00ff00;
   box-shadow:
-    0 0 20px rgba(0, 255, 0, 0.6),
-    inset 0 0 15px rgba(0, 255, 0, 0.2);
+    0 6px 20px rgba(0, 255, 0, 0.3),
+    0 0 25px rgba(0, 255, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.arcade-keyboard .hg-button[data-skbtn="{done}"].key-selected {
+  background: linear-gradient(180deg, #154528 0%, #0a3018 50%, #072010 100%);
+  border-color: #00ff00;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow:
+    0 8px 25px rgba(0, 255, 0, 0.4),
+    0 0 35px rgba(0, 255, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
 }
 
 /* Touche backspace */
 .arcade-keyboard .hg-button[data-skbtn="{backspace}"] {
-  border-color: #ff6b6b;
+  background: linear-gradient(180deg, #251515 0%, #180a0a 50%, #100505 100%);
+  border-color: rgba(255, 107, 107, 0.6);
   color: #ff6b6b;
+  font-weight: 600;
 }
 
-.arcade-keyboard .hg-button[data-skbtn="{backspace}"]:hover,
-.arcade-keyboard .hg-button[data-skbtn="{backspace}"].key-selected {
-  background: rgba(255, 107, 107, 0.2);
+.arcade-keyboard .hg-button[data-skbtn="{backspace}"]:hover {
+  background: linear-gradient(180deg, #352020 0%, #201010 50%, #180a0a 100%);
+  border-color: #ff6b6b;
   box-shadow:
-    0 0 15px rgba(255, 107, 107, 0.5),
-    inset 0 0 10px rgba(255, 107, 107, 0.1);
+    0 6px 20px rgba(255, 107, 107, 0.3),
+    0 0 20px rgba(255, 107, 107, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.arcade-keyboard .hg-button[data-skbtn="{backspace}"].key-selected {
+  background: linear-gradient(180deg, #402828 0%, #281515 50%, #200a0a 100%);
+  border-color: #ff6b6b;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow:
+    0 8px 25px rgba(255, 107, 107, 0.4),
+    0 0 30px rgba(255, 107, 107, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-shadow: 0 0 12px rgba(255, 107, 107, 0.8);
 }
 
 /* Touche symboles (!#$) */
 .arcade-keyboard .hg-button[data-skbtn="{symbols}"] {
-  background: rgba(255, 165, 0, 0.1);
-  border-color: #ffa500;
+  background: linear-gradient(180deg, #251a10 0%, #180f08 50%, #100a05 100%);
+  border-color: rgba(255, 165, 0, 0.6);
   color: #ffa500;
-  min-width: 70px;
+  min-width: 75px;
+  font-weight: 600;
 }
 
-.arcade-keyboard .hg-button[data-skbtn="{symbols}"]:hover,
-.arcade-keyboard .hg-button[data-skbtn="{symbols}"].key-selected {
-  background: rgba(255, 165, 0, 0.3);
+.arcade-keyboard .hg-button[data-skbtn="{symbols}"]:hover {
+  background: linear-gradient(180deg, #352818 0%, #201510 50%, #180f08 100%);
+  border-color: #ffa500;
   box-shadow:
-    0 0 20px rgba(255, 165, 0, 0.6),
-    inset 0 0 15px rgba(255, 165, 0, 0.2);
+    0 6px 20px rgba(255, 165, 0, 0.3),
+    0 0 20px rgba(255, 165, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.arcade-keyboard .hg-button[data-skbtn="{symbols}"].key-selected {
+  background: linear-gradient(180deg, #403220 0%, #281a10 50%, #201008 100%);
+  border-color: #ffa500;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow:
+    0 8px 25px rgba(255, 165, 0, 0.4),
+    0 0 30px rgba(255, 165, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-shadow: 0 0 12px rgba(255, 165, 0, 0.8);
 }
 
 /* Animation de transition entre champs */
@@ -2456,15 +2676,21 @@ button.cursor-hover,
   display: flex;
   justify-content: center;
   gap: var(--spacing-xl);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: #666;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(150, 150, 170, 0.8);
+  letter-spacing: 0.02em;
 }
 
 .virtual-keyboard-instructions span {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Input avec clavier virtuel activé */
@@ -2481,21 +2707,26 @@ button.cursor-hover,
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  background: transparent;
-  border: 1px solid var(--neon-purple);
-  border-radius: var(--border-radius);
+  background: linear-gradient(180deg, #1a1025 0%, #0d0812 100%);
+  border: 1px solid rgba(189, 0, 255, 0.5);
+  border-radius: 6px;
   color: var(--neon-purple);
-  padding: 6px 10px;
-  font-size: 1rem;
+  padding: 8px 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: var(--transition);
-  opacity: 0.7;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.85;
 }
 
 .keyboard-trigger-btn:hover {
   opacity: 1;
-  background: rgba(189, 0, 255, 0.2);
-  box-shadow: 0 0 10px rgba(189, 0, 255, 0.5);
+  background: linear-gradient(180deg, #251538 0%, #150d20 100%);
+  border-color: var(--neon-purple);
+  box-shadow:
+    0 4px 15px rgba(189, 0, 255, 0.3),
+    0 0 15px rgba(189, 0, 255, 0.4);
+  transform: translateY(-50%) scale(1.05);
 }
 
 /* Responsive */
@@ -2524,4 +2755,139 @@ button.cursor-hover,
     gap: var(--spacing-sm);
     align-items: center;
   }
+}
+
+/* ================================
+   POPUP ERREUR DE CONNEXION
+   ================================ */
+
+.connection-error-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+  backdrop-filter: blur(8px);
+}
+
+.connection-error-popup {
+  background: var(--card-bg);
+  border: 3px solid #ff6b6b;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xl);
+  max-width: 550px;
+  width: 90%;
+  text-align: center;
+  box-shadow:
+    0 0 40px rgba(255, 107, 107, 0.5),
+    0 0 80px rgba(255, 107, 107, 0.2),
+    inset 0 0 30px rgba(255, 107, 107, 0.05);
+  animation: popup-appear 0.3s ease;
+}
+
+@keyframes popup-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.connection-error-icon {
+  margin-bottom: var(--spacing-md);
+}
+
+.connection-error-icon svg {
+  width: 64px;
+  height: 64px;
+  color: #ff6b6b;
+  filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.8));
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(255, 107, 107, 1));
+  }
+}
+
+.connection-error-title {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  color: #ff6b6b;
+  text-shadow:
+    0 0 10px rgba(255, 107, 107, 0.8),
+    0 0 20px rgba(255, 107, 107, 0.5);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.connection-error-message {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+  text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+}
+
+.connection-error-btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: transparent;
+  border: 2px solid var(--neon-cyan);
+  border-radius: var(--border-radius);
+  color: var(--neon-cyan);
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 255, 255, 0.05);
+}
+
+.connection-error-btn:hover {
+  background: rgba(0, 255, 255, 0.15);
+  transform: scale(1.05);
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 30px rgba(0, 255, 255, 0.3),
+    inset 0 0 15px rgba(0, 255, 255, 0.1);
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .connection-error-popup {
+    padding: var(--spacing-lg);
+  }
+
+  .connection-error-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .connection-error-title {
+    font-size: 1.3rem;
+  }
+
+  .connection-error-message {
+    font-size: 1rem;
+  }
+}
+
+/* Attribut x-cloak pour Alpine.js */
+[x-cloak] {
+  display: none !important;
 }

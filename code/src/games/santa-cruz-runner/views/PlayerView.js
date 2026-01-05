@@ -49,6 +49,9 @@ export default class PlayerView {
     this.sprite.body.setGravityY(PLAYER_CONFIG.gravity);
     this.sprite.body.setCollideWorldBounds(false);
 
+    // Limiter la vélocité de chute pour éviter le tunneling
+    this.sprite.body.setMaxVelocityY(PLAYER_CONFIG.maxFallVelocity);
+
     // Créer les animations
     this.createAnimations();
 
