@@ -137,10 +137,10 @@ Chaque membre participe activement à la conception, au développement et à la 
 
 Vous pouvez ajouter ici les noms des membres :
 
-* Membre 1
-* Membre 2
-* Membre 3
-* Membre 4
+* Membre 1 Axelle Hertig
+* Membre 2 Valentin Gremaud
+* Membre 3 Noé Romanens
+* Membre 4 Diogo da Silva
 
 ---
 
