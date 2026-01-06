@@ -16,11 +16,11 @@ Le repository s’organise en deux dossiers principaux :
 
 Contient l’intégralité du code source du projet. Selon la nature du projet, ce dossier peut inclure :
 
-* Le backend
-* Le frontend
-* Les scripts nécessaires
-* Les configurations
-* Les tests éventuels
+- Le backend
+- Le frontend
+- Les scripts nécessaires
+- Les configurations
+- Les tests éventuels
 
 ### **2. `/documentation`**
 
@@ -31,6 +31,7 @@ Ce dossier regroupe tous les documents produits dans le cadre du projet, notamme
 Présentation du contexte, du besoin initial, des objectifs et de la justification du projet.
 
 #### **2.2 Cahier des charges**
+
 ### Contexte
 
 Dans de nombreux espaces éducatifs, entreprises et lieux publics, il existe un besoin croissant d’activités ludiques, conviviales et simples d’accès. L’idée de **ArcadiaLabs**, la société commanditaire, est de proposer une **borne d’arcade moderne**, basée sur un **Raspberry Pi**, accessible depuis n’importe quel navigateur et compatible avec des **manettes Xbox**.
@@ -102,27 +103,27 @@ Ce document détermine les exigences et contraintes du projet et permet la justi
 La documentation de réalisation a pour objectif de faciliter la maintenance et doit contenir les informations suivantes :
 
 1. Conception :
-    1. Les diagrammes de classes des applications.
-    2. Les diagrammes d’interactions des tâches principales des applications
-    3. Le modèle ER de la base de données de l’application Backend
+   1. Les diagrammes de classes des applications.
+   2. Les diagrammes d’interactions des tâches principales des applications
+   3. Le modèle ER de la base de données de l’application Backend
 2. Implémentation :
-    1. Les codes sources des applications, commentés.
-    2. Le script de création et sauvegarde de la base de données, commenté.
-    3. Tests fonctionnels des applications et leur communication.
+   1. Les codes sources des applications, commentés.
+   2. Le script de création et sauvegarde de la base de données, commenté.
+   3. Tests fonctionnels des applications et leur communication.
 3. Remarques et la conclusion :
-    1. Problèmes rencontrés, limites des versions et améliorations possibles.
-    2. Commentaires personnels et une auto-évaluation.
+   1. Problèmes rencontrés, limites des versions et améliorations possibles.
+   2. Commentaires personnels et une auto-évaluation.
 
 **Un Web Summary**
 
 Ce document a pour objectif de présenter le projet de manière succincte.
 
-#### **2.3 Documentation**
+#### **2.3 Documentation en Markdown**
 
-Documentation générale du projet, expliquant son fonctionnement, son architecture, les choix techniques, etc.
+Documentation générale du projet, expliquant son fonctionnement, son architecture, les choix techniques, etc. Chez nous elle se situe dans le dossier 3_documentation_projet.
 
-* **3.1 Journal** : Journal de bord retraçant l’avancement du projet au fil des séances (tâches effectuées, difficultés, décisions, etc.)
-* **3.2 Planning** : Planning prévisionnel et/ou réel du projet, sous forme de tableau, diagramme ou autre.
+- **3.1 Journal** : Journal de bord retraçant l’avancement du projet au fil des séances (tâches effectuées, difficultés, décisions, etc.)
+- **3.2 Planning** : Planning prévisionnel et/ou réel du projet, sous forme de tableau, diagramme ou autre.
 
 #### **2.4 Web Summary**
 
@@ -137,10 +138,10 @@ Chaque membre participe activement à la conception, au développement et à la 
 
 Vous pouvez ajouter ici les noms des membres :
 
-* Membre 1 Axelle Hertig
-* Membre 2 Valentin Gremaud
-* Membre 3 Noé Romanens
-* Membre 4 Diogo da Silva
+- Membre 1 Axelle Hertig
+- Membre 2 Valentin Gremaud
+- Membre 3 Noé Romanens
+- Membre 4 Diogo da Silva
 
 ---
 
@@ -148,11 +149,11 @@ Vous pouvez ajouter ici les noms des membres :
 
 Liste des technologies, frameworks et outils utilisés pour développer et documenter le projet. Par exemple :
 
-* Langage(s) : …
-* Framework(s) : …
-* Outils de gestion de versions : GitHub
-* Gestion de projet : Planning, journal, réunions
-* Autres outils : …
+- Langage(s) : JavaScript (frontend Phaser/Alpine + backend Express) et SQL via Prisma pour modéliser PostgreSQL
+- Framework(s) : Vite pour le bundling SPA, Express pour l’API REST, Phaser comme moteur des mini-jeux et Alpine.js pour l’UI
+- Outils de gestion de versions : GitHub
+- Gestion de projet : Planning, journal, réunions
+- Autres outils : Prisma + adapter pg pour accéder à la base PostgreSQL Neon, dotenv pour la config, bcrypt/JWT pour l’auth côté serveur, Raspberry Pi en cible matérielle
 
 ---
 
@@ -172,23 +173,25 @@ cd code
 
 L'ensemble de la documentation complète est disponible dans le dossier `/documentation`. Référez-vous aux fichiers pour plus de détails sur :
 
-* Le besoin et les objectifs
-* Les exigences du projet
-* L’architecture
-* Le fonctionnement interne
-* Le déroulement du projet
+- Le besoin et les objectifs
+- Les exigences du projet
+- L’architecture
+- Le fonctionnement interne
+- Le déroulement du projet
 
 ---
 
 ## RELEASE
 
-Chaque semaine, une release est créée 
+Chaque semaine, une release est créée
 
-Terminal VS Code pour le tag et le push : 
+Terminal VS Code pour le tag et le push :
+
 ```bash
 git tag -a S1 -m "Release S1"
 git push origin S1
 ```
+
 ---
 
 ## 📬 Contact
