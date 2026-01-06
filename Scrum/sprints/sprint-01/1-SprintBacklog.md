@@ -1,14 +1,15 @@
 
-# **SCRUM : Sprint Backlog 01 | Scrum Master: Axelle
-| ID  | User Story associée | Tâche                    | Description                                                                                | Priorité | Statut  |
-| --- | ------------------- | ------------------------ | ------------------------------------------------------------------------------------------ | -------- | ------- |
-| T1  | US09                | Mise en place du serveur | Installer et configurer un serveur web sur Raspberry Pi pour servir l’application via HTTP | Haute    | À faire |
-| T2  | US03                | Accès navigateur         | Vérifier l’accès à l’application depuis un navigateur web                                  | Haute    | À faire |
-| T3  | US04                | Interface menu           | Créer un menu principal simple et clair                                                    | Haute    | À faire |
-| T4  | US12                | Interface responsive     | Adapter l’interface à l’écran du Raspberry Pi                                              | Moyenne  | À faire |
-| T5  | US11                | Chargement des assets    | Charger les images, sons et scripts nécessaires au mini-jeu                                | Haute    | À faire |
-| T6  | US05                | Lancement du mini-jeu    | Permettre le lancement du mini-jeu depuis le menu                                          | Haute    | À faire |
-| T7  | US02                | Contrôles clavier        | Implémenter les contrôles du mini-jeu au clavier                                           | Haute    | À faire |
-| T8  | US01                | Contrôles manette        | Implémenter les contrôles avec une manette Xbox                                            | Haute    | À faire |
-| T9  | US06                | Fluidité du jeu          | Optimiser les performances pour une exécution fluide sur Raspberry Pi                      | Moyenne  | À faire |
-| T10 | US06                | Tests et validation      | Tester le mini-jeu et corriger les bugs bloquants                                          | Haute    | À faire |
+# SCRUM : Sprint Backlog 01 | Scrum Master: Axelle
+| ID | User Story associée | Tâche                         | Description                                                                              | Priorité |
+| -- | ------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | -------- |
+| 1  | US03, US09          | Accès via navigateur          | Configurer le Raspberry Pi/serveur pour servir l’application web et tester l’accès HTTP. | ⭐⭐⭐⭐⭐ |    |
+| 2  | US04                | Menu minimal                  | Créer un menu simple permettant de lancer le jeu depuis l’interface.                     | ⭐⭐⭐⭐     | 
+| 3  | US01, US02          | Contrôles manette et clavier  | Implémenter les contrôles du jeu et du menu avec manette Xbox et clavier.                | ⭐⭐⭐⭐     | 
+| 4  | US05                | Lancer mini-jeu               | Permettre le lancement du jeu depuis le menu arcade sans rechargement complet.           | ⭐⭐⭐⭐     | 
+| 5  | US11                | Charger assets du jeu         | Charger les images, sons et scripts nécessaires pour que le jeu fonctionne correctement. | ⭐⭐⭐      | 
+| 6  | US06                | Mini-jeu fluide               | Optimiser le jeu pour qu’il soit jouable et réactif sur Raspberry Pi.                    | ⭐⭐⭐      | 
+| 7  | US07, US10          | Sauvegarder score             | Mettre en place la sauvegarde du score dans un fichier JSON ou une petite base.          | ⭐⭐⭐      |
+| 8  | US08                | Afficher scores               | Créer une page ou interface pour afficher le score du jeu.                               | ⭐⭐⭐      | 
+| 9  | US12                | Interface responsive          | Adapter le menu et le jeu à l’écran du Raspberry Pi et à un PC.                          | ⭐⭐       | 
+| 10 | US03, US09          | Test intégration serveur/menu | Vérifier que le jeu se lance depuis le menu via navigateur, clavier et manette.          | ⭐⭐⭐⭐⭐ | 
+
