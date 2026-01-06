@@ -1,42 +1,45 @@
 ## Sprint goal
 
-Disposer d’une borne arcade avec 3 jeux accessibles depuis le menu,
-fluides, avec scores fonctionnels et mode attract basique.
-
-| ID | User Story associée | Tâche                        | Description                                                                                                            | Priorité | 
-| -- | ------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | 
-| 1  | US14, US01, US02    | Développer jeux 2 et 3       | Implémenter les logiques, collisions et contrôles clavier/manette pour les jeux 2 et 3.                                | ⭐        |
-| 2  | US15                | Charger dynamiquement assets | Optimiser le chargement des images, sons et scripts pour les jeux 2 et 3 sans rechargement global.                     | ⭐        | 
-| 3  | US16                | Optimiser performances       | Optimiser le rendu Canvas 2D pour tous les jeux afin d’assurer fluidité sur Raspberry Pi.                              | ⭐        | 
-| 4  | US18                | Intégrer jeux 2 et 3         | Ajouter les jeux 2 et 3 au menu arcade, accessible et jouable comme le premier jeu.                                    | ⭐        | 
-| 5  | US19, US07, US10    | Gestion scoring complet      | Mettre à jour le système de score pour enregistrer et afficher correctement les scores de tous les jeux.               | ⭐        | 
-| 6  | US13                | Menu attractif               | Créer un écran attractif qui s’affiche après une période d’inactivité.                                                 | ⭐        | 
-| 7  | US17                | Sécuriser logique des jeux   | Ajouter la sécurisation pour éviter la triche ou la modification de score côté client.                                 | ⭐        | 
-| 8  | US03, US09, US12    | Test final intégration       | Vérifier que tous les jeux se lancent correctement via menu, clavier/manette et navigateur, avec interface responsive. | ⭐⭐⭐⭐⭐    |
-
+Finaliser l’intégration des trois mini-jeux dans la borne arcade afin de disposer d’une version jouable, fluide et cohérente, avec menu fonctionnel, scores persistants et un mode attract basique.
+| **ID** | **User Story** | **Description** | **Tâches principales** | **Priorité** |
+| ---------- | -------------------- | ------------------------------- | -------------------------------------------------------- | ------------ |
+| **SB3-1** | **US14** | Jouer aux jeux 2 et 3 sans bug | Finalisation logique & collisions **Jeu 2** | Haute |
+| **SB3-2** | **US14** | Jouer aux jeux 2 et 3 sans bug | Développement logique de base **Jeu 3** | Haute |
+| **SB3-3** | **US15** | Chargement correct des jeux | Chargement dynamique des assets **Jeux 2 & 3** | Haute |
+| **SB3-4** | **US16** | Expérience fluide | Optimisation Canvas 2D **Jeu 2** | Haute |
+| **SB3-5** | **US16** | Expérience fluide | Premières optimisations performances **Jeu 3** | Moyenne |
+| **SB3-6** | **US18** | Accéder aux jeux depuis le menu | Intégration **Jeu 3** dans le menu arcade | Haute |
+| **SB3-7** | **US19, US07, US10** | Scores comptabilisés | Implémentation du scoring **Jeu 3** + persistance | Haute |
+| **SB3-8** | **US13** | Menu attractif | Mise en place d’un **mode attract basique** (inactivité) | Moyenne |
+| **SB3-9** | **US17** | Sécuriser la logique de score | Vérifications côté serveur / cohérence score | Moyenne |
+| **SB3-10** | **US03, US09, US12** | Validation globale | Tests finaux : menu, jeux, manette/clavier, responsive | Haute |
 
 ## Définition des critères de réussite (Definition of Done)
-- Le menu attractif s’affiche automatiquement lorsque la borne est inactive.
 
-- Les jeux 2 et 3 se lancent correctement sans bug ni ralentissement.
+- Le jeu se lance depuis le menu sans erreur
 
-- Tous les assets (images, sons, scripts) des jeux 2 et 3 se chargent correctement.
+- Le jeu est jouable au clavier et à la manette
 
-- Les jeux fonctionnent de manière fluide sur le Raspberry Pi.
+- Aucun bug bloquant
+- Les scores sont calculés et enregistrés correctement
 
-- Les jeux 2 et 3 sont accessibles depuis le menu principal de la borne.
+- Les scores s’affichent dans les classements
 
-- Les scores des joueurs sont enregistrés et affichés correctement à la fin des parties.
+- Les performances sont fluides sur Raspberry Pi
 
-- La documentation et le code sont à jour et conformes aux standards de l’équipe.
+- Le mode attract fonctionne et se désactive à l’entrée utilisateur
+
+- Le code est testé et poussé sur le dépôt Git
 
 ## Risques / Points à surveiller
-- Possibles ralentissements sur le Raspberry Pi si les assets ne sont pas optimisés.
 
-- Bugs liés à l’intégration des nouveaux jeux dans le menu existant.
+- Manque de fluidité sur Raspberry Pi
 
-- Problèmes de compatibilité entre les contrôles clavier et manette pour les jeux 2 et 3.
+- Bugs de logique ou de collisions dans le jeu 3
 
-- Gestion des scores incorrecte ou incohérente si plusieurs parties sont jouées successivement.
+- Problèmes de chargement des assets
 
-- Tests incomplets ou non réalisés sur certains scénarios du mode attract.
+- Scores incorrects ou non synchronisés
+
+- Manette non reconnue selon le matériel
+
