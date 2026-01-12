@@ -2748,6 +2748,81 @@ html.keyboard-cursor-hidden * {
 }
 
 /* ================================
+   KEYBOARD TOAST (Messages d'erreur)
+   ================================ */
+
+.keyboard-toast {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(180deg, #2a1010 0%, #1a0808 100%);
+  border: 2px solid #ff4444;
+  border-radius: var(--border-radius);
+  box-shadow:
+    0 8px 32px rgba(255, 68, 68, 0.4),
+    0 0 20px rgba(255, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 100, 100, 0.1);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 90%;
+}
+
+.keyboard-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.keyboard-toast-icon {
+  width: 24px;
+  height: 24px;
+  color: #ff6666;
+  flex-shrink: 0;
+}
+
+.keyboard-toast-message {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ff8888;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+  letter-spacing: 0.02em;
+}
+
+/* Animation de shake pour attirer l'attention */
+@keyframes toast-shake {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-50% - 5px)) translateY(0); }
+  20%, 40%, 60%, 80% { transform: translateX(calc(-50% + 5px)) translateY(0); }
+}
+
+.keyboard-toast.visible {
+  animation: toast-shake 0.5s ease 0.1s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .keyboard-toast {
+    top: 20px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .keyboard-toast-message {
+    font-size: 0.9rem;
+  }
+
+  .keyboard-toast-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ================================
    POPUP ERREUR DE CONNEXION
    ================================ */
 

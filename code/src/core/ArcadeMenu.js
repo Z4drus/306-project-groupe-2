@@ -254,12 +254,14 @@ export function createAuthFormComponent() {
         label: 'Pseudo',
         isPassword: false,
         doneLabel: 'Suivant →',
+        minLength: 3,
+        minLengthError: 'Le pseudo doit contenir au moins 3 caractères',
         onChange: (value) => {
           self.username = value;
         },
         onDone: (value) => {
-          // Si le pseudo est vide, ne pas passer à la suite
-          if (!value || value.trim().length < 3) {
+          // Valider avant de continuer
+          if (!virtualKeyboard.validateValue()) {
             return;
           }
           // Transition fluide vers le mot de passe
@@ -286,17 +288,21 @@ export function createAuthFormComponent() {
       passwordInput.classList.add('keyboard-active');
 
       const self = this;
+      const store = Alpine.store('arcade');
+      const doneLabel = store.authMode === 'login' ? 'Connexion ✓' : 'Suivant →';
 
       virtualKeyboard.transition(passwordInput, {
         label: 'Mot de passe',
         isPassword: true,
-        doneLabel: 'Connexion ✓',
+        doneLabel: doneLabel,
+        minLength: 8,
+        minLengthError: 'Le mot de passe doit contenir au moins 8 caractères',
         onChange: (value) => {
           self.password = value;
         },
         onDone: (value) => {
-          // Si le mot de passe est trop court, ne pas soumettre
-          if (!value || value.length < 8) {
+          // Valider avant de continuer
+          if (!virtualKeyboard.validateValue()) {
             return;
           }
           // Fermer le clavier et soumettre
@@ -319,17 +325,21 @@ export function createAuthFormComponent() {
       if (!input) return;
 
       const self = this;
+      const store = Alpine.store('arcade');
+      const doneLabel = store.authMode === 'login' ? 'Connexion ✓' : 'Suivant →';
 
       virtualKeyboard.open(input, {
         label: 'Mot de passe',
         isPassword: true,
-        doneLabel: 'Connexion ✓',
+        doneLabel: doneLabel,
+        minLength: 8,
+        minLengthError: 'Le mot de passe doit contenir au moins 8 caractères',
         onChange: (value) => {
           self.password = value;
         },
         onDone: (value) => {
-          // Si le mot de passe est trop court, ne pas soumettre
-          if (!value || value.length < 8) {
+          // Valider avant de continuer
+          if (!virtualKeyboard.validateValue()) {
             return;
           }
           // Fermer le clavier et soumettre

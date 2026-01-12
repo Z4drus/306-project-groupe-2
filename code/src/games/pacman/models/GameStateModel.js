@@ -126,6 +126,7 @@ export default class GameStateModel {
     this.notifyScoreUpdate();
     if (this.lives <= 0) {
       this.isGameOver = true;
+      this.notifyGameOver();
       return true;
     }
     return false;

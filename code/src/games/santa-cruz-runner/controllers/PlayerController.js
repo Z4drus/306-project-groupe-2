@@ -62,8 +62,8 @@ export default class PlayerController {
     if (!wasOnGround && this.model.isOnGround) {
       this.model.land();
     }
-    // Si on quitte le sol sans avoir sauté
-    else if (wasOnGround && !this.model.isOnGround && this.model.velocityY > 0) {
+    // Si on quitte le sol sans avoir sauté (sauf si protection respawn active)
+    else if (wasOnGround && !this.model.isOnGround && this.model.velocityY > 0 && !this.model.respawnProtection) {
       // On est tombé d'une plateforme
       this.model.jumpsRemaining = Math.min(this.model.jumpsRemaining, this.model.maxJumps - 1);
     }

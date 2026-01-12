@@ -45,6 +45,7 @@ export default class PlayerModel {
     this.isDead = false;
     this.isInvincible = false;
     this.invincibilityTimer = 0;
+    this.respawnProtection = false;
   }
 
   /**
@@ -61,6 +62,7 @@ export default class PlayerModel {
     this.isDead = false;
     this.isInvincible = false;
     this.invincibilityTimer = 0;
+    this.respawnProtection = true;
   }
 
   /**
@@ -87,6 +89,7 @@ export default class PlayerModel {
     this.isOnGround = true;
     this.velocityY = 0;
     this.jumpsRemaining = this.maxJumps;
+    this.respawnProtection = false;
     this.updateState();
   }
 

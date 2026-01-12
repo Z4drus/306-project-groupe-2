@@ -9,6 +9,7 @@
 import Keyboard from 'simple-keyboard';
 import 'simple-keyboard/build/css/index.css';
 import gamepadManager, { GamepadButton } from './GamepadManager.js';
+import cursorManager from './CursorManager.js';
 
 /**
  * Layout QWERTZ suisse standard (pour username)
@@ -97,6 +98,13 @@ export default class VirtualKeyboard {
     // Gestion souris
     this.previousCursorStyle = null;
 
+    // Élément de toast pour les erreurs
+    this.toastElement = null;
+    this.toastTimeout = null;
+
+    // Validation - messages d'erreur personnalisés
+    this.validationRules = null;
+
     // Bindings
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.updateGamepad = this.updateGamepad.bind(this);
@@ -112,6 +120,8 @@ export default class VirtualKeyboard {
    * @param {Function} options.onClose - Callback de fermeture
    * @param {Function} options.onDone - Callback lors du clic sur OK (si non défini, ferme le clavier)
    * @param {string} options.doneLabel - Label personnalisé pour le bouton OK
+   * @param {number} options.minLength - Longueur minimum requise
+   * @param {string} options.minLengthError - Message d'erreur si longueur insuffisante
    */
   open(inputElement, options = {}) {
     if (this.isVisible) return;
@@ -124,8 +134,17 @@ export default class VirtualKeyboard {
     this.label = options.label || 'Saisie';
     this.doneLabel = options.doneLabel || 'OK ✓';
 
+    // Règles de validation
+    this.validationRules = {
+      minLength: options.minLength || 0,
+      minLengthError: options.minLengthError || 'Valeur trop courte'
+    };
+
     // Cacher la souris complètement
     this.hideCursor();
+
+    // Désactiver le contrôle du curseur par manette
+    this.disableCursorControl();
 
     this.createDOM();
     this.createKeyboard();
@@ -160,6 +179,96 @@ export default class VirtualKeyboard {
     document.body.style.cursor = this.previousCursorStyle || '';
     // Retirer la classe
     document.documentElement.classList.remove('keyboard-cursor-hidden');
+  }
+
+  /**
+   * Désactive le contrôle du curseur par manette
+   * Le CursorManager ne bougera plus le curseur avec le joystick
+   */
+  disableCursorControl() {
+    if (cursorManager) {
+      cursorManager.hide();
+    }
+  }
+
+  /**
+   * Réactive le contrôle du curseur par manette
+   */
+  enableCursorControl() {
+    if (cursorManager) {
+      cursorManager.show();
+    }
+  }
+
+  /**
+   * Affiche un message d'erreur en toast en haut de l'écran
+   * @param {string} message - Le message à afficher
+   */
+  showToast(message) {
+    // Cacher le toast précédent s'il existe
+    this.hideToast();
+
+    // Créer l'élément toast
+    this.toastElement = document.createElement('div');
+    this.toastElement.className = 'keyboard-toast';
+    this.toastElement.innerHTML = `
+      <svg class="keyboard-toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span class="keyboard-toast-message">${message}</span>
+    `;
+
+    // Ajouter au DOM
+    document.body.appendChild(this.toastElement);
+
+    // Animation d'entrée
+    requestAnimationFrame(() => {
+      this.toastElement.classList.add('visible');
+    });
+
+    // Auto-hide après 3 secondes
+    this.toastTimeout = setTimeout(() => {
+      this.hideToast();
+    }, 3000);
+  }
+
+  /**
+   * Cache le toast d'erreur
+   */
+  hideToast() {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+      this.toastTimeout = null;
+    }
+
+    if (this.toastElement) {
+      this.toastElement.classList.remove('visible');
+      setTimeout(() => {
+        if (this.toastElement && this.toastElement.parentNode) {
+          this.toastElement.parentNode.removeChild(this.toastElement);
+        }
+        this.toastElement = null;
+      }, 300);
+    }
+  }
+
+  /**
+   * Valide la valeur actuelle selon les règles définies
+   * @returns {boolean} - true si valide, false sinon
+   */
+  validateValue() {
+    const value = this.currentInput?.value || '';
+
+    if (this.validationRules && this.validationRules.minLength > 0) {
+      if (value.length < this.validationRules.minLength) {
+        this.showToast(this.validationRules.minLengthError);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -614,6 +723,9 @@ export default class VirtualKeyboard {
   transition(inputElement, options = {}) {
     if (!this.isVisible) return;
 
+    // Cacher le toast précédent s'il y en a un
+    this.hideToast();
+
     // Animation de transition
     this.container.classList.add('transitioning');
 
@@ -626,6 +738,12 @@ export default class VirtualKeyboard {
       this.isPassword = options.isPassword || false;
       this.label = options.label || 'Saisie';
       this.doneLabel = options.doneLabel || 'OK ✓';
+
+      // Mettre à jour les règles de validation
+      this.validationRules = {
+        minLength: options.minLength || 0,
+        minLengthError: options.minLengthError || 'Valeur trop courte'
+      };
 
       // Mettre à jour le label
       const labelEl = this.container.querySelector('.virtual-keyboard-label');
@@ -670,8 +788,14 @@ export default class VirtualKeyboard {
 
     this.isVisible = false;
 
+    // Cacher le toast s'il y en a un
+    this.hideToast();
+
     // Réafficher le curseur
     this.showCursor();
+
+    // Réactiver le contrôle du curseur par manette
+    this.enableCursorControl();
 
     // Arrêter la boucle gamepad
     if (this.animationFrameId) {
