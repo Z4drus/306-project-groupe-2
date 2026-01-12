@@ -1181,7 +1181,11 @@ En s’appuyant sur ces critères, nous avons réussi à livrer une application 
 
 ## 7.1 Améliorations possibles
 
+- Nous avons comme idée future de mettre en place des jeux multi-joueurs
+- Et sinon nous avons aussi imaginé une interface admin pour gérer différentes choses comme les scores en cas de triches, etc..
+
 ## 7.2 Auto-évaluation
+
 
 ## 7.3 Conclusion du module de Diogo
 
