@@ -182,21 +182,21 @@ export default class VirtualKeyboard {
   }
 
   /**
-   * Désactive le contrôle du curseur par manette
-   * Le CursorManager ne bougera plus le curseur avec le joystick
+   * Désactive complètement le curseur personnalisé
+   * Le CursorManager ne traitera plus aucun input gamepad/souris
    */
   disableCursorControl() {
     if (cursorManager) {
-      cursorManager.hide();
+      cursorManager.disable();
     }
   }
 
   /**
-   * Réactive le contrôle du curseur par manette
+   * Réactive le curseur personnalisé
    */
   enableCursorControl() {
     if (cursorManager) {
-      cursorManager.show();
+      cursorManager.enable();
     }
   }
 
@@ -315,8 +315,8 @@ export default class VirtualKeyboard {
     const instructions = document.createElement('div');
     instructions.className = 'virtual-keyboard-instructions';
     instructions.innerHTML = `
-      <span>🎮 Flèches = Naviguer</span>
-      <span>A/Entrée = Sélectionner</span>
+      <span>Flèches = Naviguer</span>
+      <span>A/X/Entrée = Sélectionner</span>
       <span>B/Échap = Fermer</span>
     `;
 
@@ -549,9 +549,12 @@ export default class VirtualKeyboard {
       this.moveState.isRepeating = false;
     }
 
-    // Bouton A = Sélectionner (sur les deux manettes)
+    // Bouton A ou X = Sélectionner (sur les deux manettes)
+    // A = bouton principal, X = bouton secondaire (Cross sur PlayStation)
     if (gamepadManager.isButtonJustPressed(GamepadButton.A, 0) ||
-        gamepadManager.isButtonJustPressed(GamepadButton.A, 1)) {
+        gamepadManager.isButtonJustPressed(GamepadButton.A, 1) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.X, 0) ||
+        gamepadManager.isButtonJustPressed(GamepadButton.X, 1)) {
       this.activateSelectedKey();
     }
 

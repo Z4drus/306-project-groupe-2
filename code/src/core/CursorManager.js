@@ -70,6 +70,9 @@ class CursorManager {
     // État de visibilité (pour le mode jeu)
     this.isVisible = true;
 
+    // État de désactivation complète (pour le clavier virtuel)
+    this.isDisabled = false;
+
     // Élément actuellement survolé
     this.hoveredElement = null;
 
@@ -278,7 +281,8 @@ class CursorManager {
    * Système avancé avec courbe de réponse, accélération et lissage
    */
   update() {
-    if (!this.isVisible) return;
+    // Si désactivé ou invisible, ne rien faire
+    if (this.isDisabled || !this.isVisible) return;
 
     const now = performance.now();
     const deltaTime = now - this.lastUpdateTime;
@@ -511,6 +515,50 @@ class CursorManager {
     if (this.cursorElement) {
       this.cursorElement.style.display = 'block';
     }
+  }
+
+  /**
+   * Désactive complètement le curseur (pour le clavier virtuel)
+   * Arrête tout traitement d'input gamepad/souris
+   */
+  disable() {
+    this.isDisabled = true;
+    this.isVisible = false;
+
+    // Cacher l'élément curseur
+    if (this.cursorElement) {
+      this.cursorElement.style.display = 'none';
+      this.cursorElement.style.visibility = 'hidden';
+    }
+
+    // Reset des états de vélocité
+    this.smoothedVelocityX = 0;
+    this.smoothedVelocityY = 0;
+    this.accelerationMultiplier = 1.0;
+    this.timeAtMaxIntensity = 0;
+
+    // Retirer le hover de l'élément actuel
+    if (this.hoveredElement) {
+      this.hoveredElement.classList.remove('cursor-hover');
+      this.hoveredElement = null;
+    }
+  }
+
+  /**
+   * Réactive le curseur après désactivation
+   */
+  enable() {
+    this.isDisabled = false;
+    this.isVisible = true;
+
+    // Réafficher l'élément curseur
+    if (this.cursorElement) {
+      this.cursorElement.style.display = 'block';
+      this.cursorElement.style.visibility = 'visible';
+    }
+
+    // Reset du timer pour éviter un saut de deltaTime
+    this.lastUpdateTime = performance.now();
   }
 
   /**

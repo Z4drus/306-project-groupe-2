@@ -2296,6 +2296,14 @@ html.keyboard-cursor-hidden * {
   cursor: none !important;
 }
 
+/* Forcer le masquage du curseur personnalisé pendant le clavier virtuel */
+html.keyboard-cursor-hidden #custom-cursor {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .virtual-keyboard-overlay {
   position: fixed;
   inset: 0;
