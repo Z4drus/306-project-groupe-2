@@ -44,7 +44,7 @@ Dans l’état désiré, ArcadiaBox doit offrir une expérience de jeu **simple,
 ### **Expérience de jeu fluide**
 
 - Les trois mini-jeux doivent être jouables immédiatement.
-- Les performances doivent rester stables (50 FPS) sur Raspberry Pi 4.
+- Les performances doivent rester stables (50 FPS) sur Raspberry Pi 5.
 - Aucun freeze, bug bloquant ou lenteur importante.
 
 ### **Fonctionnalités arcade essentielles**
@@ -248,19 +248,17 @@ Bien que le projet n’ait pas un objectif commercial dans le cadre du module, l
 
 ### 3.1.1 Acteurs
 
-[use_case_v3.pdf](attachment:fc761ad1-f2c9-4599-8a56-aeeb3ae6808d:use_case_v3.pdf)
-
-![image.png](attachment:47433255-2b25-4481-9344-e2abf9178951:image.png)
+![use_case_v3.png](useCase.png)
 
 ## 3.2 Diagrammes d’activités / de séquence
 
 ### Description du flux lorsqu’un joueur veut jouer à un jeu
 
-![image.png](attachment:65f0b72c-3bdb-4dc6-be42-2b77ed537a3c:image.png)
+![image.png](DiagrammeActivite.png)
 
 ### Flux de remise à zéro du score par l’admin
 
-![image.png](attachment:8529c490-1569-4a4e-806f-97b35ca01f0d:image.png)
+![image.png](DiagrammeActiviteFlux.png)
 
 ## 3.3 Maquettes
 
@@ -317,7 +315,7 @@ AutreBorne1 -->|Envoi / lecture scores| API
 
 ## 4.2 Diagramme Entité-Relation
 
-![image.png](attachment:a9383b0b-ffc8-4d81-be9c-dde23d448848:image.png)
+![image.png](ER.png)
 
 ## 4.3 Modèle relationnel de la base de données
 
@@ -342,13 +340,11 @@ erDiagram
 
 ## 4.4 Diagrammes de classes
 
-![image.png](attachment:8432b288-0605-462b-8bf5-88a64e4d8d08:image.png)
+![image.png](diagramme_classe.png)
 
 ## 4.5 Diagrammes de séquence des interactions
 
-[SequenceDiagram 1.pdf](attachment:99fb8115-e4ec-4293-9210-f052a8de2cb9:SequenceDiagram_1.pdf)
-
-![image.png](attachment:d91eaf84-2276-40a9-8df4-82c6e99ba711:image.png)
+![image.png](DiagrammeSequence.png)
 
 ## 4.6 Concept de tests
 
@@ -375,6 +371,8 @@ erDiagram
 | 17  | US01 / US02 – Test multi-input                                            | Basculer entre clavier et manette pendant un mini-jeu                                 | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                  |                 |      |                           |
 | 18  | US12 – Test sur différents appareils                                      | Tester ArcadiaBox sur PC, tablette et RPi                                             | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                 |                 |      |                           |
 | 19  | US03 / US09 / US11 – Test stabilité serveur                               | Accéder à l’application plusieurs fois de suite                                       | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                               |                 |      |                           |
+| 20  | Feature ajouté en plus                                                    | L’utilisateur peut configurer son avatar à la création du compte                      | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                |                 |      |                           |
+| 21  | Feature ajouté en plus                                                    | L’utilisateur peut modifier son avatar après la création du profil                    | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                             |                 |      |                           |
 
 # 5 Réalisation
 
@@ -599,6 +597,14 @@ Cette approche permet une compatibilité immédiate avec :
 - clavier
 
 sans aucune configuration supplémentaire une fois le matériel branché.
+
+### Installation automatique
+
+Pour rendre le déploiement d’ArcadiaBox aussi simple que possible, nous avons mis en place un script d’installation automatique, **`setup_arcadiabox.sh`**. Qui prépare l’environnement nécessaire et installe les dépendances essentielles.
+
+Plutôt que de répéter manuellement chaque étape, ce script s’assure que le système est correctement configuré pour que la borne puisse démarrer rapidement en mode kiosk. Certaines interventions restent toutefois manuelles, comme la connexion au Wi-Fi, l’ajustement de la résolution ou le placement du fichier **`.env`**, car ces paramètres dépendent souvent de l’environnement ou des préférences de l’utilisateur.
+
+Cette approche, qui combine automatisation et réglages spécifiques, permet de gagner du temps tout en laissant la possibilité d’affiner facilement le fonctionnement de la borne. Une fois ces étapes accomplies, le Raspberry Pi se lance directement sur la session graphique et ArcadiaBox démarre, offrant immédiatement l’expérience complète de la borne d’arcade.
 
 ## 5.4 Descente de code - Joystick manette vers la droite sur pacman
 
@@ -919,6 +925,8 @@ Maintenant que la réalisation est terminée, il faut compléter le protocole de
 | 17  | US01 / US02 – Test multi-input                                            | Basculer entre clavier et manette pendant un mini-jeu                                 | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                  | 06.01.2026 | Les deux périphériques sont reconnus et utilisables                                                               | ✅   | Aucun                                                                                                                                             |
 | 18  | US12 – Test sur différents appareils                                      | Tester ArcadiaBox sur PC, tablette et RPi                                             | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                 | 06.01.2026 | Interface et navigation adaptées à chaque device                                                                  | ✅   | Aucun                                                                                                                                             |
 | 19  | US03 / US09 / US11 – Test stabilité serveur                               | Accéder à l’application plusieurs fois de suite                                       | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                               | 06.01.2026 | Serveur stable                                                                                                    | ✅   | Aucun                                                                                                                                             |
+| 20  | Feature ajouté en plus                                                    | L’utilisateur peut configurer son avatar à la création du compte                      | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                | 12.01.2026 | Ajout fluide, sans problème                                                                                       | ✅   | Aucun                                                                                                                                             |
+| 21  | Feature ajouté en plus                                                    | L’utilisateur peut modifier son avatar après la création du profil                    | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                             | 12.01.2026 | Modification fluide, aucun problème                                                                               | ✅   | Aucun                                                                                                                                             |
 
 ## 6.2 Definition of Done
 
@@ -936,11 +944,17 @@ En s’appuyant sur ces critères, nous avons réussi à livrer une application 
 
 ## 7.2 Auto-évaluation
 
-## 7.3 Conclusion du module de membre1
+## 7.3 Conclusion du module de Diogo
 
-## 7.4 Conclusion du module de membre2
+J’ai trouvé ce module très intéressant, car le fait de devoir réaliser un projet entièrement en groupe nous a obligés à réfléchir ensemble à la meilleure manière de concevoir et de mettre en place une solution fonctionnelle. Cela m’a permis de mieux comprendre l’organisation d’un projet informatique, de développer mon travail en équipe.
 
-## 7.5 Conclusion du module de membre3
+## 7.4 Conclusion du module de Valentin
+
+J’ai bien aimé travaillé en tant que product owner dans ce projet, j’ai découvert des choses que je ne connaissais pas sur la gestion de projet, une façon de travailler un peu différente de juste programmer, mais là je faisais beaucoup de travaux de gestion et coordination ainsi que de validation de la qualité du travail fait par mes collègues. Je ne me suis pas techniquement beaucoup amélioré mais j’ai appris d’autre chose donc je suis content et cela m’a bien plu.
+
+## 7.5 Conclusion du module de Axelle
+
+## 7.6 Conclusion du module de Noé
 
 # 8 Bibliographie : liste des sources et références
 
