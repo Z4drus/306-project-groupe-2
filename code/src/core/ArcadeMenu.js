@@ -377,8 +377,8 @@ export function getMainMenuTemplate() {
       <!-- Partie droite du header -->
       <div class="header-right">
         <!-- Indicateur utilisateur connecté -->
-        <div x-show="$store.arcade.isAuthenticated" class="header-user">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="header-user-icon"><path d="M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z"/><path d="M8 15H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>
+        <div x-show="$store.arcade.isAuthenticated" class="header-user" @click="$store.arcade.showAccount()">
+          <img :src="$store.arcade.getProfilePicturePath($store.arcade.user?.profilePicture)" alt="Avatar" class="header-user-avatar" />
           <span class="header-user-name" x-text="$store.arcade.user?.username"></span>
         </div>
 
@@ -491,12 +491,8 @@ export function getMainMenuTemplate() {
                 </button>
               </template>
               <template x-if="$store.arcade.isAuthenticated">
-                <button @click="$store.arcade.handleLogout()" class="option-btn option-btn-logout" :class="{ 'selected': activeZone === 'options' && selectedOptionIndex === 2 }" @mouseenter="activeZone = 'options'; selectedOptionIndex = 2">
-                  <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                  </svg>
+                <button @click="$store.arcade.showAccount()" class="option-btn option-btn-account" :class="{ 'selected': activeZone === 'options' && selectedOptionIndex === 2 }" @mouseenter="activeZone = 'options'; selectedOptionIndex = 2">
+                  <img :src="$store.arcade.getProfilePicturePath($store.arcade.user?.profilePicture)" alt="Avatar" class="option-avatar" />
                   <span x-text="$store.arcade.user?.username"></span>
                 </button>
               </template>
@@ -561,106 +557,314 @@ export function getMainMenuTemplate() {
     <!-- Vue Authentification -->
     <div x-show="$store.arcade.currentView === 'auth'" class="auth-view">
       <div class="auth-header">
-        <button @click="$store.arcade.backToMenu()" class="back-btn">
-          &larr; Retour au menu
+        <button @click="$store.arcade.registerStep === 'pfp' ? $store.arcade.backToRegisterForm() : $store.arcade.backToMenu()" class="back-btn">
+          &larr; <span x-text="$store.arcade.registerStep === 'pfp' ? 'Retour' : 'Retour au menu'"></span>
         </button>
-        <h2 x-text="$store.arcade.authMode === 'login' ? 'Connexion' : 'Inscription'"></h2>
+        <h2 x-text="$store.arcade.registerStep === 'pfp' ? 'Choisis ton avatar' : ($store.arcade.authMode === 'login' ? 'Connexion' : 'Inscription')"></h2>
       </div>
 
       <div class="auth-container">
-        <div class="auth-box" x-data="authForm">
-          <!-- Tabs -->
-          <div class="auth-tabs">
-            <button
-              class="auth-tab"
-              :class="{ 'active': $store.arcade.authMode === 'login' }"
-              @click="$store.arcade.setAuthMode('login')"
-            >
-              Connexion
-            </button>
-            <button
-              class="auth-tab"
-              :class="{ 'active': $store.arcade.authMode === 'register' }"
-              @click="$store.arcade.setAuthMode('register')"
-            >
-              Inscription
+        <!-- Étape 1: Formulaire de connexion/inscription -->
+        <template x-if="$store.arcade.registerStep === 'form'">
+          <div class="auth-box" x-data="authForm">
+            <!-- Tabs -->
+            <div class="auth-tabs">
+              <button
+                class="auth-tab"
+                :class="{ 'active': $store.arcade.authMode === 'login' }"
+                @click="$store.arcade.setAuthMode('login')"
+              >
+                Connexion
+              </button>
+              <button
+                class="auth-tab"
+                :class="{ 'active': $store.arcade.authMode === 'register' }"
+                @click="$store.arcade.setAuthMode('register')"
+              >
+                Inscription
+              </button>
+            </div>
+
+            <!-- Formulaire -->
+            <form class="auth-form" @submit.prevent="submitForm()">
+              <div class="auth-field">
+                <label for="auth-username">Pseudo</label>
+                <div class="auth-input-wrapper">
+                  <input
+                    x-model="username"
+                    type="text"
+                    id="auth-username"
+                    placeholder="Ton pseudo"
+                    autocomplete="username"
+                    required
+                    minlength="3"
+                    maxlength="20"
+                    pattern="[a-zA-Z0-9_]+"
+                    @focus="openUsernameKeyboard()"
+                  />
+                  <button type="button" class="keyboard-trigger-btn" @click="openUsernameKeyboard()" title="Ouvrir le clavier">
+                    ⌨
+                  </button>
+                </div>
+              </div>
+
+              <div class="auth-field">
+                <label for="auth-password">Mot de passe</label>
+                <div class="auth-input-wrapper">
+                  <input
+                    x-model="password"
+                    type="password"
+                    id="auth-password"
+                    placeholder="Ton mot de passe (8 caracteres min)"
+                    autocomplete="current-password"
+                    required
+                    minlength="8"
+                    @focus="openPasswordKeyboard()"
+                  />
+                  <button type="button" class="keyboard-trigger-btn" @click="openPasswordKeyboard()" title="Ouvrir le clavier">
+                    ⌨
+                  </button>
+                </div>
+              </div>
+
+              <!-- Message d'erreur -->
+              <div x-show="$store.arcade.authError" class="auth-error">
+                <span x-text="$store.arcade.authError"></span>
+              </div>
+
+              <button
+                type="submit"
+                class="auth-submit"
+                :disabled="$store.arcade.authLoading"
+              >
+                <span x-show="!$store.arcade.authLoading" x-text="$store.arcade.authMode === 'login' ? 'Se connecter' : 'Suivant'"></span>
+                <span x-show="$store.arcade.authLoading">Chargement...</span>
+              </button>
+            </form>
+
+            <p class="auth-info">
+              <template x-if="$store.arcade.authMode === 'login'">
+                <span>Pas encore de compte ? <a href="#" @click.prevent="$store.arcade.setAuthMode('register')">Inscris-toi</a></span>
+              </template>
+              <template x-if="$store.arcade.authMode === 'register'">
+                <span>Deja un compte ? <a href="#" @click.prevent="$store.arcade.setAuthMode('login')">Connecte-toi</a></span>
+              </template>
+            </p>
+          </div>
+        </template>
+
+        <!-- Étape 2: Sélection de la photo de profil (inscription uniquement) -->
+        <template x-if="$store.arcade.registerStep === 'pfp'">
+          <div class="pfp-selector-container">
+            <!-- Panneau gauche: Preview en grand -->
+            <div class="pfp-preview-panel">
+              <div class="pfp-preview">
+                <img :src="$store.arcade.getProfilePicturePath($store.arcade.selectedProfilePicture)" alt="Avatar sélectionné" class="pfp-preview-img" />
+                <p class="pfp-preview-name" x-text="$store.arcade.tempUsername"></p>
+              </div>
+
+              <!-- Message d'erreur -->
+              <div x-show="$store.arcade.authError" class="auth-error pfp-error">
+                <span x-text="$store.arcade.authError"></span>
+              </div>
+
+              <button
+                type="button"
+                class="auth-submit pfp-confirm-btn"
+                :disabled="$store.arcade.authLoading"
+                @click="$store.arcade.handleRegisterStep2()"
+              >
+                <span x-show="!$store.arcade.authLoading">Creer mon compte</span>
+                <span x-show="$store.arcade.authLoading">Creation en cours...</span>
+              </button>
+            </div>
+
+            <!-- Panneau droit: Grille d'avatars pleine hauteur -->
+            <div class="pfp-grid-panel">
+              <div class="pfp-grid">
+                <template x-for="i in 75" :key="i">
+                  <button
+                    type="button"
+                    class="pfp-item"
+                    :class="{ 'selected': $store.arcade.selectedProfilePicture === i }"
+                    @click="$store.arcade.selectedProfilePicture = i"
+                  >
+                    <img :src="$store.arcade.getProfilePicturePath(i)" :alt="'Avatar ' + i" loading="lazy" />
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template x-if="$store.arcade.registerStep === 'form'">
+          <div class="auth-benefits">
+            <h3>Pourquoi s'inscrire ?</h3>
+            <ul>
+              <li>Sauvegarde tes scores</li>
+              <li>Apparais dans le classement</li>
+              <li>Compare-toi aux autres joueurs</li>
+            </ul>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Vue Mon Compte -->
+    <div x-show="$store.arcade.currentView === 'account'" class="account-view">
+      <!-- Header compact (même style que scores/aide) -->
+      <div class="account-topbar">
+        <button @click="$store.arcade.backToMenu()" class="back-btn-compact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Retour
+        </button>
+        <h2 class="account-title">Mon Compte</h2>
+      </div>
+
+      <!-- Contenu principal -->
+      <div class="account-content">
+        <!-- Carte profil à gauche -->
+        <div class="account-profile-card">
+          <div class="account-avatar-wrapper" @click="$store.arcade.openPfpSelector()">
+            <img :src="$store.arcade.getProfilePicturePath($store.arcade.user?.profilePicture)" alt="Avatar" class="account-avatar" />
+            <div class="account-avatar-edit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="account-info">
+            <h3 class="account-username" x-text="$store.arcade.user?.username"></h3>
+            <p class="account-member-since">
+              Membre depuis le <span x-text="$store.arcade.formatDate($store.arcade.user?.registeredAt)"></span>
+            </p>
+          </div>
+          <div class="account-stats">
+            <div class="account-stat">
+              <span class="account-stat-value" x-text="$store.arcade.user?.totalGames || 0"></span>
+              <span class="account-stat-label">Parties</span>
+            </div>
+            <div class="account-stat">
+              <span class="account-stat-value" x-text="($store.arcade.user?.bestScore || 0).toLocaleString()"></span>
+              <span class="account-stat-label">Meilleur</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions à droite -->
+        <div class="account-actions-panel">
+          <div class="account-actions-section">
+            <h4 class="account-section-title">Personnalisation</h4>
+            <button class="account-action-btn" @click="$store.arcade.openPfpSelector()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Changer mon avatar
             </button>
           </div>
 
-          <!-- Formulaire -->
-          <form class="auth-form" @submit.prevent="submitForm()">
-            <div class="auth-field">
-              <label for="auth-username">Pseudo</label>
-              <div class="auth-input-wrapper">
-                <input
-                  x-model="username"
-                  type="text"
-                  id="auth-username"
-                  placeholder="Ton pseudo"
-                  autocomplete="username"
-                  required
-                  minlength="3"
-                  maxlength="20"
-                  pattern="[a-zA-Z0-9_]+"
-                  @focus="openUsernameKeyboard()"
-                />
-                <button type="button" class="keyboard-trigger-btn" @click="openUsernameKeyboard()" title="Ouvrir le clavier">
-                  ⌨
-                </button>
-              </div>
-            </div>
-
-            <div class="auth-field">
-              <label for="auth-password">Mot de passe</label>
-              <div class="auth-input-wrapper">
-                <input
-                  x-model="password"
-                  type="password"
-                  id="auth-password"
-                  placeholder="Ton mot de passe (8 caracteres min)"
-                  autocomplete="current-password"
-                  required
-                  minlength="8"
-                  @focus="openPasswordKeyboard()"
-                />
-                <button type="button" class="keyboard-trigger-btn" @click="openPasswordKeyboard()" title="Ouvrir le clavier">
-                  ⌨
-                </button>
-              </div>
-            </div>
-
-            <!-- Message d'erreur -->
-            <div x-show="$store.arcade.authError" class="auth-error">
-              <span x-text="$store.arcade.authError"></span>
-            </div>
-
-            <button
-              type="submit"
-              class="auth-submit"
-              :disabled="$store.arcade.authLoading"
-            >
-              <span x-show="!$store.arcade.authLoading" x-text="$store.arcade.authMode === 'login' ? 'Se connecter' : 'Creer un compte'"></span>
-              <span x-show="$store.arcade.authLoading">Chargement...</span>
+          <div class="account-actions-section">
+            <h4 class="account-section-title">Securite</h4>
+            <button class="account-action-btn" @click="$store.arcade.openPasswordReset()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Changer mon mot de passe
             </button>
-          </form>
+          </div>
 
-          <p class="auth-info">
-            <template x-if="$store.arcade.authMode === 'login'">
-              <span>Pas encore de compte ? <a href="#" @click.prevent="$store.arcade.setAuthMode('register')">Inscris-toi</a></span>
-            </template>
-            <template x-if="$store.arcade.authMode === 'register'">
-              <span>Deja un compte ? <a href="#" @click.prevent="$store.arcade.setAuthMode('login')">Connecte-toi</a></span>
-            </template>
-          </p>
+          <div class="account-actions-section">
+            <h4 class="account-section-title">Session</h4>
+            <button class="account-action-btn account-action-logout" @click="$store.arcade.handleLogout()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Deconnexion
+            </button>
+          </div>
         </div>
+      </div>
 
-        <div class="auth-benefits">
-          <h3>Pourquoi s'inscrire ?</h3>
-          <ul>
-            <li>Sauvegarde tes scores</li>
-            <li>Apparais dans le classement</li>
-            <li>Compare-toi aux autres joueurs</li>
-          </ul>
+      <!-- Modal sélecteur de photo de profil -->
+      <div x-show="$store.arcade.showPfpSelector" x-cloak class="pfp-modal-overlay" @click.self="$store.arcade.closePfpSelector()">
+        <div class="pfp-modal">
+          <div class="pfp-modal-header">
+            <h3>Choisir un avatar</h3>
+            <button class="pfp-modal-close" @click="$store.arcade.closePfpSelector()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="pfp-modal-preview">
+            <img :src="$store.arcade.getProfilePicturePath($store.arcade.selectedProfilePicture)" alt="Avatar sélectionné" />
+          </div>
+          <div class="pfp-modal-grid-wrapper">
+            <div class="pfp-modal-grid">
+              <template x-for="i in 75" :key="i">
+                <button type="button" class="pfp-modal-item" :class="{ 'selected': $store.arcade.selectedProfilePicture === i }" @click="$store.arcade.selectedProfilePicture = i">
+                  <img :src="$store.arcade.getProfilePicturePath(i)" :alt="'Avatar ' + i" loading="lazy" />
+                </button>
+              </template>
+            </div>
+          </div>
+          <div class="pfp-modal-actions">
+            <button class="pfp-modal-cancel" @click="$store.arcade.closePfpSelector()">Annuler</button>
+            <button class="pfp-modal-confirm" :disabled="$store.arcade.pfpSelectorLoading" @click="$store.arcade.saveProfilePicture()">
+              <span x-show="!$store.arcade.pfpSelectorLoading">Enregistrer</span>
+              <span x-show="$store.arcade.pfpSelectorLoading">Enregistrement...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal changement de mot de passe -->
+      <div x-show="$store.arcade.showPasswordReset" x-cloak class="pfp-modal-overlay" @click.self="$store.arcade.closePasswordReset()">
+        <div class="password-modal">
+          <div class="pfp-modal-header">
+            <h3>Changer le mot de passe</h3>
+            <button class="pfp-modal-close" @click="$store.arcade.closePasswordReset()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <form class="password-form" @submit.prevent="$store.arcade.handlePasswordReset()">
+            <div class="password-field">
+              <label for="current-password">Mot de passe actuel</label>
+              <input type="password" id="current-password" x-model="$store.arcade.currentPassword" required minlength="8" placeholder="••••••••" />
+            </div>
+            <div class="password-field">
+              <label for="new-password">Nouveau mot de passe</label>
+              <input type="password" id="new-password" x-model="$store.arcade.newPassword" required minlength="8" placeholder="8 caracteres minimum" />
+            </div>
+            <div class="password-field">
+              <label for="confirm-password">Confirmer le mot de passe</label>
+              <input type="password" id="confirm-password" x-model="$store.arcade.confirmPassword" required minlength="8" placeholder="••••••••" />
+            </div>
+            <div x-show="$store.arcade.passwordError" class="auth-error">
+              <span x-text="$store.arcade.passwordError"></span>
+            </div>
+            <div x-show="$store.arcade.passwordSuccess" class="password-success">
+              <span x-text="$store.arcade.passwordSuccess"></span>
+            </div>
+            <div class="pfp-modal-actions">
+              <button type="button" class="pfp-modal-cancel" @click="$store.arcade.closePasswordReset()">Annuler</button>
+              <button type="submit" class="pfp-modal-confirm" :disabled="$store.arcade.passwordLoading">
+                <span x-show="!$store.arcade.passwordLoading">Modifier</span>
+                <span x-show="$store.arcade.passwordLoading">Modification...</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -681,10 +885,7 @@ export function getMainMenuTemplate() {
           <template x-if="$store.arcade.isAuthenticated">
             <div class="my-scores-inner">
               <span class="my-scores-user">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="user-icon-svg">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
+                <img :src="$store.arcade.getProfilePicturePath($store.arcade.user?.profilePicture)" alt="Avatar" class="my-scores-avatar" />
                 <span x-text="$store.arcade.user?.username || 'Joueur'"></span>
               </span>
               <span class="my-score-chip">
@@ -721,7 +922,7 @@ export function getMainMenuTemplate() {
           </div>
           <div class="score-list">
             <template x-for="(score, idx) in ($store.arcade.gameScores['pacman'] || []).slice(0, 10)" :key="score.id || idx">
-              <div class="score-row" :class="'rank-' + (idx + 1)">
+              <div class="score-row score-row-clickable" :class="'rank-' + (idx + 1)" @click="$store.arcade.openUserProfile(score.playerId)">
                 <span class="score-position" :class="{ 'gold': idx === 0, 'silver': idx === 1, 'bronze': idx === 2 }">
                   <template x-if="idx === 0">
                     <svg viewBox="0 0 24 24" class="medal-svg gold"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z M5 16h14v3H5z" fill="currentColor"/></svg>
@@ -736,6 +937,7 @@ export function getMainMenuTemplate() {
                     <span x-text="idx + 1"></span>
                   </template>
                 </span>
+                <img :src="$store.arcade.getProfilePicturePath(score.profilePicture)" alt="Avatar" class="score-avatar" />
                 <span class="score-name" x-text="score.playerName"></span>
                 <span class="score-pts" x-text="score.score?.toLocaleString()"></span>
               </div>
@@ -751,7 +953,7 @@ export function getMainMenuTemplate() {
           </div>
           <div class="score-list">
             <template x-for="(score, idx) in ($store.arcade.gameScores['wallbreaker'] || []).slice(0, 10)" :key="score.id || idx">
-              <div class="score-row" :class="'rank-' + (idx + 1)">
+              <div class="score-row score-row-clickable" :class="'rank-' + (idx + 1)" @click="$store.arcade.openUserProfile(score.playerId)">
                 <span class="score-position" :class="{ 'gold': idx === 0, 'silver': idx === 1, 'bronze': idx === 2 }">
                   <template x-if="idx === 0">
                     <svg viewBox="0 0 24 24" class="medal-svg gold"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z M5 16h14v3H5z" fill="currentColor"/></svg>
@@ -766,6 +968,7 @@ export function getMainMenuTemplate() {
                     <span x-text="idx + 1"></span>
                   </template>
                 </span>
+                <img :src="$store.arcade.getProfilePicturePath(score.profilePicture)" alt="Avatar" class="score-avatar" />
                 <span class="score-name" x-text="score.playerName"></span>
                 <span class="score-pts" x-text="score.score?.toLocaleString()"></span>
               </div>
@@ -781,7 +984,7 @@ export function getMainMenuTemplate() {
           </div>
           <div class="score-list">
             <template x-for="(score, idx) in ($store.arcade.gameScores['santa-cruz-runner'] || []).slice(0, 10)" :key="score.id || idx">
-              <div class="score-row" :class="'rank-' + (idx + 1)">
+              <div class="score-row score-row-clickable" :class="'rank-' + (idx + 1)" @click="$store.arcade.openUserProfile(score.playerId)">
                 <span class="score-position" :class="{ 'gold': idx === 0, 'silver': idx === 1, 'bronze': idx === 2 }">
                   <template x-if="idx === 0">
                     <svg viewBox="0 0 24 24" class="medal-svg gold"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z M5 16h14v3H5z" fill="currentColor"/></svg>
@@ -796,12 +999,77 @@ export function getMainMenuTemplate() {
                     <span x-text="idx + 1"></span>
                   </template>
                 </span>
+                <img :src="$store.arcade.getProfilePicturePath(score.profilePicture)" alt="Avatar" class="score-avatar" />
                 <span class="score-name" x-text="score.playerName"></span>
                 <span class="score-pts" x-text="score.score?.toLocaleString()"></span>
               </div>
             </template>
             <p x-show="!$store.arcade.gameScores['santa-cruz-runner']?.length" class="no-scores-msg">Aucun score</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Modal profil utilisateur -->
+      <div x-show="$store.arcade.showUserProfileModal" x-cloak class="user-profile-modal-overlay" @click.self="$store.arcade.closeUserProfile()">
+        <div class="user-profile-modal">
+          <button class="user-profile-modal-close" @click="$store.arcade.closeUserProfile()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+
+          <!-- Loading -->
+          <div x-show="$store.arcade.profileLoading" class="user-profile-loading">
+            <span>Chargement...</span>
+          </div>
+
+          <!-- Contenu du profil -->
+          <template x-if="!$store.arcade.profileLoading && $store.arcade.viewedUserProfile">
+            <div class="user-profile-content">
+              <div class="user-profile-header">
+                <img :src="$store.arcade.getProfilePicturePath($store.arcade.viewedUserProfile.profilePicture)" alt="Avatar" class="user-profile-avatar" />
+                <div class="user-profile-info">
+                  <h3 class="user-profile-name" x-text="$store.arcade.viewedUserProfile.username"></h3>
+                  <p class="user-profile-date">
+                    Membre depuis le <span x-text="$store.arcade.formatDate($store.arcade.viewedUserProfile.registeredAt)"></span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="user-profile-stats">
+                <div class="user-profile-stat">
+                  <span class="user-profile-stat-value" x-text="$store.arcade.viewedUserProfile.totalGames || 0"></span>
+                  <span class="user-profile-stat-label">Parties jouees</span>
+                </div>
+                <div class="user-profile-stat">
+                  <span class="user-profile-stat-value" x-text="($store.arcade.viewedUserProfile.bestScore || 0).toLocaleString()"></span>
+                  <span class="user-profile-stat-label">Meilleur score</span>
+                </div>
+              </div>
+
+              <div class="user-profile-games">
+                <h4>Scores par jeu</h4>
+                <div class="user-profile-games-grid">
+                  <div class="user-profile-game">
+                    <span class="user-profile-game-name">Pac-Man</span>
+                    <span class="user-profile-game-score" x-text="($store.arcade.viewedUserProfile.statsByGame?.pacman?.bestScore || 0).toLocaleString()"></span>
+                    <span class="user-profile-game-plays" x-text="($store.arcade.viewedUserProfile.statsByGame?.pacman?.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                  <div class="user-profile-game">
+                    <span class="user-profile-game-name">Wallbreaker</span>
+                    <span class="user-profile-game-score" x-text="($store.arcade.viewedUserProfile.statsByGame?.wallbreaker?.bestScore || 0).toLocaleString()"></span>
+                    <span class="user-profile-game-plays" x-text="($store.arcade.viewedUserProfile.statsByGame?.wallbreaker?.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                  <div class="user-profile-game">
+                    <span class="user-profile-game-name">Santa Cruz</span>
+                    <span class="user-profile-game-score" x-text="($store.arcade.viewedUserProfile.statsByGame?.['santa-cruz-runner']?.bestScore || 0).toLocaleString()"></span>
+                    <span class="user-profile-game-plays" x-text="($store.arcade.viewedUserProfile.statsByGame?.['santa-cruz-runner']?.totalPlays || 0) + ' parties'"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>

@@ -22,6 +22,8 @@ model Joueur {
   id_joueur    Int      @id @default(autoincrement())
   pseudo       String   @unique @db.VarChar(50)
   mot_de_passe String   @db.VarChar(100)
+  photo_profil Int?     @default(1) @db.SmallInt
+  date_inscription DateTime @default(now())
 
   scores       Score[]
 }

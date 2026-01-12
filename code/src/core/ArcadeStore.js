@@ -19,6 +19,9 @@ import {
   getGameScores,
   getUserBestScore,
   getUserScores,
+  updateProfilePicture,
+  getUserProfile,
+  changePassword,
 } from './AuthManager.js';
 import { getAttractMode } from './AttractMode.js';
 
@@ -34,7 +37,7 @@ const ATTRACT_MODE_DELAY = 20000;
 export function createArcadeStore() {
   return {
     // État de la vue
-    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help' | 'auth'
+    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help' | 'auth' | 'account'
     currentGame: null,
     currentGameName: '',
 
@@ -67,6 +70,12 @@ export function createArcadeStore() {
     authLoading: false,
     authMode: 'login', // 'login' | 'register'
 
+    // État de l'inscription (étape de sélection de pfp)
+    registerStep: 'form', // 'form' | 'pfp'
+    selectedProfilePicture: 1,
+    tempUsername: '',
+    tempPassword: '',
+
     // État du leaderboard
     leaderboard: [],
     gameScores: {},
@@ -81,6 +90,24 @@ export function createArcadeStore() {
     // Erreur de connexion au serveur (réseau restreint)
     connectionError: false,
     connectionErrorMessage: '',
+
+    // Modal de profil utilisateur (dans les scores)
+    showUserProfileModal: false,
+    viewedUserProfile: null,
+    profileLoading: false,
+
+    // Sélecteur de photo de profil (dans Mon Compte)
+    showPfpSelector: false,
+    pfpSelectorLoading: false,
+
+    // Changement de mot de passe
+    showPasswordReset: false,
+    passwordLoading: false,
+    passwordError: null,
+    passwordSuccess: null,
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
 
     /**
      * Initialise le store
@@ -137,21 +164,49 @@ export function createArcadeStore() {
     },
 
     /**
-     * Inscription utilisateur
+     * Première étape d'inscription: validation du formulaire et passage à la sélection de pfp
      * @param {string} username
      * @param {string} password
      */
-    async handleRegister(username, password) {
+    async handleRegisterStep1(username, password) {
+      // Validation côté client
+      if (!username || username.length < 3) {
+        this.authError = 'Le pseudo doit contenir au moins 3 caractères';
+        return;
+      }
+      if (!password || password.length < 8) {
+        this.authError = 'Le mot de passe doit contenir au moins 8 caractères';
+        return;
+      }
+
+      // Stocker temporairement les identifiants
+      this.tempUsername = username;
+      this.tempPassword = password;
+      this.authError = null;
+
+      // Passer à l'étape de sélection de photo de profil
+      this.registerStep = 'pfp';
+      this.selectedProfilePicture = Math.floor(Math.random() * 75) + 1;
+    },
+
+    /**
+     * Deuxième étape d'inscription: création du compte avec la photo de profil
+     */
+    async handleRegisterStep2() {
       this.authLoading = true;
       this.authError = null;
 
-      const result = await register(username, password);
+      const result = await register(this.tempUsername, this.tempPassword, this.selectedProfilePicture);
 
       this.authLoading = false;
 
       if (result.success) {
         this.isAuthenticated = true;
         this.user = result.user;
+        // Nettoyer les données temporaires
+        this.tempUsername = '';
+        this.tempPassword = '';
+        this.registerStep = 'form';
         this.backToMenu();
       } else {
         // Détecter une erreur de connexion au serveur
@@ -159,7 +214,27 @@ export function createArcadeStore() {
           this.showConnectionError();
         }
         this.authError = result.error;
+        // Revenir au formulaire en cas d'erreur
+        this.registerStep = 'form';
       }
+    },
+
+    /**
+     * Retour à l'étape formulaire depuis la sélection de pfp
+     */
+    backToRegisterForm() {
+      this.registerStep = 'form';
+      this.authError = null;
+    },
+
+    /**
+     * Inscription utilisateur (ancienne méthode pour compatibilité)
+     * @param {string} username
+     * @param {string} password
+     */
+    async handleRegister(username, password) {
+      // Utiliser le nouveau processus en deux étapes
+      await this.handleRegisterStep1(username, password);
     },
 
     /**
@@ -169,6 +244,10 @@ export function createArcadeStore() {
       logout();
       this.isAuthenticated = false;
       this.user = null;
+      // Rediriger vers le menu si on était sur une page protégée
+      if (this.currentView === 'account') {
+        this.backToMenu();
+      }
     },
 
     /**
@@ -177,6 +256,9 @@ export function createArcadeStore() {
     showAuth() {
       this.currentView = 'auth';
       this.authError = null;
+      this.registerStep = 'form';
+      this.tempUsername = '';
+      this.tempPassword = '';
       this.resetAttractTimer();
     },
 
@@ -552,6 +634,171 @@ export function createArcadeStore() {
     hideAttractScreen() {
       const attractMode = getAttractMode();
       attractMode.hide();
+    },
+
+    /**
+     * Affiche la page Mon Compte
+     */
+    showAccount() {
+      if (!this.isAuthenticated) {
+        this.backToMenu();
+        return;
+      }
+      this.currentView = 'account';
+      this.showPfpSelector = false;
+      this.resetAttractTimer();
+    },
+
+    /**
+     * Ouvre le sélecteur de photo de profil dans Mon Compte
+     */
+    openPfpSelector() {
+      this.showPfpSelector = true;
+      this.selectedProfilePicture = this.user?.profilePicture || 1;
+    },
+
+    /**
+     * Ferme le sélecteur de photo de profil
+     */
+    closePfpSelector() {
+      this.showPfpSelector = false;
+    },
+
+    /**
+     * Sauvegarde la nouvelle photo de profil
+     */
+    async saveProfilePicture() {
+      if (!this.isAuthenticated) return;
+
+      this.pfpSelectorLoading = true;
+
+      const result = await updateProfilePicture(this.selectedProfilePicture);
+
+      this.pfpSelectorLoading = false;
+
+      if (result.success) {
+        this.user = { ...this.user, profilePicture: result.user.profilePicture };
+        this.showPfpSelector = false;
+      } else {
+        console.error('Erreur lors de la modification de la photo de profil:', result.error);
+      }
+    },
+
+    /**
+     * Ouvre le modal de changement de mot de passe
+     */
+    openPasswordReset() {
+      this.showPasswordReset = true;
+      this.passwordError = null;
+      this.passwordSuccess = null;
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+    },
+
+    /**
+     * Ferme le modal de changement de mot de passe
+     */
+    closePasswordReset() {
+      this.showPasswordReset = false;
+      this.passwordError = null;
+      this.passwordSuccess = null;
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+    },
+
+    /**
+     * Gère le changement de mot de passe
+     */
+    async handlePasswordReset() {
+      if (!this.isAuthenticated) return;
+
+      // Validation
+      if (this.newPassword !== this.confirmPassword) {
+        this.passwordError = 'Les mots de passe ne correspondent pas';
+        return;
+      }
+
+      if (this.newPassword.length < 8) {
+        this.passwordError = 'Le nouveau mot de passe doit faire au moins 8 caractères';
+        return;
+      }
+
+      this.passwordLoading = true;
+      this.passwordError = null;
+      this.passwordSuccess = null;
+
+      const result = await changePassword(this.currentPassword, this.newPassword);
+
+      this.passwordLoading = false;
+
+      if (result.success) {
+        this.passwordSuccess = 'Mot de passe modifié avec succès';
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+        // Fermer après 2 secondes
+        setTimeout(() => {
+          this.closePasswordReset();
+        }, 2000);
+      } else {
+        this.passwordError = result.error || 'Erreur lors du changement de mot de passe';
+      }
+    },
+
+    /**
+     * Ouvre le modal de profil d'un utilisateur
+     * @param {number} userId - ID du joueur
+     */
+    async openUserProfile(userId) {
+      this.profileLoading = true;
+      this.showUserProfileModal = true;
+      this.viewedUserProfile = null;
+
+      const result = await getUserProfile(userId);
+
+      this.profileLoading = false;
+
+      if (result.success) {
+        this.viewedUserProfile = result.profile;
+      } else {
+        this.showUserProfileModal = false;
+        console.error('Erreur lors de la récupération du profil:', result.error);
+      }
+    },
+
+    /**
+     * Ferme le modal de profil utilisateur
+     */
+    closeUserProfile() {
+      this.showUserProfileModal = false;
+      this.viewedUserProfile = null;
+    },
+
+    /**
+     * Retourne le chemin de la photo de profil
+     * @param {number} pfpId - ID de la photo de profil (1-75)
+     * @returns {string} Chemin de l'image
+     */
+    getProfilePicturePath(pfpId) {
+      const id = pfpId || 1;
+      return `/assets/pfp/pfp_${id}.webp`;
+    },
+
+    /**
+     * Formate une date en format lisible
+     * @param {string} dateStr - Date ISO
+     * @returns {string} Date formatée
+     */
+    formatDate(dateStr) {
+      if (!dateStr) return 'Inconnu';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
     }
   };
 }

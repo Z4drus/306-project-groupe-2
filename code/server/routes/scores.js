@@ -67,16 +67,18 @@ router.get('/', async (req, res) => {
     for (const gameId of VALID_GAMES) {
       const jeuEnum = GAME_ID_TO_ENUM[gameId];
 
-      // Requête SQL pour récupérer le meilleur score de chaque joueur
+      // Requête SQL pour récupérer le meilleur score de chaque joueur avec photo de profil
       const scores = await prisma.$queryRawUnsafe(`
         SELECT
+          j.id_joueur as player_id,
           j.pseudo as player_name,
+          j.photo_profil as profile_picture,
           MAX(s.valeur) as best_score,
           COUNT(s.id_score) as total_plays
         FROM "Score" s
         JOIN "Joueur" j ON s.id_joueur = j.id_joueur
         WHERE s.jeu = $1::"Jeu"
-        GROUP BY j.id_joueur, j.pseudo
+        GROUP BY j.id_joueur, j.pseudo, j.photo_profil
         ORDER BY best_score DESC
         LIMIT $2
       `, jeuEnum, limit);
@@ -84,7 +86,9 @@ router.get('/', async (req, res) => {
       results[gameId] = scores.map((s, index) => ({
         rank: index + 1,
         id: index + 1,
+        playerId: Number(s.player_id),
         playerName: s.player_name,
+        profilePicture: s.profile_picture || 1,
         score: Number(s.best_score),
         totalPlays: Number(s.total_plays),
       }));
@@ -299,16 +303,18 @@ router.get('/:gameId', async (req, res) => {
 
     const jeuEnum = GAME_ID_TO_ENUM[gameId];
 
-    // Requête SQL pour récupérer le meilleur score de chaque joueur
+    // Requête SQL pour récupérer le meilleur score de chaque joueur avec photo de profil
     const scores = await prisma.$queryRawUnsafe(`
       SELECT
+        j.id_joueur as player_id,
         j.pseudo as player_name,
+        j.photo_profil as profile_picture,
         MAX(s.valeur) as best_score,
         COUNT(s.id_score) as total_plays
       FROM "Score" s
       JOIN "Joueur" j ON s.id_joueur = j.id_joueur
       WHERE s.jeu = $1::"Jeu"
-      GROUP BY j.id_joueur, j.pseudo
+      GROUP BY j.id_joueur, j.pseudo, j.photo_profil
       ORDER BY best_score DESC
       LIMIT $2
     `, jeuEnum, limit);
@@ -318,7 +324,9 @@ router.get('/:gameId', async (req, res) => {
       data: scores.map((s, index) => ({
         rank: index + 1,
         id: index + 1,
+        playerId: Number(s.player_id),
         playerName: s.player_name,
+        profilePicture: s.profile_picture || 1,
         score: Number(s.best_score),
         totalPlays: Number(s.total_plays),
       })),
