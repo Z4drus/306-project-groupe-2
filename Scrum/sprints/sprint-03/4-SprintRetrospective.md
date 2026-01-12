@@ -1,4 +1,4 @@
-# SCRUM : Sprint retrospective - Sprint02 | Scrum Master: Axelle
+# SCRUM : Sprint retrospective - –Sprint02 | Scrum Master: Axelle
 
 ## Ce qui a bien fonctionné
 - Travail efficace au sein de l’équipe

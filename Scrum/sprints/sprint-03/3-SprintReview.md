@@ -1,4 +1,4 @@
-# Sprint Review – Sprint02  | Scrum Master: AXELLE
+# Sprint Review –Sprint02  | Scrum Master: AXELLE
 
 # Sprint Review – ArcadiaBox
 
