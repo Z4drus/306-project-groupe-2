@@ -10,7 +10,7 @@
 ---
 
 ## Objectif du sprint
-- Objectif : Avoir une borne d’arcade fonctionnelle intégrant au minimum trois jeux, jouables au clavier et à la manette, avec un mode attract.
+- Objectif : Finaliser l’intégration des trois mini-jeux dans la borne arcade afin de disposer d’une version jouable, fluide et cohérente, avec menu fonctionnel, scores persistants et un mode attract basique.
 
 
 ## Fonctionnalités / Stories présentées
@@ -30,25 +30,26 @@
 
 ## Retours 
 
-| Participant | Feedback / Commentaires | Action à envisager |
-|------------|------------------------|------------------|
-|    Noé     |      Le projet s’est bien déroulé             |     Aucune             |
-|    Diogo   |    Tout s’est bien passé                  |    Aucune              |
-|    Valentin|    Le résultat est satisfaisant                    |       Aucune           |
-|    Axelle  |    Le sprint s’est bien déroulé               |    Aucune              |
----
+| Participant | Avis / Observations                        | Action à envisager |
+| ----------- | ------------------------------------------ | ------------------ |
+| Noé         | Le sprint s’est déroulé sans difficulté    | Aucune             |
+| Diogo       | Le travail a été réalisé de manière fluide | Aucune             |
+| Valentin    | Les résultats obtenus sont satisfaisants   | Aucune             |
+| Axelle      | L’avancement du sprint a été efficace      | Aucune             |
+
+
 
 ## Points bloquants ou problèmes rencontrés
 
-- Aucun problème bloquant rencontré.
+- Aucun obstacle majeur n’a été identifié au cours de ce sprint.
 
 
 ## Adaptations / Ajustements pour le Product Backlog
 
-- Avancer sur les sprints suivants et ajouter de nouvelles fonctionnalités.
+- Préparer les prochains sprints en ajoutant de nouvelles fonctionnalités prévues par le client.
 
 
 ## Décisions prises pendant la Sprint Review
-- Le projet étant en avance, et à la demande du client, de nouvelles fonctionnalités seront ajoutées.
+- Étant donné l’avance sur le planning, le client a validé l’ajout de nouvelles fonctionnalités pour les prochains sprints.
 
 

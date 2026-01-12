@@ -1,7 +1,5 @@
 # SCRUM : Daily scrum du lundi matin 12 janvier 2026 | Scrum Master: Axelle
 
-ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par qui. Donnez donc suffisamment de substance ici pour cela. Rien de plus.
-
 ## Ce qui a été fait la semaine passée
 
 ### AXELLE
@@ -49,9 +47,3 @@ ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par 
 ## Problèmes rencontrés
 
 -   Aucun problème majeur à ce jour.
-
-# Instructions
-
-Ce document est complété durant la cérémonie du `Daily Scrum`.
-
-1. Tenir également à jour le Kanban.
