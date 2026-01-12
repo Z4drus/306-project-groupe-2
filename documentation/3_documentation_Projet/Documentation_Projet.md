@@ -376,175 +376,415 @@ erDiagram
 
 # 5 Réalisation
 
-## 5.1 Application web ArcadiaBox
+## 5.1 Choix technologiques et justifications
+
+### Stack technique retenue
+
+| Composant       | Technologie          | Version | Justification                                                              |
+| --------------- | -------------------- | ------- | -------------------------------------------------------------------------- |
+| Build & Dev     | Vite                 | 7.2.7   | Build rapide, HMR instantané, optimisé pour le dev moderne                 |
+| UI Framework    | Alpine.js            | 3.15.2  | Ultra-léger (~15kb), réactif, parfait pour Raspberry Pi                    |
+| Moteur de jeux  | Phaser               | 3.90.0  | Standard 2D web, excellente performance Canvas/WebGL                       |
+| Backend         | Express              | 5.2.1   | Framework minimaliste, performant, grande communauté                       |
+| ORM             | Prisma               | 7.1.0   | Typage fort, migrations simples, client généré                             |
+| Base de données | PostgreSQL (Neon)    | -       | Fiabilité, scalabilité, hébergement cloud managé                           |
+| Authentification| JWT + bcryptjs       | -       | Stateless, sécurisé, pas de session serveur                                |
+
+### Pourquoi Alpine.js plutôt que React/Vue ?
+
+Le choix d'**Alpine.js** s'est imposé pour plusieurs raisons :
+
+1. **Performance sur Raspberry Pi** : Alpine.js pèse ~15kb minifié contre ~45kb pour React. Sur un Raspberry Pi avec des ressources limitées, cette différence est significative.
+
+2. **Simplicité d'intégration** : L'interface arcade ne nécessite pas de composants complexes. Alpine permet de gérer l'état directement dans le HTML avec des directives (`x-data`, `x-show`, `x-on`).
+
+3. **Pas de transpilation JSX** : Le code reste du JavaScript natif, ce qui simplifie le debugging et réduit le temps de build.
+
+4. **Cohabitation avec Phaser** : Les jeux Phaser gèrent leur propre rendu Canvas. Alpine ne crée pas de conflits car il ne virtualise pas le DOM.
+
+### Pourquoi Phaser pour les jeux ?
+
+**Phaser 3** est le moteur de jeux 2D le plus mature de l'écosystème web :
+
+- **Abstraction hardware** : Bascule automatiquement entre WebGL et Canvas selon les capacités du device
+- **Système de scènes** : Architecture MVC native avec les scènes (Menu, Game, GameOver)
+- **Physique intégrée** : Arcade Physics pour les collisions et mouvements
+- **Tilemap support** : Chargement natif des cartes Tiled (utilisé pour Pac-Man)
+- **Gamepad API** : Support natif des manettes
+
+### Pourquoi Prisma + PostgreSQL ?
+
+L'alternative SQLite locale a été abandonnée car :
+
+- **Synchronisation impossible** : Chaque borne aurait eu son propre classement isolé
+- **Fiabilité** : SQLite sur carte SD Raspberry est sujet aux corruptions
+
+PostgreSQL hébergé sur **Neon** apporte :
+
+- **Centralisation** : Toutes les bornes partagent le même scoreboard
+- **Disponibilité** : Base accessible 24/7, indépendante de l'état des bornes
+- **Sauvegardes automatiques** : Gestion par Neon, sans intervention
+- **Connexions sécurisées** : TLS obligatoire
+
+## 5.2 Structure du code source
+
+```
+code/
+├── src/                          # Frontend (Vite bundle)
+│   ├── main.js                   # Point d'entrée
+│   ├── style.css                 # Styles globaux
+│   ├── core/                     # Modules applicatifs
+│   │   ├── ArcadeStore.js        # Store Alpine.js global
+│   │   ├── ArcadeMenu.js         # Templates et composants menu
+│   │   ├── AuthManager.js        # Gestion authentification
+│   │   ├── GameLoader.js         # Chargement dynamique des jeux
+│   │   ├── GamepadManager.js     # API Gamepad unifiée
+│   │   ├── CursorManager.js      # Curseur custom arcade
+│   │   ├── AttractMode.js        # Mode démo (idle)
+│   │   └── VirtualKeyboard.js    # Clavier tactile
+│   └── games/                    # Mini-jeux
+│       ├── pacman/               # Pac-Man (complet)
+│       ├── wallbreaker/          # Wallbreaker (complet)
+│       └── santa-cruz-runner/    # Runner (prototype)
+│
+├── server/                       # Backend Express
+│   ├── index.js                  # Point d'entrée serveur
+│   ├── prisma.js                 # Client Prisma initialisé
+│   ├── routes/
+│   │   ├── auth.js               # API authentification
+│   │   └── scores.js             # API scores
+│   └── generated/prisma/         # Client Prisma généré
+│
+├── prisma/
+│   └── schema.prisma             # Schéma base de données
+│
+├── public/                       # Assets statiques
+│   └── assets/
+│       ├── pfp/                  # Photos de profil (75 images)
+│       └── games/                # Assets des jeux
+│
+├── scripts/                      # Scripts d'automatisation
+│   ├── setup.js                  # Installation complète
+│   └── start-dev.js              # Lancement dev full-stack
+│
+├── vite.config.js                # Configuration Vite
+└── package.json                  # Dépendances et scripts
+```
+
+## 5.3 Application web ArcadiaBox
 
 ### Architecture front-end
 
-L’application est implémentée sous forme de Single Page Application (SPA). Le choix d’Alpine.js permet de conserver une interface légère, adaptée aux contraintes matérielles du Raspberry Pi, tout en centralisant l’état de l’application dans un store unique.
+L'application est une **Single Page Application (SPA)** structurée autour d'Alpine.js. Le point d'entrée `src/main.js` initialise :
 
-Le point d’entrée `main.js` initialise les éléments principaux de l’application :
+```javascript
+// src/main.js - Initialisation de l'application
+import Alpine from 'alpinejs';
+import { createArcadeStore } from './core/ArcadeStore.js';
+import { createArcadeMenuComponent } from './core/ArcadeMenu.js';
+import cursorManager from './core/CursorManager.js';
 
-- le **store global Alpine**
-- le **menu arcade**
-- le **curseur personnalisé**
-- le rendu dynamique du template principal
+function initializeApp() {
+  // Enregistrer le store global
+  Alpine.store('arcade', createArcadeStore());
 
-Le **store global** centralise toute la logique applicative :
+  // Enregistrer le composant menu
+  Alpine.data('arcadeMenu', createArcadeMenuComponent);
 
-- navigation entre les vues (menu, jeu, scores, aide, authentification)
-- état du joueur et de la session
-- score courant et mode _attract_
-- détection des manettes via la **Gamepad API**
-- communication avec l’API backend (authentification et scores)
+  // Démarrer Alpine.js
+  Alpine.start();
 
-Cette approche permet une gestion cohérente de l’état et évite les duplications de logique entre les composants.
+  // Initialiser le store et le curseur custom
+  Alpine.store('arcade').init();
+  cursorManager.init();
+}
+```
 
-### Interface arcade et services transverses
+### Store global (ArcadeStore)
 
-L’interface principale repose sur un template Alpine structuré autour :
+Le **store Alpine.js** centralise l'intégralité de l'état applicatif :
 
-- d’un **header** indiquant l’état du joueur connecté et des manettes
-- d’une **grille de sélection des jeux**
-- d’un **mode attract** déclenché après 60 secondes d’inactivité
-- d’actions globales comme le score, le menu d’aide, l’authentification,…
+```javascript
+// src/core/ArcadeStore.js - Extrait du store
+export function createArcadeStore() {
+  return {
+    // État de la vue
+    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help' | 'auth' | 'account'
+    currentGame: null,
 
-La vue **Scores** affiche :
+    // État du jeu en cours
+    gameScore: 0,
+    gameLives: 3,
+    gameLevel: 1,
 
-- un bandeau personnalisé
-- des podiums par jeu
-- un classement global des joueurs actifs
+    // État d'authentification
+    isAuthenticated: false,
+    user: null,
 
-Un store global (`ArcadeStore`) centralise l’état de l’application : vue active (menu, jeu, scores), score courant, état des manettes et mode attract. Ce choix évite la duplication d’état entre composants et simplifie la gestion des transitions entre les différentes vues.
+    // État des manettes
+    connectedGamepads: [],
 
-Les mini-jeux sont chargés dynamiquement via un `GameLoader`, ce qui permet de limiter la mémoire utilisée et de réduire le temps de chargement initial du menu. Chaque jeu est isolé dans son module et expose des callbacks standardisés pour la gestion du score et de la fin de partie.
+    // Mode attract (idle)
+    attractMode: false,
 
-Il gère :
+    // Méthodes principales
+    async startGame(gameName) { /* ... */ },
+    async handleGameOver(gameName, score) { /* ... */ },
+    async showScores() { /* ... */ },
+    // ...
+  };
+}
+```
 
-- l’affichage d’une barre de progression
-- le lancement et l’arrêt des jeux
-- les callbacks de fin de partie et de score
+Cette centralisation permet :
+- Une **navigation cohérente** entre les vues
+- La **synchronisation automatique** de l'UI avec l'état
+- La **gestion des transitions** (chargement, erreurs)
+- Le **mode attract** déclenché après 20 secondes d'inactivité
 
-La gestion des utilisateurs est assurée par le **AuthManager**, qui :
+### Chargement dynamique des jeux
 
-- stocke le token JWT
-- gère login, register et logout
-- fournit les méthodes sécurisées pour poster des scores et récupérer les classements
+Les mini-jeux sont chargés à la demande via le **GameLoader**, évitant de charger tout le code au démarrage :
 
-### Mini-jeux embarqués
+```javascript
+// src/core/GameLoader.js - Chargement dynamique
+export async function loadGame(gameName, container, onGameOver, onScoreUpdate, bestScore, username) {
+  const gameModule = await import(`../games/${gameName}/index.js`);
 
-Deux jeux complets ont été développés avec **Phaser**, selon une architecture de type MVC :
+  return gameModule.default(
+    container,
+    onGameOver,
+    onScoreUpdate,
+    bestScore,
+    username
+  );
+}
+```
 
-- **Pac-Man**
-- **Wallbreaker**
+Les callbacks `onGameOver` et `onScoreUpdate` permettent la communication bidirectionnelle entre les jeux et l'application hôte.
 
-Chaque jeu est structuré en scènes distinctes (_Menu_, _Game_, _GameOver_), avec une séparation claire entre logique, rendu et contrôles.
+### Mini-jeux : Architecture MVC
 
-Deux prototypes supplémentaires ont été réalisés :
+Chaque jeu suit le pattern **Model-View-Controller** de Phaser :
 
-- **Santa Cruz Runner**
-- **Pong Duel**
+```
+games/pacman/
+├── index.js              # Point d'entrée (export startPacman)
+├── config/
+│   └── GameConfig.js     # Constantes, vitesses, niveaux
+├── models/
+│   ├── PacmanModel.js    # État de Pac-Man (position, direction, vies)
+│   ├── GhostModel.js     # État des fantômes (mode, cible)
+│   └── MapModel.js       # Données de la carte (tuiles, dots)
+├── controllers/
+│   ├── PacmanController.js   # Logique de mouvement
+│   ├── GhostController.js    # IA des fantômes
+│   ├── InputController.js    # Gestion clavier/manette
+│   └── GameController.js     # Orchestration générale
+├── views/
+│   ├── PacmanView.js     # Rendu sprite Pac-Man
+│   ├── GhostView.js      # Rendu sprites fantômes
+│   └── scenes/
+│       ├── MenuScene.js      # Écran titre
+│       ├── GameScene.js      # Gameplay principal
+│       └── GameOverScene.js  # Fin de partie
+└── assets/               # Sprites, sons, tilemap
+```
 
-Ces prototypes servent de base technique pour tester la physique, les contrôles et l’intégration dans l’arcade avant l’activation complète des scores.
+### Backend Express
 
-Les jeux communiquent avec l’application hôte via des callbacks, ce qui permet l’affichage synchronisé du score, des vies et du niveau dans les panneaux latéraux de l’interface.
+Le serveur Express (`server/index.js`) expose l'API REST et sert le build Vite :
 
-### Backend et persistance
+```javascript
+// server/index.js - Configuration du serveur
+import express from "express";
+import cors from "cors";
+import scoresRouter from "./routes/scores.js";
+import authRouter from "./routes/auth.js";
 
-Le backend repose sur un **serveur Express** qui :
+const app = express();
 
-- sert le build Vite
-- expose une API REST
-- fournit un endpoint de _health check_
-- journalise chaque requête HTTP
+app.use(cors());
+app.use(express.json());
 
-L’API d’authentification permet :
+// Routes API
+app.use("/api/auth", authRouter);
+app.use("/api/scores", scoresRouter);
 
-- l’inscription et la connexion des joueurs
-- la validation des tokens JWT
-- le comptage des parties jouées
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
 
-La gestion des scores offre :
+// Sert les fichiers statiques du build Vite
+app.use(express.static(join(__dirname, "../dist")));
 
-- des classements globaux
-- des classements par jeu
-- des statistiques par joueur
-- une création de score sécurisée
+// SPA fallback
+app.use((req, res) => {
+  res.sendFile(join(__dirname, "../dist/index.html"));
+});
+```
 
-La persistance est assurée via Prisma avec PostgreSQL, sur un schéma simple :
+### API REST
 
-- `Joueur`
-- `Score`
+| Endpoint                    | Méthode | Description                        | Auth requise |
+| --------------------------- | ------- | ---------------------------------- | ------------ |
+| `/api/auth/register`        | POST    | Inscription avec avatar            | Non          |
+| `/api/auth/login`           | POST    | Connexion, retourne JWT            | Non          |
+| `/api/auth/me`              | GET     | Profil utilisateur courant         | Oui          |
+| `/api/auth/profile/:id`     | GET     | Profil public d'un joueur          | Non          |
+| `/api/auth/profile-picture` | PUT     | Modifier son avatar                | Oui          |
+| `/api/scores`               | GET     | Top scores par jeu                 | Non          |
+| `/api/scores`               | POST    | Soumettre un score                 | Oui          |
+| `/api/scores/leaderboard`   | GET     | Classement global                  | Non          |
+| `/api/scores/:gameId`       | GET     | Scores d'un jeu spécifique         | Non          |
+| `/api/scores/user/me`       | GET     | Scores du joueur connecté          | Oui          |
+| `/api/health`               | GET     | État du serveur                    | Non          |
 
-Des index ont été ajoutés afin d’optimiser les tris et les requêtes de classement.
+## 5.4 Base de données – Neon (PostgreSQL)
 
-### Industrialisation et scripts
+### Schéma Prisma
 
-Plusieurs scripts ont été développés pour faciliter le déploiement et le développement :
+Le schéma est volontairement minimaliste, avec deux tables et un enum :
 
-- `npm run setup`
-  Automatise l’installation des dépendances, la génération du client Prisma et la vérification du schéma, tout en nettoyant les caches problématiques.
-- `npm run dev:full`
-  Vérifie les prérequis, libère les ports, lance simultanément le backend (port 8080) et Vite (port 3000), puis assure un arrêt propre des processus.
+```prisma
+// prisma/schema.prisma
 
-Ces outils permettent de reproduire rapidement un environnement fonctionnel, y compris sur un **Raspberry Pi fraîchement installé**.
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
 
-## **5.2 Base de données – Neon (PostgreSQL)**
+datasource db {
+  provider = "postgresql"
+}
 
-### **Rôle de la base de données**
+/// Enum des jeux disponibles
+enum Jeu {
+  PACMAN
+  SANTA_CRUZ_RUNNER
+  WALLBREAKER
+}
 
-La base de données Neon est utilisée pour stocker l’ensemble des **joueurs authentifiés** (`Joueur`) ainsi que leurs **scores par jeu** (`Score`).
+/// Table Joueur
+model Joueur {
+  id_joueur        Int      @id @default(autoincrement())
+  pseudo           String   @unique @db.VarChar(50)
+  mot_de_passe     String   @db.VarChar(100)  // Hash bcrypt
+  photo_profil     Int?     @default(1) @db.SmallInt
+  date_inscription DateTime @default(now())
+  scores           Score[]
+}
 
-Elle permet :
+/// Table Score
+model Score {
+  id_score   Int      @id @default(autoincrement())
+  id_joueur  Int
+  jeu        Jeu
+  valeur     Int
+  date_score DateTime @default(now())
+  joueur     Joueur   @relation(fields: [id_joueur], references: [id_joueur], onDelete: Cascade)
 
-- la gestion des **classements globaux** et **par jeu** (Pacman, Wallbreaker, Santa Cruz Runner),
-- l’accès à l’**historique personnel** d’un joueur,
-- la **synchronisation des scores entre toutes les bornes**,
-- la remise à zéro sécurisée des scores.
+  @@index([jeu, valeur(sort: Desc)])  // Index pour classements
+  @@index([id_joueur])                 // Index pour scores par joueur
+}
+```
 
-Les données sont exposées via l’API Express, notamment à travers les routes :
+### Optimisations
 
-- `GET /api/scores`
-- `GET /api/scores/:gameId`
-- `GET /api/scores/leaderboard`
-- `GET /api/scores/user/me`
-  (code/server/routes/scores.js)
+Les **index composites** `@@index([jeu, valeur(sort: Desc)])` permettent des requêtes de classement performantes :
 
-### **Justification du choix technologique**
+```javascript
+// Requête typique de classement (scores.js)
+const topScores = await prisma.score.findMany({
+  where: { jeu: 'PACMAN' },
+  orderBy: { valeur: 'desc' },
+  take: 10,
+  include: { joueur: { select: { pseudo: true, photo_profil: true } } }
+});
+```
 
-Le choix d’un **PostgreSQL managé sur Neon** répond à plusieurs contraintes du projet :
+### Connexion sécurisée
 
-- **Disponibilité** : la base est accessible en permanence, indépendamment de l’état des bornes.
-- **Centralisation** : toutes les bornes partagent un **scoreboard unique**, garantissant la cohérence des résultats.
-- **Robustesse** : absence de dépendance à une base locale fragile sur Raspberry Pi.
-- **Maintenance réduite** : Neon fournit les sauvegardes automatiques, la gestion du scaling et des connexions sécurisées (TLS).
+Le client Prisma est initialisé avec l'adaptateur `pg` pour la connexion TLS vers Neon :
 
-L’utilisation de **Prisma** permet :
+```javascript
+// server/prisma.js
+import pg from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from './generated/prisma/index.js';
 
-- de définir le schéma de données de manière déclarative,
-- de bénéficier d’un client typé en TypeScript,
-- de simplifier les requêtes complexes (classements, statistiques),
-- de s’intégrer directement à Neon via `pg` et `@prisma/adapter-pg`, sans couche intermédiaire.
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-L’alternative initiale basée sur **SQLite local** (ancien module `code/server/db.js`) a été abandonnée car elle limitait les scores à une seule borne et ne répondait pas au besoin de synchronisation globale.
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
-### **Intégration dans l’architecture**
+export default prisma;
+```
 
-Au démarrage, le serveur Express initialise Prisma via `code/server/prisma.js`, qui :
+## 5.5 Configuration Vite
 
-- lit la variable d’environnement `DATABASE_URL`,
-- établit une connexion sécurisée vers Neon à l’aide d’un `pg.Pool`,
-- instancie le `PrismaClient` partagé par l’application.
+La configuration Vite est optimisée pour le Raspberry Pi :
 
-Les routes :
+```javascript
+// vite.config.js
+export default defineConfig({
+  server: {
+    port: 3000,
+    host: true, // Accès réseau local
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 
-- **d’authentification** (`auth.js`) utilisent Prisma pour créer les joueurs, vérifier les mots de passe hashés et générer des tokens JWT,
-- **de scores** (`scores.js`) exploitent Prisma (et ponctuellement du SQL brut) pour insérer les scores, calculer les classements et agréger les statistiques.
+  build: {
+    outDir: 'dist',
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        // Chunking pour meilleur cache
+        manualChunks: {
+          'phaser': ['phaser'],
+          'alpine': ['alpinejs'],
+        },
+      },
+    },
+  },
 
-Côté front-end, les mini-jeux envoient les scores via l’endpoint `/api/scores`.
+  optimizeDeps: {
+    include: ['phaser', 'alpinejs'],
+  },
+});
+```
 
-Chaque enregistrement déclenche une insertion en base, rendant immédiatement les données visibles sur toutes les bornes connectées.
+Le **chunking manuel** sépare Phaser (~1.2MB) et Alpine.js dans des fichiers distincts, permettant une mise en cache efficace par le navigateur.
 
-## 5.3 Raspberry Pi
+## 5.6 Scripts d'automatisation
+
+| Script           | Commande              | Description                                           |
+| ---------------- | --------------------- | ----------------------------------------------------- |
+| `setup`          | `npm run setup`       | Installation complète (deps, Prisma, vérifications)   |
+| `dev`            | `npm run dev`         | Serveur Vite seul (port 3000)                         |
+| `dev:full`       | `npm run dev:full`    | Vite + Express en parallèle                           |
+| `build`          | `npm run build`       | Build de production                                   |
+| `server`         | `npm run server`      | Serveur Express seul (port 8080)                      |
+| `start`          | `npm run start`       | Build puis serveur (production)                       |
+| `db:generate`    | `npm run db:generate` | Génère le client Prisma                               |
+| `db:push`        | `npm run db:push`     | Synchronise le schéma vers la base                    |
+| `db:migrate`     | `npm run db:migrate`  | Crée une migration                                    |
+
+Le script `start-dev.js` orchestre le lancement simultané du frontend et du backend avec gestion propre de l'arrêt (SIGTERM/SIGINT).
+
+## 5.7 Raspberry Pi
 
 ### Système d’exploitation
 
@@ -606,7 +846,7 @@ Plutôt que de répéter manuellement chaque étape, ce script s’assure que le
 
 Cette approche, qui combine automatisation et réglages spécifiques, permet de gagner du temps tout en laissant la possibilité d’affiner facilement le fonctionnement de la borne. Une fois ces étapes accomplies, le Raspberry Pi se lance directement sur la session graphique et ArcadiaBox démarre, offrant immédiatement l’expérience complète de la borne d’arcade.
 
-## 5.4 Descente de code - Joystick manette vers la droite sur pacman
+## 5.8 Descente de code - Joystick manette vers la droite sur pacman
 
 ### Vue d’ensemble
 
