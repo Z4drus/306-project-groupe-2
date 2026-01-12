@@ -1,3 +1,11 @@
+# Product Goal
+
+L’objectif d’ArcadiaBox est de fournir une borne d’arcade moderne,
+accessible via navigateur sur Raspberry Pi, permettant à des utilisateurs
+non techniques de jouer rapidement à plusieurs mini-jeux fluides,
+avec manette ou clavier, tout en conservant leurs scores de manière sécurisée
+et centralisée.
+
 # SCRUM : Product backlog
 
 | ID       | User Story                                       | Priorité   | Critères d’acceptation                                            |
@@ -21,5 +29,3 @@
 | **US17** | Sécuriser la logique des jeux 2 et 3             | ⭐         | Impossible de falsifier un score côté client.                     |
 | **US18** | Intégrer les jeux 2 et 3 dans le menu arcade     | ⭐         | Les jeux sont accessibles et lançables depuis le menu.            |
 | **US19** | Gérer le scoring des jeux 2 et 3                 | ⭐         | Scores calculés, envoyés et sauvegardés correctement.             |
-
-
