@@ -161,6 +161,15 @@ export default class GameStateModel {
   }
 
   /**
+   * Ajoute une vie (power-up)
+   * @param {number} count - Nombre de vies à ajouter (défaut: 1)
+   */
+  addLife(count = 1) {
+    this.lives += count;
+    this.notifyScoreUpdate();
+  }
+
+  /**
    * Lance la balle
    */
   launchBall() {

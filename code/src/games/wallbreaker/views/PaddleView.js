@@ -89,6 +89,28 @@ export default class PaddleView {
   }
 
   /**
+   * Met à jour la taille du paddle avec animation
+   * @param {number} width - Nouvelle largeur
+   */
+  setWidth(width) {
+    if (!this.sprite) return;
+
+    // Animation de changement de taille
+    this.scene.tweens.add({
+      targets: this.sprite,
+      displayWidth: width,
+      duration: 200,
+      ease: 'Back.easeOut',
+      onUpdate: () => {
+        // Mettre à jour le body physique pendant l'animation
+        if (this.sprite.body) {
+          this.sprite.body.setSize(this.sprite.displayWidth, this.sprite.displayHeight);
+        }
+      }
+    });
+  }
+
+  /**
    * Retourne le sprite pour les collisions
    * @returns {Phaser.Physics.Arcade.Sprite}
    */

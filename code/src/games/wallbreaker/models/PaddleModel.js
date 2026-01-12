@@ -92,6 +92,19 @@ export default class PaddleModel {
   }
 
   /**
+   * Met à jour la largeur du paddle
+   * @param {number} width - Nouvelle largeur
+   */
+  setWidth(width) {
+    this.width = width;
+    // Recalculer les limites pour prendre en compte la nouvelle largeur
+    this.minX = PLAY_AREA.x + width / 2;
+    this.maxX = PLAY_AREA.x + PLAY_AREA.width - width / 2;
+    // S'assurer que la position actuelle est valide
+    this.x = Math.max(this.minX, Math.min(this.maxX, this.x));
+  }
+
+  /**
    * Retourne les limites du paddle pour les collisions
    * @returns {Object} Bounds du paddle
    */

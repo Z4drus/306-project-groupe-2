@@ -17,9 +17,16 @@ export default class CollisionController {
     this.paddleController = paddleController;
     this.brickViewManager = brickViewManager;
 
+    // Balles supplémentaires (multi-ball)
+    this.extraBallControllers = [];
+
     // Callbacks
     this.onBrickHit = null;
     this.onPaddleHit = null;
+    this.onBrickDestroyed = null;
+
+    // Mode destructeur (one-hit kill)
+    this.destroyerMode = false;
   }
 
   /**
@@ -101,21 +108,35 @@ export default class CollisionController {
 
     if (!brickModel || brickModel.isDestroyed) return;
 
-    // Laisser Phaser gérer le rebond naturellement (bounce: 1 sur la balle)
-    // On ne fait que jouer l'effet visuel
-    this.ballController.view.playBounceEffect();
+    // Trouver le bon contrôleur de balle pour les effets visuels
+    const ballController = this.findBallController(ballSprite);
+    if (ballController) {
+      ballController.view.playBounceEffect();
+      ballController.view.syncFromPhysics();
+    }
 
-    // Synchroniser le modèle avec la physique Phaser
-    this.ballController.view.syncFromPhysics();
-
-    // Infliger des dégâts à la brique
-    const result = brickModel.hit();
+    // Mode destructeur : détruit en un coup (sauf indestructibles)
+    let result;
+    if (this.destroyerMode && !brickModel.isIndestructible) {
+      // Forcer la destruction
+      while (!brickModel.isDestroyed) {
+        result = brickModel.hit();
+      }
+    } else {
+      // Infliger des dégâts normaux
+      result = brickModel.hit();
+    }
 
     if (result.destroyed) {
       // Brique détruite
       brickView.playDestroyEffect(() => {
         // La brique est retirée automatiquement du groupe
       });
+
+      // Callback de destruction (pour spawn power-up)
+      if (this.onBrickDestroyed) {
+        this.onBrickDestroyed(brickModel);
+      }
     } else if (result.hitsRemaining > 0) {
       // Brique endommagée mais pas détruite
       brickView.playHitEffect();
@@ -126,6 +147,25 @@ export default class CollisionController {
     if (this.onBrickHit) {
       this.onBrickHit(brickModel, result);
     }
+  }
+
+  /**
+   * Trouve le contrôleur de balle associé à un sprite
+   * @param {Phaser.Physics.Arcade.Sprite} ballSprite
+   * @returns {BallController|null}
+   */
+  findBallController(ballSprite) {
+    // Vérifier la balle principale
+    if (this.ballController.getSprite() === ballSprite) {
+      return this.ballController;
+    }
+    // Vérifier les balles supplémentaires
+    for (const controller of this.extraBallControllers) {
+      if (controller.getSprite() === ballSprite) {
+        return controller;
+      }
+    }
+    return this.ballController; // Fallback
   }
 
   /**
@@ -170,16 +210,98 @@ export default class CollisionController {
   }
 
   /**
+   * Définit le callback de destruction de brique
+   * @param {Function} callback - callback(brickModel)
+   */
+  setBrickDestroyedCallback(callback) {
+    this.onBrickDestroyed = callback;
+  }
+
+  /**
+   * Active/désactive le mode destructeur
+   * @param {boolean} enabled
+   */
+  setDestroyerMode(enabled) {
+    this.destroyerMode = enabled;
+  }
+
+  /**
+   * Ajoute une balle supplémentaire pour les collisions
+   * @param {BallController} ballController
+   */
+  addExtraBall(ballController) {
+    this.extraBallControllers.push(ballController);
+
+    // Configurer les collisions pour cette balle
+    const ballSprite = ballController.getSprite();
+    const paddleSprite = this.paddleController.getSprite();
+    const brickGroup = this.brickViewManager.getGroup();
+
+    if (ballSprite && paddleSprite) {
+      this.scene.physics.add.collider(
+        ballSprite,
+        paddleSprite,
+        this.handlePaddleCollision,
+        null,
+        this
+      );
+    }
+
+    if (ballSprite && brickGroup) {
+      this.scene.physics.add.collider(
+        ballSprite,
+        brickGroup,
+        this.handleBrickCollision,
+        null,
+        this
+      );
+    }
+  }
+
+  /**
+   * Retire une balle supplémentaire
+   * @param {BallController} ballController
+   */
+  removeExtraBall(ballController) {
+    const index = this.extraBallControllers.indexOf(ballController);
+    if (index !== -1) {
+      this.extraBallControllers.splice(index, 1);
+    }
+  }
+
+  /**
+   * Vide la liste des balles supplémentaires
+   */
+  clearExtraBalls() {
+    this.extraBallControllers = [];
+  }
+
+  /**
    * Reconfigure les collisions (après changement de niveau)
    */
   reconfigure() {
     this.setupBrickCollisions();
+    // Reconfigurer aussi les balles supplémentaires
+    this.extraBallControllers.forEach(controller => {
+      const ballSprite = controller.getSprite();
+      const brickGroup = this.brickViewManager.getGroup();
+      if (ballSprite && brickGroup) {
+        this.scene.physics.add.collider(
+          ballSprite,
+          brickGroup,
+          this.handleBrickCollision,
+          null,
+          this
+        );
+      }
+    });
   }
 
   /**
    * Détruit le contrôleur
    */
   destroy() {
+    this.extraBallControllers = [];
     // Les colliders sont automatiquement nettoyés avec la scène
   }
 }

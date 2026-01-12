@@ -29,6 +29,11 @@ export default class HUDView {
     // Zone de jeu
     this.playAreaBorder = null;
     this.playAreaBackground = null;
+
+    // Power-ups
+    this.powerUpMessage = null;
+    this.activeEffectsContainer = null;
+    this.effectsTexts = [];
   }
 
   /**
@@ -47,6 +52,8 @@ export default class HUDView {
     this.createLevelDisplay();
     this.createLivesDisplay();
     this.createMessageArea();
+    this.createPowerUpDisplay();
+    this.createActiveEffectsDisplay();
   }
 
   /**
@@ -374,6 +381,134 @@ export default class HUDView {
   }
 
   /**
+   * Crée la zone d'affichage des power-ups collectés
+   */
+  createPowerUpDisplay() {
+    const centerX = PLAY_AREA.x + PLAY_AREA.width / 2;
+    const topY = PLAY_AREA.y + 30;
+
+    this.powerUpMessage = this.scene.add.text(centerX, topY, '', {
+      fontSize: '18px',
+      fontFamily: 'Arial Black, Arial',
+      fill: '#00ff88',
+      stroke: '#000000',
+      strokeThickness: 3,
+      align: 'center'
+    });
+    this.powerUpMessage.setOrigin(0.5);
+    this.powerUpMessage.setDepth(90);
+    this.powerUpMessage.setVisible(false);
+  }
+
+  /**
+   * Crée la zone d'affichage des effets actifs
+   */
+  createActiveEffectsDisplay() {
+    // Position en bas à gauche de la zone de jeu
+    this.activeEffectsContainer = this.scene.add.container(
+      PLAY_AREA.x + 10,
+      PLAY_AREA.y + PLAY_AREA.height - 10
+    );
+    this.activeEffectsContainer.setDepth(80);
+  }
+
+  /**
+   * Affiche un message de power-up collecté
+   * @param {string} name - Nom du power-up
+   */
+  showPowerUpMessage(name) {
+    if (!this.powerUpMessage) return;
+
+    this.powerUpMessage.setText(`${name}!`);
+    this.powerUpMessage.setVisible(true);
+    this.powerUpMessage.alpha = 1;
+    this.powerUpMessage.y = PLAY_AREA.y + 30;
+
+    // Animation de montée et disparition
+    this.scene.tweens.add({
+      targets: this.powerUpMessage,
+      y: PLAY_AREA.y + 10,
+      alpha: 0,
+      duration: 1500,
+      ease: 'Power2',
+      onComplete: () => {
+        if (this.powerUpMessage) {
+          this.powerUpMessage.setVisible(false);
+        }
+      }
+    });
+  }
+
+  /**
+   * Met à jour l'affichage des effets actifs
+   * @param {Array<Object>} effects - Liste des effets actifs
+   */
+  updateActiveEffects(effects) {
+    if (!this.activeEffectsContainer) return;
+
+    // Supprimer les anciens textes
+    this.effectsTexts.forEach(text => text.destroy());
+    this.effectsTexts = [];
+
+    // Afficher les effets actifs
+    effects.forEach((effect, index) => {
+      let label = this.getEffectLabel(effect.id);
+      let timeLeft = '';
+
+      if (effect.remainingTime > 0) {
+        const seconds = Math.ceil(effect.remainingTime / 1000);
+        timeLeft = ` (${seconds}s)`;
+      }
+
+      const text = this.scene.add.text(0, -index * 18, `${label}${timeLeft}`, {
+        fontSize: '12px',
+        fontFamily: 'Arial',
+        fill: this.getEffectColor(effect.id),
+        stroke: '#000000',
+        strokeThickness: 2
+      });
+      text.setOrigin(0, 1);
+
+      this.activeEffectsContainer.add(text);
+      this.effectsTexts.push(text);
+    });
+  }
+
+  /**
+   * Retourne le label d'un effet
+   * @param {string} effectId
+   * @returns {string}
+   */
+  getEffectLabel(effectId) {
+    const labels = {
+      'ball_speed': 'Vitesse',
+      'paddle_size': 'Paddle',
+      'destroyer': 'Destructeur',
+      'laser': 'Laser',
+      'magnet': 'Aimant',
+      'score_multiplier': 'Score x2'
+    };
+    return labels[effectId] || effectId;
+  }
+
+  /**
+   * Retourne la couleur d'un effet
+   * @param {string} effectId
+   * @returns {string}
+   */
+  getEffectColor(effectId) {
+    const colors = {
+      'ball_speed': '#ff4444',
+      'paddle_size': '#00ffaa',
+      'destroyer': '#ffaa00',
+      'laser': '#ff0066',
+      'magnet': '#9966ff',
+      'score_multiplier': '#ffd700'
+    };
+    return colors[effectId] || '#ffffff';
+  }
+
+  /**
    * Détruit tous les éléments du HUD
    */
   destroy() {
@@ -388,7 +523,10 @@ export default class HUDView {
       this.subMessageText,
       this.playAreaBorder,
       this.playAreaBackground,
-      ...this.livesIcons
+      this.powerUpMessage,
+      this.activeEffectsContainer,
+      ...this.livesIcons,
+      ...this.effectsTexts
     ];
 
     elements.forEach(el => {
@@ -396,5 +534,6 @@ export default class HUDView {
     });
 
     this.livesIcons = [];
+    this.effectsTexts = [];
   }
 }

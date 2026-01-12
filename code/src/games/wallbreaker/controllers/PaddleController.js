@@ -73,6 +73,15 @@ export default class PaddleController {
   }
 
   /**
+   * Met à jour la largeur du paddle
+   * @param {number} width
+   */
+  setWidth(width) {
+    this.model.setWidth(width);
+    this.view.setWidth(width);
+  }
+
+  /**
    * Retourne le sprite du paddle pour les collisions
    * @returns {Phaser.Physics.Arcade.Sprite}
    */
