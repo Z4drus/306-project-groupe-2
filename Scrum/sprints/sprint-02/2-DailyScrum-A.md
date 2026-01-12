@@ -1,4 +1,4 @@
-# SCRUM : Daily scrum du mardi matin 09 decembre 2025 | Scrum Master: Axelle
+# SCRUM : Daily scrum du mardi matin 05 janvier 2026 | Scrum Master: Axelle
 
 ATTENTION : c'est **le lecteur qui doit comprendre** ce qui a été fait et par qui. Donnez donc suffisamment de substance ici pour cela. Rien de plus.
 
