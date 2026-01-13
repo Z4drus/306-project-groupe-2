@@ -1196,6 +1196,9 @@ J’ai trouvé ce module très intéressant, car le fait de devoir réaliser un 
 J’ai bien aimé travaillé en tant que product owner dans ce projet, j’ai découvert des choses que je ne connaissais pas sur la gestion de projet, une façon de travailler un peu différente de juste programmer, mais là je faisais beaucoup de travaux de gestion et coordination ainsi que de validation de la qualité du travail fait par mes collègues. Je ne me suis pas techniquement beaucoup amélioré mais j’ai appris d’autre chose donc je suis content et cela m’a bien plu.
 
 ## 7.5 Conclusion du module de Axelle
+J’ai bien aimé ce module, car il m’a permis de découvrir une autre manière de travailler sur un projet. J’ai particulièrement bien aimé mon rôle de Scrum Master, car j’ai pu participer à l’organisation du travail, au suivi des tâches et à la communication au sein du groupe.
+J’ai bien aimé animer les réunions Scrum et aider le groupe à avancer de manière structurée. Ce rôle m’a permis de mieux comprendre l’importance de l’organisation et du travail d’équipe dans un projet. J’ai aussi bien aimé travailler avec la méthode Scrum, car elle rend le projet plus clair et mieux organisé.
+Ce module m’a permis d’apprendre de nouvelles choses et de gagner en confiance, et j’ai bien aimé cette expérience de travail en groupe.
 
 ## 7.6 Conclusion du module de Noé
 
