@@ -281,7 +281,6 @@ subgraph Borne[ArcadiaBox - Borne locale Raspberry Pi]
   Browser[Navigateur en plein écran kiosk]
   LocalServer[Serveur web local Node.js]
   App[Application web ArcadiaBox<br/>menu + mini-jeux]
-  LocalScores[Stockage local des scores<br/>fichier / petite base]
 end
 
 %% ==== SERVEUR EXTERNE ====
@@ -302,7 +301,6 @@ Keyboard --> Browser
 %% Sur la borne
 Browser --> LocalServer
 LocalServer --> App
-App --> LocalScores
 
 %% Scores en ligne
 App -->|Envoi score + pseudo + token| API
