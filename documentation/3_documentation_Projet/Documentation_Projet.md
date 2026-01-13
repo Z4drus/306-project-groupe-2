@@ -1,8 +1,8 @@
 | **Informaticien/-ne CFC**
 
-| Travail pratique individuel 2025 (TPI) |  |
-| -------------------------------------- | - |
-|                                        |  |
+| Travail pratique individuel 2025 (TPI) |     |
+| -------------------------------------- | --- |
+|                                        |     |
 
 **Modèle de rapport v1.4**
 
@@ -234,14 +234,14 @@ Bien que le projet n’ait pas un objectif commercial dans le cadre du module, l
 
 ## 2.4 Analyse de risque
 
-| **ID** | **Risque**                           | **Probabilité** | **Impact** | **Criticité** | **Plan d’atténuation**                             |
-| ------------ | ------------------------------------------ | ---------------------- | ---------------- | -------------------- | ---------------------------------------------------------- |
-| **R1** | Retard dans la livraison du prototype      | Moyenne                | Élevé          | Élevée             | Priorisation stricte des fonctionnalités essentielles     |
-| **R2** | Absence d’un membre clé                  | Faible                 | Moyen            | Moyenne              | Documentation continue et partage des connaissances        |
-| **R3** | Problème de performance sur Raspberry Pi  | Moyenne                | Élevé          | Élevée             | Tests fréquents et optimisation Canvas/jeux               |
-| **R4** | Mauvaise compréhension des besoins client | Moyenne                | Élevé          | Élevée             | Réunions régulières et validations intermédiaires      |
-| **R5** | Problèmes réseau ou dépendance Internet | Moyenne                | Moyen            | Moyenne              | Mode dégradé et gestion des erreurs réseau              |
-| **R6** | Perte ou falsification des scores          | Faible                 | Élevé          | Moyenne              | Vérification côté serveur, token et stockage sécurisé |
+| **ID** | **Risque**                                | **Probabilité** | **Impact** | **Criticité** | **Plan d’atténuation**                                |
+| ------ | ----------------------------------------- | --------------- | ---------- | ------------- | ----------------------------------------------------- |
+| **R1** | Retard dans la livraison du prototype     | Moyenne         | Élevé      | Élevée        | Priorisation stricte des fonctionnalités essentielles |
+| **R2** | Absence d’un membre clé                   | Faible          | Moyen      | Moyenne       | Documentation continue et partage des connaissances   |
+| **R3** | Problème de performance sur Raspberry Pi  | Moyenne         | Élevé      | Élevée        | Tests fréquents et optimisation Canvas/jeux           |
+| **R4** | Mauvaise compréhension des besoins client | Moyenne         | Élevé      | Élevée        | Réunions régulières et validations intermédiaires     |
+| **R5** | Problèmes réseau ou dépendance Internet   | Moyenne         | Moyen      | Moyenne       | Mode dégradé et gestion des erreurs réseau            |
+| **R6** | Perte ou falsification des scores         | Faible          | Élevé      | Moyenne       | Vérification côté serveur, token et stockage sécurisé |
 
 # 3 Analyse
 
@@ -281,7 +281,6 @@ subgraph Borne[ArcadiaBox - Borne locale Raspberry Pi]
   Browser[Navigateur en plein écran kiosk]
   LocalServer[Serveur web local Node.js]
   App[Application web ArcadiaBox<br/>menu + mini-jeux]
-  LocalScores[Stockage local des scores<br/>fichier / petite base]
 end
 
 %% ==== SERVEUR EXTERNE ====
@@ -302,7 +301,6 @@ Keyboard --> Browser
 %% Sur la borne
 Browser --> LocalServer
 LocalServer --> App
-App --> LocalScores
 
 %% Scores en ligne
 App -->|Envoi score + pseudo + token| API
@@ -351,29 +349,29 @@ erDiagram
 
 ### 4.6.1 Protocole de tests
 
-| N° | Objectif (US)                                                                | Méthode                                                                           | Résultat attendu                                                                                                                       | Résultat obtenu | État | Commentaires / conclusion |
-| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----- | ------------------------- |
-| 1   | US03 – Accéder à ArcadiaBox via navigateur                                | Ouvrir Chromium sur le Raspberry Pi ([http://localhost:3000](http://localhost:3000/)) | La page d’accueil du menu arcade s’affiche correctement, tous les éléments visibles (logo, liste des mini-jeux, boutons)            |                  |       |                           |
-| 2   | US09 / US12 – Lancer l’application en plein écran et interface responsive | Démarrer le Raspberry Pi                                                          | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions (PC, tablette, RPi) |                  |       |                           |
-| 3   | US02 / US04 – Naviguer dans le menu au clavier                              | Utiliser les flèches haut/bas pour naviguer, Entrée pour valider                 | Navigation fluide dans le menu, sélection possible de chaque mini-jeu                                                                  |                  |       |                           |
-| 4   | US01 / US04 – Naviguer dans le menu avec manette Xbox                       | Brancher la manette et naviguer avec sticks et boutons                             | Les actions de la manette sont reconnues correctement, toutes les touches mappées fonctionnent pour naviguer et sélectionner          |                  |       |                           |
-| 5   | US05 / US11 – Lancer Mini-jeu 1                                             | Depuis le menu, sélectionner Mini-jeu 1 et valider                                | Le jeu démarre immédiatement, tous les assets (images, sons, scripts) sont chargés correctement                                      |                  |       |                           |
-| 6   | US06 – Jouer à Mini-jeu 1                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     |                  |       |                           |
-| 7   | US07 / US10 – Sauvegarder score Mini-jeu 1                                  | Finir une partie                                                                   | Le score est enregistré automatiquement dans le fichier JSON ou base de données                                                       |                  |       |                           |
-| 8   | US05 / US11 – Lancer Mini-jeu 2                                             | Depuis le menu, sélectionner Mini-jeu 2 et valider                                | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                              |                  |       |                           |
-| 9   | US06 – Jouer à Mini-jeu 2                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     |                  |       |                           |
-| 10  | US07 / US10 – Sauvegarder score Mini-jeu 2                                  | Finir une partie                                                                   | Le score est enregistré automatiquement                                                                                                |                  |       |                           |
-| 11  | US05 / US11 – Lancer Mini-jeu 3                                             | Depuis le menu, sélectionner Mini-jeu 3 et valider                                | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                              |                  |       |                           |
-| 12  | US06 – Jouer à Mini-jeu 3                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     |                  |       |                           |
-| 13  | US07 / US10 – Sauvegarder score Mini-jeu 3                                  | Finir une partie                                                                   | Le score est enregistré automatiquement                                                                                                |                  |       |                           |
-| 14  | US08 / US10 – Afficher le tableau des scores                                | Accéder à la page “Scores” depuis le menu                                      | Les scores de Mini-jeu 1, 2 et 3 s’affichent correctement, triés et horodatés                                                        |                  |       |                           |
-| 15  | US09 / US10 – Redémarrage du Raspberry                                     | Redémarrer le Raspberry Pi                                                        | L’application redémarre automatiquement, les scores précédents de tous les mini-jeux sont conservés                                |                  |       |                           |
-| 16  | US03 / US12 – Comportement sans réseau                                     | Débrancher Internet, naviguer et lancer les mini-jeux                             | L’application reste utilisable, les mini-jeux fonctionnent localement, interface responsive intacte                                    |                  |       |                           |
-| 17  | US01 / US02 – Test multi-input                                              | Basculer entre clavier et manette pendant un mini-jeu                              | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                     |                  |       |                           |
-| 18  | US12 – Test sur différents appareils                                       | Tester ArcadiaBox sur PC, tablette et RPi                                          | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                   |                  |       |                           |
-| 19  | US03 / US09 / US11 – Test stabilité serveur                                | Accéder à l’application plusieurs fois de suite                                 | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                                    |                  |       |                           |
-| 20  | Feature ajouté en plus                                                      | L’utilisateur peut configurer son avatar à la création du compte                | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                  |                  |       |                           |
-| 21  | Feature ajouté en plus                                                      | L’utilisateur peut modifier son avatar après la création du profil              | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                                |                  |       |                           |
+| N°  | Objectif (US)                                                             | Méthode                                                                               | Résultat attendu                                                                                                                  | Résultat obtenu | État | Commentaires / conclusion |
+| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---- | ------------------------- |
+| 1   | US03 – Accéder à ArcadiaBox via navigateur                                | Ouvrir Chromium sur le Raspberry Pi ([http://localhost:3000](http://localhost:3000/)) | La page d’accueil du menu arcade s’affiche correctement, tous les éléments visibles (logo, liste des mini-jeux, boutons)          |                 |      |                           |
+| 2   | US09 / US12 – Lancer l’application en plein écran et interface responsive | Démarrer le Raspberry Pi                                                              | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions (PC, tablette, RPi) |                 |      |                           |
+| 3   | US02 / US04 – Naviguer dans le menu au clavier                            | Utiliser les flèches haut/bas pour naviguer, Entrée pour valider                      | Navigation fluide dans le menu, sélection possible de chaque mini-jeu                                                             |                 |      |                           |
+| 4   | US01 / US04 – Naviguer dans le menu avec manette Xbox                     | Brancher la manette et naviguer avec sticks et boutons                                | Les actions de la manette sont reconnues correctement, toutes les touches mappées fonctionnent pour naviguer et sélectionner      |                 |      |                           |
+| 5   | US05 / US11 – Lancer Mini-jeu 1                                           | Depuis le menu, sélectionner Mini-jeu 1 et valider                                    | Le jeu démarre immédiatement, tous les assets (images, sons, scripts) sont chargés correctement                                   |                 |      |                           |
+| 6   | US06 – Jouer à Mini-jeu 1                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               |                 |      |                           |
+| 7   | US07 / US10 – Sauvegarder score Mini-jeu 1                                | Finir une partie                                                                      | Le score est enregistré automatiquement dans le fichier JSON ou base de données                                                   |                 |      |                           |
+| 8   | US05 / US11 – Lancer Mini-jeu 2                                           | Depuis le menu, sélectionner Mini-jeu 2 et valider                                    | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                           |                 |      |                           |
+| 9   | US06 – Jouer à Mini-jeu 2                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               |                 |      |                           |
+| 10  | US07 / US10 – Sauvegarder score Mini-jeu 2                                | Finir une partie                                                                      | Le score est enregistré automatiquement                                                                                           |                 |      |                           |
+| 11  | US05 / US11 – Lancer Mini-jeu 3                                           | Depuis le menu, sélectionner Mini-jeu 3 et valider                                    | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                           |                 |      |                           |
+| 12  | US06 – Jouer à Mini-jeu 3                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               |                 |      |                           |
+| 13  | US07 / US10 – Sauvegarder score Mini-jeu 3                                | Finir une partie                                                                      | Le score est enregistré automatiquement                                                                                           |                 |      |                           |
+| 14  | US08 / US10 – Afficher le tableau des scores                              | Accéder à la page “Scores” depuis le menu                                             | Les scores de Mini-jeu 1, 2 et 3 s’affichent correctement, triés et horodatés                                                     |                 |      |                           |
+| 15  | US09 / US10 – Redémarrage du Raspberry                                    | Redémarrer le Raspberry Pi                                                            | L’application redémarre automatiquement, les scores précédents de tous les mini-jeux sont conservés                               |                 |      |                           |
+| 16  | US03 / US12 – Comportement sans réseau                                    | Débrancher Internet, naviguer et lancer les mini-jeux                                 | L’application reste utilisable, les mini-jeux fonctionnent localement, interface responsive intacte                               |                 |      |                           |
+| 17  | US01 / US02 – Test multi-input                                            | Basculer entre clavier et manette pendant un mini-jeu                                 | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                  |                 |      |                           |
+| 18  | US12 – Test sur différents appareils                                      | Tester ArcadiaBox sur PC, tablette et RPi                                             | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                 |                 |      |                           |
+| 19  | US03 / US09 / US11 – Test stabilité serveur                               | Accéder à l’application plusieurs fois de suite                                       | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                               |                 |      |                           |
+| 20  | Feature ajouté en plus                                                    | L’utilisateur peut configurer son avatar à la création du compte                      | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                |                 |      |                           |
+| 21  | Feature ajouté en plus                                                    | L’utilisateur peut modifier son avatar après la création du profil                    | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                             |                 |      |                           |
 
 # 5 Réalisation
 
@@ -381,14 +379,14 @@ erDiagram
 
 ### Stack technique retenue
 
-| Composant        | Technologie       | Version | Justification                                                |
-| ---------------- | ----------------- | ------- | ------------------------------------------------------------ |
+| Composant        | Technologie       | Version | Justification                                              |
+| ---------------- | ----------------- | ------- | ---------------------------------------------------------- |
 | Build & Dev      | Vite              | 7.2.7   | Build rapide, HMR instantané, optimisé pour le dev moderne |
 | UI Framework     | Alpine.js         | 3.15.2  | Ultra-léger (~15kb), réactif, parfait pour Raspberry Pi    |
-| Moteur de jeux   | Phaser            | 3.90.0  | Standard 2D web, excellente performance Canvas/WebGL         |
-| Backend          | Express           | 5.2.1   | Framework minimaliste, performant, grande communauté        |
-| ORM              | Prisma            | 7.1.0   | Typage fort, migrations simples, client généré            |
-| Base de données | PostgreSQL (Neon) | -       | Fiabilité, scalabilité, hébergement cloud managé         |
+| Moteur de jeux   | Phaser            | 3.90.0  | Standard 2D web, excellente performance Canvas/WebGL       |
+| Backend          | Express           | 5.2.1   | Framework minimaliste, performant, grande communauté       |
+| ORM              | Prisma            | 7.1.0   | Typage fort, migrations simples, client généré             |
+| Base de données  | PostgreSQL (Neon) | -       | Fiabilité, scalabilité, hébergement cloud managé           |
 | Authentification | JWT + bcryptjs    | -       | Stateless, sécurisé, pas de session serveur                |
 
 ### Pourquoi Alpine.js plutôt que React/Vue ?
@@ -477,23 +475,23 @@ L'application est une **Single Page Application (SPA)** structurée autour d'Alp
 
 ```javascript
 // src/main.js - Initialisation de l'application
-import Alpine from 'alpinejs';
-import { createArcadeStore } from './core/ArcadeStore.js';
-import { createArcadeMenuComponent } from './core/ArcadeMenu.js';
-import cursorManager from './core/CursorManager.js';
+import Alpine from "alpinejs";
+import { createArcadeStore } from "./core/ArcadeStore.js";
+import { createArcadeMenuComponent } from "./core/ArcadeMenu.js";
+import cursorManager from "./core/CursorManager.js";
 
 function initializeApp() {
   // Enregistrer le store global
-  Alpine.store('arcade', createArcadeStore());
+  Alpine.store("arcade", createArcadeStore());
 
   // Enregistrer le composant menu
-  Alpine.data('arcadeMenu', createArcadeMenuComponent);
+  Alpine.data("arcadeMenu", createArcadeMenuComponent);
 
   // Démarrer Alpine.js
   Alpine.start();
 
   // Initialiser le store et le curseur custom
-  Alpine.store('arcade').init();
+  Alpine.store("arcade").init();
   cursorManager.init();
 }
 ```
@@ -507,7 +505,7 @@ Le **store Alpine.js** centralise l'intégralité de l'état applicatif :
 export function createArcadeStore() {
   return {
     // État de la vue
-    currentView: 'menu', // 'menu' | 'game' | 'scores' | 'help' | 'auth' | 'account'
+    currentView: "menu", // 'menu' | 'game' | 'scores' | 'help' | 'auth' | 'account'
     currentGame: null,
 
     // État du jeu en cours
@@ -526,9 +524,15 @@ export function createArcadeStore() {
     attractMode: false,
 
     // Méthodes principales
-    async startGame(gameName) { /* ... */ },
-    async handleGameOver(gameName, score) { /* ... */ },
-    async showScores() { /* ... */ },
+    async startGame(gameName) {
+      /* ... */
+    },
+    async handleGameOver(gameName, score) {
+      /* ... */
+    },
+    async showScores() {
+      /* ... */
+    },
     // ...
   };
 }
@@ -547,7 +551,14 @@ Les mini-jeux sont chargés à la demande via le **GameLoader**, évitant de cha
 
 ```javascript
 // src/core/GameLoader.js - Chargement dynamique
-export async function loadGame(gameName, container, onGameOver, onScoreUpdate, bestScore, username) {
+export async function loadGame(
+  gameName,
+  container,
+  onGameOver,
+  onScoreUpdate,
+  bestScore,
+  username
+) {
   const gameModule = await import(`../games/${gameName}/index.js`);
 
   return gameModule.default(
@@ -630,19 +641,19 @@ app.use((req, res) => {
 
 ### API REST
 
-| Endpoint                      | Méthode | Description                 | Auth requise |
-| ----------------------------- | -------- | --------------------------- | ------------ |
-| `/api/auth/register`        | POST     | Inscription avec avatar     | Non          |
-| `/api/auth/login`           | POST     | Connexion, retourne JWT     | Non          |
-| `/api/auth/me`              | GET      | Profil utilisateur courant  | Oui          |
-| `/api/auth/profile/:id`     | GET      | Profil public d'un joueur   | Non          |
-| `/api/auth/profile-picture` | PUT      | Modifier son avatar         | Oui          |
-| `/api/scores`               | GET      | Top scores par jeu          | Non          |
-| `/api/scores`               | POST     | Soumettre un score          | Oui          |
-| `/api/scores/leaderboard`   | GET      | Classement global           | Non          |
-| `/api/scores/:gameId`       | GET      | Scores d'un jeu spécifique | Non          |
-| `/api/scores/user/me`       | GET      | Scores du joueur connecté  | Oui          |
-| `/api/health`               | GET      | État du serveur            | Non          |
+| Endpoint                    | Méthode | Description                | Auth requise |
+| --------------------------- | ------- | -------------------------- | ------------ |
+| `/api/auth/register`        | POST    | Inscription avec avatar    | Non          |
+| `/api/auth/login`           | POST    | Connexion, retourne JWT    | Non          |
+| `/api/auth/me`              | GET     | Profil utilisateur courant | Oui          |
+| `/api/auth/profile/:id`     | GET     | Profil public d'un joueur  | Non          |
+| `/api/auth/profile-picture` | PUT     | Modifier son avatar        | Oui          |
+| `/api/scores`               | GET     | Top scores par jeu         | Non          |
+| `/api/scores`               | POST    | Soumettre un score         | Oui          |
+| `/api/scores/leaderboard`   | GET     | Classement global          | Non          |
+| `/api/scores/:gameId`       | GET     | Scores d'un jeu spécifique | Non          |
+| `/api/scores/user/me`       | GET     | Scores du joueur connecté  | Oui          |
+| `/api/health`               | GET     | État du serveur            | Non          |
 
 ## 5.4 Base de données – Neon (PostgreSQL)
 
@@ -700,10 +711,10 @@ Les **index composites** `@@index([jeu, valeur(sort: Desc)])` permettent des req
 ```javascript
 // Requête typique de classement (scores.js)
 const topScores = await prisma.score.findMany({
-  where: { jeu: 'PACMAN' },
-  orderBy: { valeur: 'desc' },
+  where: { jeu: "PACMAN" },
+  orderBy: { valeur: "desc" },
   take: 10,
-  include: { joueur: { select: { pseudo: true, photo_profil: true } } }
+  include: { joueur: { select: { pseudo: true, photo_profil: true } } },
 });
 ```
 
@@ -713,9 +724,9 @@ Le client Prisma est initialisé avec l'adaptateur `pg` pour la connexion TLS ve
 
 ```javascript
 // server/prisma.js
-import pg from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from './generated/prisma/index.js';
+import pg from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "./generated/prisma/index.js";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -738,29 +749,29 @@ export default defineConfig({
     port: 3000,
     host: true, // Accès réseau local
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+      "/api": {
+        target: "http://localhost:8080",
         changeOrigin: true,
       },
     },
   },
 
   build: {
-    outDir: 'dist',
-    minify: 'terser',
+    outDir: "dist",
+    minify: "terser",
     rollupOptions: {
       output: {
         // Chunking pour meilleur cache
         manualChunks: {
-          'phaser': ['phaser'],
-          'alpine': ['alpinejs'],
+          phaser: ["phaser"],
+          alpine: ["alpinejs"],
         },
       },
     },
   },
 
   optimizeDeps: {
-    include: ['phaser', 'alpinejs'],
+    include: ["phaser", "alpinejs"],
   },
 });
 ```
@@ -769,17 +780,17 @@ Le **chunking manuel** sépare Phaser (~1.2MB) et Alpine.js dans des fichiers di
 
 ## 5.6 Scripts d'automatisation
 
-| Script          | Commande                | Description                                           |
-| --------------- | ----------------------- | ----------------------------------------------------- |
+| Script        | Commande              | Description                                         |
+| ------------- | --------------------- | --------------------------------------------------- |
 | `setup`       | `npm run setup`       | Installation complète (deps, Prisma, vérifications) |
-| `dev`         | `npm run dev`         | Serveur Vite seul (port 3000)                         |
-| `dev:full`    | `npm run dev:full`    | Vite + Express en parallèle                          |
-| `build`       | `npm run build`       | Build de production                                   |
-| `server`      | `npm run server`      | Serveur Express seul (port 8080)                      |
-| `start`       | `npm run start`       | Build puis serveur (production)                       |
+| `dev`         | `npm run dev`         | Serveur Vite seul (port 3000)                       |
+| `dev:full`    | `npm run dev:full`    | Vite + Express en parallèle                         |
+| `build`       | `npm run build`       | Build de production                                 |
+| `server`      | `npm run server`      | Serveur Express seul (port 8080)                    |
+| `start`       | `npm run start`       | Build puis serveur (production)                     |
 | `db:generate` | `npm run db:generate` | Génère le client Prisma                             |
-| `db:push`     | `npm run db:push`     | Synchronise le schéma vers la base                   |
-| `db:migrate`  | `npm run db:migrate`  | Crée une migration                                   |
+| `db:push`     | `npm run db:push`     | Synchronise le schéma vers la base                  |
+| `db:migrate`  | `npm run db:migrate`  | Crée une migration                                  |
 
 Le script `start-dev.js` orchestre le lancement simultané du frontend et du backend avec gestion propre de l'arrêt (SIGTERM/SIGINT).
 
@@ -1143,29 +1154,29 @@ Maintenant que la réalisation est terminée, il faut compléter le protocole de
 
 ## 6.2 Protocole de tests
 
-| N° | Objectif (US)                                                                | Méthode                                                                           | Résultat attendu                                                                                                                       | Date       | Résultat obtenu                                                                                                     | État | Commentaires / conclusion                                                                                                                              |
-| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | US03 – Accéder à ArcadiaBox via navigateur                                | Ouvrir Chromium sur le Raspberry Pi ([http://localhost:3000](http://localhost:3000/)) | La page d’accueil du menu arcade s’affiche correctement, tous les éléments visibles (logo, liste des mini-jeux, boutons)            | 06.01.2026 | La page d’accueil se charge et est accessible correctement                                                          | ✅    | Aucun                                                                                                                                                  |
-| 2   | US09 / US12 – Lancer l’application en plein écran et interface responsive | Démarrer le Raspberry Pi                                                          | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions (PC, tablette, RPi) | 06.01.2026 | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions  | ✅    | L’arcade est surtout fait pour être utilisé avec un écran en mode portrait bien que cela soit responsive                                           |
-| 3   | US02 / US04 – Naviguer dans le menu au clavier                              | Utiliser les flèches haut/bas pour naviguer, Entrée pour valider                 | Navigation fluide dans le menu, sélection possible de chaque mini-jeu                                                                  | 06.01.2026 | Navigation fluide dans le menu de l’arcade                                                                          | ✅    | Aucun                                                                                                                                                  |
-| 4   | US01 / US04 – Naviguer dans le menu avec manette Xbox                       | Brancher la manette et naviguer avec sticks et boutons                             | Les actions de la manette sont reconnues correctement, toutes les touches mappées fonctionnent pour naviguer et sélectionner          | 06.01.2026 | Les actions de la manette sont reconnues correctement                                                                | ✅    | Aucun                                                                                                                                                  |
-| 5   | US05 / US11 – Lancer Mini-jeu 1                                             | Depuis le menu, sélectionner Mini-jeu 1 et valider                                | Le jeu démarre immédiatement, tous les assets (images, sons, scripts) sont chargés correctement                                      | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                  | ✅    | Aucun                                                                                                                                                  |
-| 6   | US06 – Jouer à Mini-jeu 1                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     | 05.01.2026 | Le jeu est fonctionnel, avec parfois de légers bugs sur les fantômes, mais cela n’empêche pas de jouer           | ☑️  | Oui, le jeu est fonctionnel, mais il pourrait être amélioré, notamment pour les mouvements des fantômes, ce qui est cependant complexe à corriger |
-| 7   | US07 / US10 – Sauvegarder score Mini-jeu 1                                  | Finir une partie                                                                   | Le score est enregistré automatiquement dans le fichier JSON ou base de données                                                       | 05.01.2026 | Le score est bien sauvegardé                                                                                        | ✅    | Aucun                                                                                                                                                  |
-| 8   | US05 / US11 – Lancer Mini-jeu 2                                             | Depuis le menu, sélectionner Mini-jeu 2 et valider                                | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                              | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                  | ✅    | Aucun                                                                                                                                                  |
-| 9   | US06 – Jouer à Mini-jeu 2                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                  | ✅    | Aucun                                                                                                                                                  |
-| 10  | US07 / US10 – Sauvegarder score Mini-jeu 2                                  | Finir une partie                                                                   | Le score est enregistré automatiquement                                                                                                | 05.01.2026 | Le score est enregistré automatiquement                                                                             | ✅    | Oui, les scores sont enregistrés automatiquement, mais seulement lorsqu’un utilisateur est connecté.                                                |
-| 11  | US05 / US11 – Lancer Mini-jeu 3                                             | Depuis le menu, sélectionner Mini-jeu 3 et valider                                | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                              | 06.01.2026 | Le jeu démarre immédiatementet les assets sont chargés correctement                                               | ✅    | Aucun                                                                                                                                                  |
-| 12  | US06 – Jouer à Mini-jeu 3                                                  | Jouer 2–3 minutes, tester mouvements et actions                                   | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                                     | 06.01.2026 | Jeu fluide et parfaitement jouable                                                                                   | ✅    | Aucun                                                                                                                                                  |
-| 13  | US07 / US10 – Sauvegarder score Mini-jeu 3                                  | Finir une partie                                                                   | Le score est enregistré automatiquement                                                                                                | 06.01.2026 | Le score est enregistré automatiquement                                                                             | ✅    | Aucun                                                                                                                                                  |
-| 14  | US08 / US10 – Afficher le tableau des scores                                | Accéder à la page “Scores” depuis le menu                                      | Les scores de Mini-jeu 1, 2 et 3 s’affichent correctement, triés et horodatés                                                        | 05.01.2026 | Les scores sont bien affichés et triés                                                                             | ☑️  | Les scores s’affichent, mais seulement s’il y a du réseau. Sur le réseau de l’État, cela ne fonctionne pas car les scores sont bloqués          |
-| 15  | US09 / US10 – Redémarrage du Raspberry                                     | Redémarrer le Raspberry Pi                                                        | L’application redémarre automatiquement, les scores précédents de tous les mini-jeux sont conservés                                | 06.01.2026 | L’application redémarre automatiquement et tout est conservé                                                      | ✅    | Aucun                                                                                                                                                  |
-| 16  | US03 / US12 – Comportement sans réseau                                     | Débrancher Internet, naviguer et lancer les mini-jeux                             | L’application reste utilisable, les mini-jeux fonctionnent localement, interface responsive intacte                                    | 06.01.2026 | L’application reste utilisable juste le score n’est pas enregistré et on ne peut pas afficher le tableau de score | ✅    | Juste sans les scores ducoup                                                                                                                           |
-| 17  | US01 / US02 – Test multi-input                                              | Basculer entre clavier et manette pendant un mini-jeu                              | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                     | 06.01.2026 | Les deux périphériques sont reconnus et utilisables                                                                | ✅    | Aucun                                                                                                                                                  |
-| 18  | US12 – Test sur différents appareils                                       | Tester ArcadiaBox sur PC, tablette et RPi                                          | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                   | 06.01.2026 | Interface et navigation adaptées à chaque device                                                                   | ✅    | Aucun                                                                                                                                                  |
-| 19  | US03 / US09 / US11 – Test stabilité serveur                                | Accéder à l’application plusieurs fois de suite                                 | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                                    | 06.01.2026 | Serveur stable                                                                                                       | ✅    | Aucun                                                                                                                                                  |
-| 20  | Feature ajouté en plus                                                      | L’utilisateur peut configurer son avatar à la création du compte                | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                  | 12.01.2026 | Ajout fluide, sans problème                                                                                         | ✅    | Aucun                                                                                                                                                  |
-| 21  | Feature ajouté en plus                                                      | L’utilisateur peut modifier son avatar après la création du profil              | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                                | 12.01.2026 | Modification fluide, aucun problème                                                                                 | ✅    | Aucun                                                                                                                                                  |
+| N°  | Objectif (US)                                                             | Méthode                                                                               | Résultat attendu                                                                                                                  | Date       | Résultat obtenu                                                                                                   | État | Commentaires / conclusion                                                                                                                         |
+| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | US03 – Accéder à ArcadiaBox via navigateur                                | Ouvrir Chromium sur le Raspberry Pi ([http://localhost:3000](http://localhost:3000/)) | La page d’accueil du menu arcade s’affiche correctement, tous les éléments visibles (logo, liste des mini-jeux, boutons)          | 06.01.2026 | La page d’accueil se charge et est accessible correctement                                                        | ✅   | Aucun                                                                                                                                             |
+| 2   | US09 / US12 – Lancer l’application en plein écran et interface responsive | Démarrer le Raspberry Pi                                                              | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions (PC, tablette, RPi) | 06.01.2026 | Chromium démarre automatiquement en plein écran et l’interface s’adapte correctement à toutes les résolutions     | ✅   | L’arcade est surtout fait pour être utilisé avec un écran en mode portrait bien que cela soit responsive                                          |
+| 3   | US02 / US04 – Naviguer dans le menu au clavier                            | Utiliser les flèches haut/bas pour naviguer, Entrée pour valider                      | Navigation fluide dans le menu, sélection possible de chaque mini-jeu                                                             | 06.01.2026 | Navigation fluide dans le menu de l’arcade                                                                        | ✅   | Aucun                                                                                                                                             |
+| 4   | US01 / US04 – Naviguer dans le menu avec manette Xbox                     | Brancher la manette et naviguer avec sticks et boutons                                | Les actions de la manette sont reconnues correctement, toutes les touches mappées fonctionnent pour naviguer et sélectionner      | 06.01.2026 | Les actions de la manette sont reconnues correctement                                                             | ✅   | Aucun                                                                                                                                             |
+| 5   | US05 / US11 – Lancer Mini-jeu 1                                           | Depuis le menu, sélectionner Mini-jeu 1 et valider                                    | Le jeu démarre immédiatement, tous les assets (images, sons, scripts) sont chargés correctement                                   | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                    | ✅   | Aucun                                                                                                                                             |
+| 6   | US06 – Jouer à Mini-jeu 1                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               | 05.01.2026 | Le jeu est fonctionnel, avec parfois de légers bugs sur les fantômes, mais cela n’empêche pas de jouer            | ☑️   | Oui, le jeu est fonctionnel, mais il pourrait être amélioré, notamment pour les mouvements des fantômes, ce qui est cependant complexe à corriger |
+| 7   | US07 / US10 – Sauvegarder score Mini-jeu 1                                | Finir une partie                                                                      | Le score est enregistré automatiquement dans le fichier JSON ou base de données                                                   | 05.01.2026 | Le score est bien sauvegardé                                                                                      | ✅   | Aucun                                                                                                                                             |
+| 8   | US05 / US11 – Lancer Mini-jeu 2                                           | Depuis le menu, sélectionner Mini-jeu 2 et valider                                    | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                           | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                    | ✅   | Aucun                                                                                                                                             |
+| 9   | US06 – Jouer à Mini-jeu 2                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               | 05.01.2026 | Le jeu démarre immédiatement et tous les éléments sont chargés                                                    | ✅   | Aucun                                                                                                                                             |
+| 10  | US07 / US10 – Sauvegarder score Mini-jeu 2                                | Finir une partie                                                                      | Le score est enregistré automatiquement                                                                                           | 05.01.2026 | Le score est enregistré automatiquement                                                                           | ✅   | Oui, les scores sont enregistrés automatiquement, mais seulement lorsqu’un utilisateur est connecté.                                              |
+| 11  | US05 / US11 – Lancer Mini-jeu 3                                           | Depuis le menu, sélectionner Mini-jeu 3 et valider                                    | Le jeu démarre immédiatement, tous les assets sont chargés correctement                                                           | 06.01.2026 | Le jeu démarre immédiatementet les assets sont chargés correctement                                               | ✅   | Aucun                                                                                                                                             |
+| 12  | US06 – Jouer à Mini-jeu 3                                                 | Jouer 2–3 minutes, tester mouvements et actions                                       | Jeu fluide, sans latence ni freeze, actions et collisions fonctionnent correctement                                               | 06.01.2026 | Jeu fluide et parfaitement jouable                                                                                | ✅   | Aucun                                                                                                                                             |
+| 13  | US07 / US10 – Sauvegarder score Mini-jeu 3                                | Finir une partie                                                                      | Le score est enregistré automatiquement                                                                                           | 06.01.2026 | Le score est enregistré automatiquement                                                                           | ✅   | Aucun                                                                                                                                             |
+| 14  | US08 / US10 – Afficher le tableau des scores                              | Accéder à la page “Scores” depuis le menu                                             | Les scores de Mini-jeu 1, 2 et 3 s’affichent correctement, triés et horodatés                                                     | 05.01.2026 | Les scores sont bien affichés et triés                                                                            | ☑️   | Les scores s’affichent, mais seulement s’il y a du réseau. Sur le réseau de l’État, cela ne fonctionne pas car les scores sont bloqués            |
+| 15  | US09 / US10 – Redémarrage du Raspberry                                    | Redémarrer le Raspberry Pi                                                            | L’application redémarre automatiquement, les scores précédents de tous les mini-jeux sont conservés                               | 06.01.2026 | L’application redémarre automatiquement et tout est conservé                                                      | ✅   | Aucun                                                                                                                                             |
+| 16  | US03 / US12 – Comportement sans réseau                                    | Débrancher Internet, naviguer et lancer les mini-jeux                                 | L’application reste utilisable, les mini-jeux fonctionnent localement, interface responsive intacte                               | 06.01.2026 | L’application reste utilisable juste le score n’est pas enregistré et on ne peut pas afficher le tableau de score | ✅   | Juste sans les scores ducoup                                                                                                                      |
+| 17  | US01 / US02 – Test multi-input                                            | Basculer entre clavier et manette pendant un mini-jeu                                 | Les deux périphériques sont reconnus, aucune interférence, actions correctement prises en compte                                  | 06.01.2026 | Les deux périphériques sont reconnus et utilisables                                                               | ✅   | Aucun                                                                                                                                             |
+| 18  | US12 – Test sur différents appareils                                      | Tester ArcadiaBox sur PC, tablette et RPi                                             | Interface et navigation adaptées à chaque device, tous les mini-jeux jouables, fluidité conservée                                 | 06.01.2026 | Interface et navigation adaptées à chaque device                                                                  | ✅   | Aucun                                                                                                                                             |
+| 19  | US03 / US09 / US11 – Test stabilité serveur                               | Accéder à l’application plusieurs fois de suite                                       | Serveur stable, assets correctement servis, pas d’erreurs ou crashs                                                               | 06.01.2026 | Serveur stable                                                                                                    | ✅   | Aucun                                                                                                                                             |
+| 20  | Feature ajouté en plus                                                    | L’utilisateur peut configurer son avatar à la création du compte                      | L’ajout de l’avatar fonctionne très bien, aucune erreur à signaler                                                                | 12.01.2026 | Ajout fluide, sans problème                                                                                       | ✅   | Aucun                                                                                                                                             |
+| 21  | Feature ajouté en plus                                                    | L’utilisateur peut modifier son avatar après la création du profil                    | La modification de l’avatar fonctionne très bien, le changement se fait facilement et de façon fluide                             | 12.01.2026 | Modification fluide, aucun problème                                                                               | ✅   | Aucun                                                                                                                                             |
 
 ## 6.2 Definition of Done
 
@@ -1186,6 +1197,7 @@ En s’appuyant sur ces critères, nous avons réussi à livrer une application 
 
 ## 7.2 Auto-évaluation
 
+Nous avons vraiment assuré sur ce qui est de la livrable finale pour notre client. Nous avons su gérer les priorités correctement tout au long du projet. La division des tâches était bien, chacun avait du travail quasiment tout le temps. Peut-être que nous aurions pu mieux faire le planning en mettant moins de temps par tâche et donc nous avions de l'avance dessus. Aussi, nous aurions pu prévoir des fonctionnalités supplémentaires dès le début dans le cas où nous avions du temps pour celles-ci. Mais globalement nous avons bien géré.
 
 ## 7.3 Conclusion du module de Diogo
 
@@ -1196,6 +1208,7 @@ J’ai trouvé ce module très intéressant, car le fait de devoir réaliser un 
 J’ai bien aimé travaillé en tant que product owner dans ce projet, j’ai découvert des choses que je ne connaissais pas sur la gestion de projet, une façon de travailler un peu différente de juste programmer, mais là je faisais beaucoup de travaux de gestion et coordination ainsi que de validation de la qualité du travail fait par mes collègues. Je ne me suis pas techniquement beaucoup amélioré mais j’ai appris d’autre chose donc je suis content et cela m’a bien plu.
 
 ## 7.5 Conclusion du module de Axelle
+
 J’ai bien aimé ce module, car il m’a permis de découvrir une autre manière de travailler sur un projet. J’ai particulièrement bien aimé mon rôle de Scrum Master, car j’ai pu participer à l’organisation du travail, au suivi des tâches et à la communication au sein du groupe.
 J’ai bien aimé animer les réunions Scrum et aider le groupe à avancer de manière structurée. Ce rôle m’a permis de mieux comprendre l’importance de l’organisation et du travail d’équipe dans un projet. J’ai aussi bien aimé travailler avec la méthode Scrum, car elle rend le projet plus clair et mieux organisé.
 Ce module m’a permis d’apprendre de nouvelles choses et de gagner en confiance, et j’ai bien aimé cette expérience de travail en groupe.
@@ -1208,14 +1221,14 @@ J'ai apprécié travailler sur ce projet que je trouvait être un mélange de cr
 
 # 9 Glossaire
 
-|  |  |
-| - | - |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
+|     |     |
+| --- | --- |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
+|     |     |
